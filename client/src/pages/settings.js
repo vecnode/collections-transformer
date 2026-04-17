@@ -116,29 +116,22 @@ const Settings = () => {
         <title>Settings - Collections Transformer</title>
       </Head>
       <main>
-        <div className="container">
+        <div className="container settings-shell">
           <h1>Settings</h1>
           <hr/>
           
-          <div style={{ border: '1px solid grey', borderRadius: '5px', padding: '10px', paddingLeft: '20px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 'bold' }}>LLM Provider:</span>
+          <div className="settings-row">
+            <span className="settings-label">LLM Provider:</span>
             <span>Ollama</span>
           </div>
 
-          <div style={{ border: '1px solid grey', borderRadius: '5px', padding: '10px', paddingLeft: '20px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 'bold' }}>Ollama Backend:</span>
+          <div className="settings-row">
+            <span className="settings-label">Ollama Backend:</span>
             <select
               value={ollamaBackend}
               onChange={(e) => setOllamaBackend(e.target.value)}
               disabled={loadingModels}
-              style={{
-                border: '1px solid grey',
-                borderRadius: '5px',
-                padding: '8px 12px',
-                minWidth: '200px',
-                fontSize: '1rem',
-                opacity: loadingModels ? 0.6 : 1
-              }}
+              className={`settings-input ${loadingModels ? 'is-disabled' : ''}`}
             >
               {loadingModels ? (
                 <option value="">Loading models...</option>
@@ -152,28 +145,16 @@ const Settings = () => {
             </select>
           </div>
 
-          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px' }}>
+          <div className="settings-actions">
             {saveMessage && (
-              <span style={{ color: saveMessage.includes('successfully') ? 'green' : 'red', fontSize: '0.9rem' }}>
+              <span className={`settings-message ${saveMessage.includes('successfully') ? 'is-success' : 'is-error'}`}>
                 {saveMessage}
               </span>
             )}
             <button
               onClick={handleSavePreferences}
               disabled={saving}
-              style={{
-                border: '1px solid grey',
-                borderRadius: '5px',
-                padding: '8px 20px',
-                fontSize: '1rem',
-                backgroundColor: saving ? '#f5f5f5' : 'transparent',
-                color: 'black',
-                cursor: saving ? 'not-allowed' : 'pointer',
-                transition: 'background-color 0.2s ease',
-                opacity: saving ? 0.6 : 1
-              }}
-              onMouseEnter={(e) => !saving && (e.target.style.backgroundColor = '#f5f5f5')}
-              onMouseLeave={(e) => !saving && (e.target.style.backgroundColor = 'transparent')}
+              className={`settings-save-btn ${saving ? 'is-saving' : ''}`}
             >
               {saving ? 'Saving' : 'Save'}
             </button>
