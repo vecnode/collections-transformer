@@ -23,15 +23,22 @@ nvm use 20
 npm install
 
 # Start services
-# Terminal 1 (from root, backend):
+# Terminal 1 (from root, backend - development):
 cd server/
 python3 app.py
+
+# Terminal 1 (from root, backend - production with Gunicorn):
+./scripts/run_server_prod.sh
 
 # Terminal 2 (from root/client, frontend):
 npm run dev
 ```
 
-Alternatively, use `./scripts/create_server_env.sh` to set up the server environment, or `./scripts/run_server.sh` and `./scripts/run_client.sh` to run them, or use `environment.yml` with conda.
+**Setup alternatives:**
+- Use `./scripts/create_server_env.sh` to set up just the server environment
+- Use `./scripts/run_server.sh` (dev mode) or `./scripts/run_server_prod.sh` (production) to start the server
+- Use `./scripts/run_client.sh` to start the client
+- Use `environment.yml` with conda to set up environments
 
 - See `requirements.txt` and `client/package.json` for a full set of dependencies. 
 - Authentication uses Auth0. You can use an existing Auth0 Tenant. Create `.env` files, the following keys are needed.
