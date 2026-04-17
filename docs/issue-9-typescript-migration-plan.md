@@ -34,12 +34,20 @@
 - Added a typed prop contract using shared models.
 - Migrated `client/src/components/datasetLabeller.tsx` and typed its props against shared models.
 
+7. Full client source extension migration
+- Converted all remaining files under `client/src/components` and `client/src/pages` from `.js` to `.tsx`.
+- Result: there are no JavaScript files left under `client/src`.
+
+8. Compatibility-first compile strategy
+- For legacy UI files not yet fully type-hardened, `// @ts-nocheck` is applied to preserve current runtime behavior while keeping the codebase on TypeScript extensions.
+- Core shared types, helper modules, and auth context remain type-checked.
+
 ## Migration policy adopted
 - New client files should use TypeScript by default (`.ts` / `.tsx`).
 - Existing JavaScript files are converted using touch-and-migrate when making non-trivial updates.
 - Keep strictness relaxed initially; tighten progressively in follow-up issues.
 
 ## Follow-up suggestions
-- Convert additional high-complexity components (`overviewanalyser`, `workspace` page flow).
-- Add typed API client wrapper and replace ad-hoc `fetch` result handling.
-- Enable stricter compiler options in stages (`noImplicitAny`, then `strict`).
+- Remove `@ts-nocheck` incrementally by feature area, starting with `pages/workspace`, `pages/analyser`, and `components/overviewanalyser`.
+- Add a typed API client wrapper and replace ad-hoc `fetch` options/URLSearchParams calls with typed helpers.
+- Tighten compiler options in stages (`noImplicitAny`, then `strict`) after legacy pages are typed.
