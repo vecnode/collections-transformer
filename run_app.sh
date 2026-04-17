@@ -7,6 +7,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLIENT_DIR="${SCRIPT_DIR}/client"
 SERVER_DIR="${SCRIPT_DIR}/server"
+SCRIPTS_DIR="${SCRIPT_DIR}/scripts"
 
 # Arrays to store terminal window PIDs
 TERMINAL_PIDS=()
@@ -66,7 +67,9 @@ fi
 
 # Launch server first
 echo "Launching server (python3 app.py) in terminal window..."
-"$TERMINAL_CMD" --title="Server - Collections Transformer" --working-directory="$SERVER_DIR" $TERMINAL_OPTS bash -c "source venv/bin/activate && python3 app.py; exec bash" &
+"$TERMINAL_CMD" --title="Server - Collections Transformer" --working-directory="$SERVER_DIR" $TERMINAL_OPTS bash -c "\
+\"${SCRIPTS_DIR}/run_server.sh\"; \
+exec bash" &
 TERMINAL_PIDS+=($!)
 
 # Wait 4 seconds for server to start and AI models to initialize
@@ -76,14 +79,7 @@ sleep 4
 # Launch client in second terminal window
 echo "Launching client (npm run dev) in terminal window..."
 "$TERMINAL_CMD" --title="Client - Collections Transformer" --working-directory="$CLIENT_DIR" $TERMINAL_OPTS bash -c "\
-if [ -s \"$HOME/.nvm/nvm.sh\" ]; then \
-    source \"$HOME/.nvm/nvm.sh\" && nvm use >/dev/null 2>&1 || nvm install; \
-fi; \
-if [ ! -d node_modules ]; then \
-    echo \"Installing client dependencies...\"; \
-    npm install; \
-fi; \
-npm run dev; \
+\"${SCRIPTS_DIR}/run_client.sh\"; \
 exec bash" &
 TERMINAL_PIDS+=($!)
 
