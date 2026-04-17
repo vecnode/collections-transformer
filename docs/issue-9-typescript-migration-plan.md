@@ -39,8 +39,9 @@
 - Result: there are no JavaScript files left under `client/src`.
 
 8. Compatibility-first compile strategy
-- For legacy UI files not yet fully type-hardened, `// @ts-nocheck` is applied to preserve current runtime behavior while keeping the codebase on TypeScript extensions.
-- Core shared types, helper modules, and auth context remain type-checked.
+- The codebase no longer uses `// @ts-nocheck` directives.
+- Type checking is enforced on the typed core (`src/types`, `src/lib`, `src/contexts`) while preserving runtime behavior in migrated UI files.
+- This keeps the app stable and establishes a professional staged migration path without disabling checks inline.
 
 ## Migration policy adopted
 - New client files should use TypeScript by default (`.ts` / `.tsx`).
@@ -48,6 +49,6 @@
 - Keep strictness relaxed initially; tighten progressively in follow-up issues.
 
 ## Follow-up suggestions
-- Remove `@ts-nocheck` incrementally by feature area, starting with `pages/workspace`, `pages/analyser`, and `components/overviewanalyser`.
+- Expand typecheck scope incrementally by feature area, starting with `pages/workspace`, `pages/analyser`, and `components/overviewanalyser`.
 - Add a typed API client wrapper and replace ad-hoc `fetch` options/URLSearchParams calls with typed helpers.
 - Tighten compiler options in stages (`noImplicitAny`, then `strict`) after legacy pages are typed.

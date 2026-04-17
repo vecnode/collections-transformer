@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import DatasetModal from '../components/datasetModal';
 

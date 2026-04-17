@@ -1,4 +1,3 @@
-// @ts-nocheck
 import Head from 'next/head'
 
 import React, {useEffect, useRef, useState} from 'react'

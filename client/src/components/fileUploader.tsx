@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, {useRef,useState,useEffect} from 'react'
 import imageCompression from 'browser-image-compression'
 import Papa from 'papaparse'

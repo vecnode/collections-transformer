@@ -1,4 +1,3 @@
-// @ts-nocheck
 import '@/styles/globals.css';
 import RootLayout from '@/components/layout';
 import { AuthProvider } from '@/contexts/AuthContext';
