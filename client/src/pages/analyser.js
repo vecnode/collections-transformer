@@ -13,7 +13,7 @@ import OverviewAnalyser from '@/_components/overviewanalyser';
 
 import ErrorBox from '@/_components/errorBox';
 
-import { getFilterErrorString } from '@/_helpers/utills';
+import { getFilterErrorString } from '@/lib/errors/contentFilter';
 
 
 const Analyser = () => {

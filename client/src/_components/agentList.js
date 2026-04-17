@@ -1,7 +1,7 @@
 'use client'
  
 import Link from 'next/link';
-import { dateFromObjectId } from '@/_helpers/utills';
+import { dateFromObjectId } from '@/lib/time/date';
 
 const AgentList = ({
   user_id,
