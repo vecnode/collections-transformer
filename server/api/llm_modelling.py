@@ -7,15 +7,9 @@ import re
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 os.environ["PYTORCH_USE_CUDA_DSA"] = "1"
 
-import math
-import traceback
 import random
-import re
-import copy
 
 import numpy as np
-
-from sklearn.metrics import mean_absolute_error, root_mean_squared_error, precision_recall_fscore_support
 
 from . import provider_openai as provider_openai
 from . import provider_blip2 as provider_blip2
@@ -61,54 +55,6 @@ def init(model):
     print("Model Source: " + model_source)
     print("Providers: Ollama (text) + Blip2 (images)")
     print("======================================================")
-
-
-
-def get_model_baseline(prompt_examples,items_for_inference,analyser,labels,dataset):
-
-  #Get fake "random" predictions based on example distribution
-  if (analyser['analyser_type'] == "binary"):
-    pos_examples = [example for example in prompt_examples if str(example['label']) == "1"]
-    prob = len(pos_examples)/len(prompt_examples)
-    prob_dist = [prob, 1-prob]
-    random_preds = random.choices(["positive","negative"],prob_dist,k=len(items_for_inference))
-    predictions = [{item["_id"]:random_preds[index]} for index, item in enumerate(items_for_inference)]
-
-    trained_example_ids = [example['_id'] for example in prompt_examples]
-
-  elif (analyser['analyser_type'] == "score"):
-    positive_examples = [example for example in prompt_examples if str(example['label']) == "1"]
-    prob = len(positive_examples)/len(prompt_examples)
-    
-    predictions = [{item["_id"]: 1 if random.random() < prob else 0} for item in items_for_inference]
-    trained_example_ids = [example['_id'] for example in prompt_examples]
-
-  elif (analyser['analyser_type'] == "opinion"):
-    positive_examples = [example for example in prompt_examples if str(example['label']) == "1"]
-    prob = len(positive_examples)/len(prompt_examples)
-    
-    default_opinions = []
-    for i in range(len(items_for_inference)):
-      if random.random() < prob:
-        default_opinions.append("This is a good example of the pattern we are looking for.")
-      else:
-        default_opinions.append("This is not a good example of the pattern we are looking for.")
-    
-    predictions = [{item["_id"]: default_opinions[index]} for index, item in enumerate(items_for_inference)]
-    trained_example_ids = [example['_id'] for example in prompt_examples]
-
-  else:
-
-    return None
-
-  try:
-    accuracy = compute_accuracy(labels,dataset,trained_example_ids,predictions,analyser['analyser_type'],analyser['analyser_format'], True)
-  
-  except Exception as e:
-    print(e)
-    return None
-  
-  return accuracy
 
 
 
@@ -448,10 +394,4 @@ def extract_binary_result(prediction):
 def clean_response_string(string) :
   result = ''.join([s for s in string if s.isalnum() or s.isspace()])
   return result
-
-
-def removeItemEmbeddings(item):
-  image_content_obj = next((x for x in item["content"] if x['content_type'] == 'image'), None)
-  image_content_obj['content_value']["embeddings"] = []
-  return item
 

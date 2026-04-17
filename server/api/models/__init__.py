@@ -3,7 +3,7 @@ from api import db, grid_fs
 from bson.objectid import ObjectId
 import bson.binary
 import json
-from . import llm_modelling as llm
+from .. import llm_modelling as llm
 import pandas as pd
 import copy
 import random
@@ -38,7 +38,7 @@ formatExamplesInsidePrompt = True
 
 
 # Load model domains in-order into this module namespace to preserve legacy API.
-_MODELS_PARTS_DIR = Path(__file__).with_name("models")
+_MODELS_PARTS_DIR = Path(__file__).resolve().parent
 _MODELS_PART_FILES = [
     "embedding.py",
     "labelset.py",

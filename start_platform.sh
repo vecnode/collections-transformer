@@ -67,9 +67,13 @@ fi
 
 # Launch server first
 echo "Launching server (python3 app.py) in terminal window..."
-"$TERMINAL_CMD" --title="Server - Collections Transformer" --working-directory="$SERVER_DIR" $TERMINAL_OPTS bash -c "\
-\"${SCRIPTS_DIR}/run_server.sh\"; \
-exec bash" &
+if [[ "$TERMINAL_CMD" == "gnome-terminal" ]]; then
+    "$TERMINAL_CMD" --title="Server - Collections Transformer" --working-directory="$SERVER_DIR" $TERMINAL_OPTS bash -c "\"${SCRIPTS_DIR}/run_server.sh\"; exec bash" &
+elif [[ "$TERMINAL_CMD" == "konsole" ]]; then
+    "$TERMINAL_CMD" --title "Server - Collections Transformer" --workdir "$SERVER_DIR" $TERMINAL_OPTS bash -c "\"${SCRIPTS_DIR}/run_server.sh\"; exec bash" &
+else
+    "$TERMINAL_CMD" $TERMINAL_OPTS bash -c "\"${SCRIPTS_DIR}/run_server.sh\"; exec bash" &
+fi
 TERMINAL_PIDS+=($!)
 
 # Wait 4 seconds for server to start and AI models to initialize
@@ -78,9 +82,13 @@ sleep 4
 
 # Launch client in second terminal window
 echo "Launching client (npm run dev) in terminal window..."
-"$TERMINAL_CMD" --title="Client - Collections Transformer" --working-directory="$CLIENT_DIR" $TERMINAL_OPTS bash -c "\
-\"${SCRIPTS_DIR}/run_client.sh\"; \
-exec bash" &
+if [[ "$TERMINAL_CMD" == "gnome-terminal" ]]; then
+    "$TERMINAL_CMD" --title="Client - Collections Transformer" --working-directory="$CLIENT_DIR" $TERMINAL_OPTS bash -c "\"${SCRIPTS_DIR}/run_client.sh\"; exec bash" &
+elif [[ "$TERMINAL_CMD" == "konsole" ]]; then
+    "$TERMINAL_CMD" --title "Client - Collections Transformer" --workdir "$CLIENT_DIR" $TERMINAL_OPTS bash -c "\"${SCRIPTS_DIR}/run_client.sh\"; exec bash" &
+else
+    "$TERMINAL_CMD" $TERMINAL_OPTS bash -c "\"${SCRIPTS_DIR}/run_client.sh\"; exec bash" &
+fi
 TERMINAL_PIDS+=($!)
 
 echo ""

@@ -12,7 +12,7 @@ import api.llm_modelling as llm
 from app import model
 from flask import Blueprint
 import traceback
-from . import provider_ollama
+from .. import provider_ollama
 from pathlib import Path
 
 
@@ -24,7 +24,7 @@ def parse_json(data):
 
 
 # Load route modules in-order into this module namespace to preserve endpoint behavior.
-_ROUTES_PARTS_DIR = Path(__file__).with_name("routes")
+_ROUTES_PARTS_DIR = Path(__file__).resolve().parent
 _ROUTES_PART_FILES = [
     "core_crud.py",
     "analyser_and_predictions.py",
