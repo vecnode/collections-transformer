@@ -37,8 +37,6 @@ def parse_json(data):
 _ROUTES_PARTS_DIR = Path(__file__).resolve().parent
 _ROUTES_PART_FILES = [
     "core_crud.py",
-    "analyser_and_predictions.py",
-    "findpatterns.py",
     "agents.py",
     "system_db.py",
     "auth_user.py",

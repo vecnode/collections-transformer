@@ -123,7 +123,7 @@ const AnalysisDetailsModal = ({
     // Analysis summary row
     rows.push([
       selectedAnalysis._id || '',
-      selectedAnalysis.analyser_name || 'Unknown',
+      selectedAnalysis.agent_name || selectedAnalysis.analyser_name || 'Unknown',
       selectedAnalysis.dataset_name || 'Unknown',
       selectedAnalysis.status || 'Completed',
       new Date(selectedAnalysis.created_at).toLocaleString('en-GB', {
@@ -317,9 +317,9 @@ const AnalysisDetailsModal = ({
           <div style={{ marginBottom: '0.5rem' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
               <div style={{ padding: '0.5rem', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #ddd' }}>
-                <strong>Analysis Model:</strong> {selectedAnalysis.analyser_name || 'Unknown'}
+                <strong>Agent:</strong> {selectedAnalysis.agent_name || selectedAnalysis.analyser_name || 'Unknown'}
                 <br />
-                <small style={{ color: '#666' }}>ID: {selectedAnalysis.analyser_id}</small>
+                <small style={{ color: '#666' }}>ID: {selectedAnalysis.agent_id || selectedAnalysis.analyser_id}</small>
               </div>
               <div style={{ padding: '0.5rem', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #ddd' }}>
                 <strong>Dataset:</strong> {selectedAnalysis.dataset_name || 'Unknown'}

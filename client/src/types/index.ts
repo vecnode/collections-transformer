@@ -8,7 +8,6 @@ export type {
   Labelset,
   Dataset,
   PredictionResult,
-  Analyser,
   ContentFilterThemeResult,
   ContentFilterError,
   AuthResult,

@@ -1,7 +1,6 @@
 import Head from 'next/head'
 import React, {useEffect, useState} from 'react'
 
-import AnalyserList from '../components/analyserList'
 import DatasetList from '../components/datasetList'
 import LabelsetsList from '../components/labelsetsList'
 import AgentList from '../components/agentList'
@@ -21,7 +20,6 @@ const Workspace = () => {
     const title = "Workspace - Collections Transformer (TaNC UAL)"
 
     const [datasets, setDatasets] = useState([{id:"Loading...",name:" ",status:""}])
-    const [analysers, setAnalysers] = useState([{id:"Loading...",name:" ",dataset_id:"",category_id:"",dataset_name:"",category_name:""}])
     const [labelsets, setLabelsets] = useState([{id:"Loading...",name:" "}])
     const [agents, setAgents] = useState([{_id:"Loading...",name:" "}])
     const [analysisHistory, setAnalysisHistory] = useState([])
@@ -33,8 +31,6 @@ const Workspace = () => {
     const [selectedAnalysis, setSelectedAnalysis] = useState(null)
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [analysisToDelete, setAnalysisToDelete] = useState(null)
-    const [showAnalyserDeleteModal, setShowAnalyserDeleteModal] = useState(false)
-    const [analyserToDelete, setAnalyserToDelete] = useState(null)
     const [selectedItemsDetails, setSelectedItemsDetails] = useState([])
     const [showDatasetDeleteModal, setShowDatasetDeleteModal] = useState(false)
     const [datasetToDelete, setDatasetToDelete] = useState(null)
@@ -45,7 +41,6 @@ const Workspace = () => {
     const [activeTab, setActiveTab] = useState('history')
 
     useEffect(() => {
-      getAnalysers()
       getDatasets()
       getLabelsets()
       getAgents()
@@ -73,28 +68,6 @@ const Workspace = () => {
         }
       });
     };
-
-    const getAnalysers = () => {
-      const requestOptions = {
-        method: 'GET',
-        mode: 'cors',
-        headers: {'Content-Type': 'application/json'}
-      };
-  
-      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/analysers?" + new URLSearchParams({
-        user_id:user.user_id || user.sub,
-        include_names:true // Returns names of dataset and categories not just IDs
-      }), requestOptions)
-      .then(
-        response =>  response.json()
-      ).then(
-        res => {
-          console.log(res)
-          if (res.status == 200)
-            setAnalysers(res.data)
-        }
-      )
-    }
 
     const getAgents = () => {
       const requestOptions = {
@@ -192,11 +165,6 @@ const Workspace = () => {
       setShowDeleteModal(true);
     };
 
-    const confirmDeleteAnalyser = (analyser) => {
-      setAnalyserToDelete(analyser);
-      setShowAnalyserDeleteModal(true);
-    };
-
     const confirmDeleteDataset = (dataset) => {
       setDatasetToDelete(dataset);
       setShowDatasetDeleteModal(true);
@@ -237,35 +205,6 @@ const Workspace = () => {
         setStatus("Error deleting analysis")
         setShowDeleteModal(false)
         setAnalysisToDelete(null)
-      });
-    };
-
-    const executeDeleteAnalyser = () => {
-      if (!analyserToDelete) return;
-      
-      setStatus("Deleting analyser...")
-      const requestOptions = {
-        method: 'POST',
-        mode: 'cors',
-        headers: {'Content-Type': 'application/json'}
-      };
-      
-      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/classifier_delete?" + new URLSearchParams({
-        analyser_id: analyserToDelete._id
-      }), requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        setStatus("Analyser deleted")
-        console.log(data)
-        getAnalysers()
-        setShowAnalyserDeleteModal(false)
-        setAnalyserToDelete(null)
-      })
-      .catch(error => {
-        console.error('Error deleting analyser:', error);
-        setStatus("Error deleting analyser")
-        setShowAnalyserDeleteModal(false)
-        setAnalyserToDelete(null)
       });
     };
 
@@ -414,8 +353,6 @@ const Workspace = () => {
     const displayName = user.name === user.email ? user.nickname : user.name;
     const hasAgentLoadingPlaceholder = agents.some(agent => agent && agent._id === 'Loading...');
     const realAgentsCount = agents.filter(agent => agent && agent._id && agent._id !== 'Loading...').length;
-    const hasAnalyserLoadingPlaceholder = analysers.some(analyser => analyser && analyser.id === 'Loading...');
-    const realAnalysersCount = analysers.filter(analyser => analyser && analyser.id !== 'Loading...').length;
     const hasDatasetLoadingPlaceholder = datasets.some(dataset => dataset && dataset.id === 'Loading...');
     const realDatasetsCount = datasets.filter(dataset => dataset && dataset.id !== 'Loading...').length;
     const hasLabelsetLoadingPlaceholder = labelsets.some(labelset => labelset && labelset.id === 'Loading...');
@@ -462,10 +399,6 @@ const Workspace = () => {
                 <span className="ws-stat-value">{labelsets.length}</span>
                 <span className="ws-stat-label">Annotation sets</span>
               </div>
-              <div className="ws-stat">
-                <span className="ws-stat-value">{analysers.filter(a => a.id !== 'Loading...').length}</span>
-                <span className="ws-stat-label">Analysers</span>
-              </div>
             </div>
 
             {/* Tab bar */}
@@ -473,7 +406,6 @@ const Workspace = () => {
               {[
                 { id: 'history',     icon: 'task_alt',    label: 'Analysis History',  sub: 'Saved runs from the Tasks page' },
                 { id: 'agents',      icon: 'smart_toy',   label: 'Agents',            sub: 'Ollama model configurations' },
-                { id: 'analysers',   icon: 'analytics',   label: 'Analysers',         sub: 'Configured analysis pipelines' },
                 { id: 'datasets',    icon: 'folder_open', label: 'Datasets',          sub: 'Uploaded media collections' },
                 { id: 'annotations', icon: 'label',       label: 'Annotation Sets',   sub: 'Label schemas and category sets' },
               ].map(tab => (
@@ -516,7 +448,7 @@ const Workspace = () => {
                             return (
                               <tr key={analysis._id}>
                                 <td>{formattedDate}</td>
-                                <td>{analysis.analyser_name || 'Unknown'}</td>
+                                <td>{analysis.agent_name || analysis.analyser_name || 'Unknown'}</td>
                                 <td>{analysis.dataset_name || 'Unknown'}</td>
                                 <td>
                                   <span className={`ws-badge ws-badge--${(analysis.status || 'completed').toLowerCase()}`}>
@@ -543,15 +475,6 @@ const Workspace = () => {
                       <div className="ws-empty">No agents yet. Create your first agent from the New Agent page.</div>
                     ) : (
                       <AgentList user_id={user.user_id || user.sub} agents={agents} onDeleteHandler={confirmDeleteAgent}/>
-                    )}
-                  </div>
-                )}
-                {activeTab === 'analysers' && (
-                  <div className="ws-list-body">
-                    {!hasAnalyserLoadingPlaceholder && realAnalysersCount === 0 ? (
-                      <div className="ws-empty">No analysers yet. Create your first analyser from the New Agent page.</div>
-                    ) : (
-                      <AnalyserList user_id={user.user_id || user.sub} analysers={analysers} onDeleteHandler={confirmDeleteAnalyser}/>
                     )}
                   </div>
                 )}
@@ -673,101 +596,6 @@ const Workspace = () => {
                 </button>
                 <button 
                   onClick={() => setShowDeleteModal(false)}
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: 'black',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Analyser Delete Confirmation Modal */}
-        {showAnalyserDeleteModal && analyserToDelete && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.8)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999
-          }}>
-            <div style={{
-              maxWidth: '60vw',
-              maxHeight: '90vh',
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              padding: '20px',
-              position: 'relative',
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden'
-            }}>
-              <button 
-                onClick={() => setShowAnalyserDeleteModal(false)}
-                style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '15px',
-                  background: 'none',
-                  border: 'none',
-                  fontSize: '24px',
-                  cursor: 'pointer',
-                  color: '#666',
-                  zIndex: 10000
-                }}
-              >
-                ×
-              </button>
-              
-              <h3 style={{ marginBottom: '1rem', marginRight: '2rem' }}>Confirm Deletion</h3>
-              
-              <div style={{
-                flex: 1,
-                overflowY: 'auto',
-                padding: '1rem',
-                backgroundColor: '#f8f9fa',
-                borderRadius: '4px',
-                border: '1px solid #dee2e6',
-                fontSize: '0.9rem',
-                lineHeight: '1.4',
-                whiteSpace: 'pre-wrap'
-              }}>
-                Are you sure you want to delete the analyser "{analyserToDelete.name}"?
-                {"\n\n"}Note: Any associated datasets and labelsets will NOT be removed.
-              </div>
-
-              <div style={{
-                marginTop: '20px',
-                display: 'flex',
-                justifyContent: 'space-between'
-              }}>
-                <button 
-                  onClick={executeDeleteAnalyser}
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: 'black',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Delete
-                </button>
-                <button 
-                  onClick={() => setShowAnalyserDeleteModal(false)}
                   style={{
                     padding: '8px 16px',
                     backgroundColor: 'black',
@@ -935,7 +763,7 @@ const Workspace = () => {
                 whiteSpace: 'pre-wrap'
               }}>
                 Are you sure you want to delete the annotation set"{labelsetToDelete.name}"?
-                {"\n\n"}Note: Any analysers that use this annotation set may become unusable.
+                {"\n\n"}Note: Any agents that use this annotation set may become unusable.
               </div>
 
               <div style={{

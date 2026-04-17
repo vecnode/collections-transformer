@@ -110,7 +110,6 @@ interface ItemDynamicListProps {
   onLabelsChanged?: (...args: unknown[]) => void;
   onExamplesChanged?: (...args: unknown[]) => void;
   onSampleChanged?: (...args: unknown[]) => void;
-  analyser_id?: string | null;
   expand_mode?: string;
   useTab?: boolean;
   model_source?: string;
@@ -136,7 +135,6 @@ const ItemDynamicList = ({
     onLabelsChanged=(e)=>{},
     onExamplesChanged=(e)=>{},
     onSampleChanged=(e)=>{},
-    analyser_id=null,
     expand_mode="",
     useTab,
     model_source=""
@@ -490,7 +488,7 @@ const ItemDynamicList = ({
       cell: (info) => {
         let example = info.getValue()
         return flexRender(ItemCheckboxSet, {
-          ref_id:analyser_id,
+          ref_id:labelset_id,
           checkbox_type:"local-example",
           item_id:info.row.original._id,
           itemLabels:example,
@@ -543,7 +541,7 @@ const ItemDynamicList = ({
       cell: (info) => {
         let sample = info.getValue()
         return flexRender(ItemCheckboxSet, {
-          ref_id:analyser_id,
+          ref_id:labelset_id,
           checkbox_type:"sample",
           item_id:info.row.original._id,
           itemLabels:sample,
@@ -817,7 +815,7 @@ const ItemDynamicList = ({
 
     columnHelper.accessor('_textPredictions', {
       id: '_textPredictions',
-      header: () => <span>Analyser Prediction</span>,
+      header: () => <span>Prediction</span>,
       cell: (info) => {
         if (info.getValue('_textPredictions') !== undefined){
           return flexRender(ItemPredictions, {

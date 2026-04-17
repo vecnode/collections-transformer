@@ -1,12 +1,11 @@
 class AnalysisHistory():
-    def create(user_id, analyser_id, dataset_id, selected_items, chat_messages, analysis_summary):
+    def create(user_id, dataset_id, selected_items, chat_messages, analysis_summary, agent_id=None, analyser_id=None):
         """Create a new analysis history record"""
         london_tz = pytz.timezone('Europe/London')
         current_time = datetime.datetime.now(london_tz)
         
         analysis_obj = {
             "user_id": user_id,
-            "analyser_id": analyser_id,
             "dataset_id": dataset_id,
             "selected_items": selected_items,
             "selected_items_count": len(selected_items),
@@ -15,6 +14,10 @@ class AnalysisHistory():
             "created_at": current_time,
             "status": "completed"
         }
+        if agent_id:
+            analysis_obj["agent_id"] = agent_id
+        if analyser_id:
+            analysis_obj["analyser_id"] = analyser_id
         
         analysis_id = analysis_history_collection.insert_one(analysis_obj).inserted_id
         return str(analysis_id)
@@ -26,7 +29,10 @@ class AnalysisHistory():
             
             for analysis in analyses:
                 analysis["_id"] = str(analysis["_id"])
-                analysis["analyser_id"] = str(analysis["analyser_id"])
+                if analysis.get("analyser_id"):
+                    analysis["analyser_id"] = str(analysis["analyser_id"])
+                if analysis.get("agent_id"):
+                    analysis["agent_id"] = str(analysis["agent_id"])
                 analysis["dataset_id"] = str(analysis["dataset_id"])
                 analysis["created_at"] = analysis["created_at"].isoformat()
             
@@ -41,7 +47,10 @@ class AnalysisHistory():
             analysis = analysis_history_collection.find_one({"_id": ObjectId(analysis_id)})
             if analysis:
                 analysis["_id"] = str(analysis["_id"])
-                analysis["analyser_id"] = str(analysis["analyser_id"])
+                if analysis.get("analyser_id"):
+                    analysis["analyser_id"] = str(analysis["analyser_id"])
+                if analysis.get("agent_id"):
+                    analysis["agent_id"] = str(analysis["agent_id"])
                 analysis["dataset_id"] = str(analysis["dataset_id"])
                 analysis["created_at"] = analysis["created_at"].isoformat()
             return analysis

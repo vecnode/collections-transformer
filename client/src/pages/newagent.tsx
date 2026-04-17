@@ -459,8 +459,6 @@ const SelectedExamplesDisplay = ({ selectedExamples, datasetData, onClearAll, it
 const NewAgent = () => {
   const { user } = useAuth();
   const [datasets, setDatasets] = useState([]);
-  const [analysers, setAnalysers] = useState([]);
-  const [selectedAnalyser, setSelectedAnalyser] = useState(null);
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [selectedButtonType, setSelectedButtonType] = useState('boolean');
   
@@ -484,17 +482,9 @@ const NewAgent = () => {
 
   useEffect(() => {
     if (user) {
-      getAnalysers();
       getDatasets();
     }
   }, [user]);
-  
-  // When analysers are loaded, select the last one by default
-  useEffect(() => {
-    if (analysers.length > 0 && !analysers.some(a => a._id === selectedAnalyser)) {
-      setSelectedAnalyser(analysers[analysers.length - 1]._id);
-    }
-  }, [analysers, selectedAnalyser]);
 
   // When datasets are loaded, select the last one by default
   useEffect(() => {
@@ -522,23 +512,6 @@ const NewAgent = () => {
         setDetectedFormat('textimage');
       }
     }
-  };
-
-  const getAnalysers = () => {
-    const requestOptions = {
-      method: 'GET',
-      mode: 'cors',
-      headers: {'Content-Type': 'application/json'}
-    };
-    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/analysers?" + new URLSearchParams({
-      user_id:user.user_id || user.sub,
-      include_names:true
-    }), requestOptions)
-    .then(response => response.json())
-    .then(res => {
-      if (res.status == 200)
-        setAnalysers(res.data)
-    });
   };
 
   const getDatasets = () => {

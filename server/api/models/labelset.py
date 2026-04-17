@@ -171,28 +171,6 @@ class Labelset():
     for label in labels:
       Label.delete('text',label["_id"])
 
-    #Remove reference from all Analysers
-    analysers_db_res = analyser_collection.find({})
-    for analyser in list(analysers_db_res):
-      analyser_versions = [v for v in analyser['versions'] if ('versions' in analyser) and v!=None]
-      new_versions = []
-      for v in analyser_versions:
-        if ('labelset_id' in v) and (v['labelset_id'] != str(labelset_id)):
-          new_versions.append(v)
-      analyser_collection.update_one({"_id":analyser['_id']},{"$set":{"versions":new_versions}})
-
-    analyser_collection.update_many({"labelset_id":labelset_id},{
-      "$set": {
-        "labelset_id":"",
-        "prompt":"",
-        "example_refs":[],
-        "examples":[],
-        "sample_ids":[],
-        "predictions":[],
-        "accuracy":""
-      }
-    })
-
     labelset_collection.delete_one({"_id":labelset_id})
 
   def update(labelset_id, data, isNewVersion):

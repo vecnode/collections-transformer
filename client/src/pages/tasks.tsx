@@ -462,9 +462,7 @@ const SelectedItemsDisplay = ({ selectedItems, datasetData, onClearAll }) => {
 const Tasks = () => {
   const { user } = useAuth();
   const [datasets, setDatasets] = useState([]);
-  const [analysers, setAnalysers] = useState([]);
   const [agents, setAgents] = useState([]);
-  const [selectedAnalyser, setSelectedAnalyser] = useState(null);
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [selectedButtonType, setSelectedButtonType] = useState('boolean'); // Default to first option
@@ -481,11 +479,6 @@ const Tasks = () => {
   const [serviceProvider, setServiceProvider] = useState('Ollama');
   // Task is now determined by the selected agent's task_type
   const scrollPositionRef = useRef({ container: null, position: 0 });
-
-  // Get selected items for display
-  const getSelectedAnalyser = () => {
-    return analysers.find(a => a._id === selectedAnalyser) || null;
-  };
 
   const getSelectedDataset = () => {
     return datasets.find(d => d._id === selectedDataset) || null;
@@ -642,18 +635,10 @@ const Tasks = () => {
 
   useEffect(() => {
     if (user) {
-      getAnalysers();
       getAgents();
       getDatasets();
     }
   }, [user]);
-  
-  // When analysers are loaded, select the last one by default
-  useEffect(() => {
-    if (analysers.length > 0 && !analysers.some(a => a._id === selectedAnalyser)) {
-      setSelectedAnalyser(analysers[analysers.length - 1]._id);
-    }
-  }, [analysers, selectedAnalyser]);
 
   // When datasets are loaded, select the last one by default
   useEffect(() => {
@@ -672,25 +657,6 @@ const Tasks = () => {
     console.log("Selected dataset changed to:", selectedDataset);
     fetchDatasetData(selectedDataset);
   }, [selectedDataset]);
-
-
-
-  const getAnalysers = () => {
-    const requestOptions = {
-      method: 'GET',
-      mode: 'cors',
-      headers: {'Content-Type': 'application/json'}
-    };
-    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/analysers?" + new URLSearchParams({
-      user_id:user.user_id || user.sub,
-      include_names:true
-    }), requestOptions)
-    .then(response => response.json())
-    .then(res => {
-      if (res.status == 200)
-        setAnalysers(res.data)
-    });
-  };
 
   const getAgents = () => {
     const requestOptions = {
@@ -737,7 +703,7 @@ const Tasks = () => {
     setIsAnalyzing(true);
     const newMessageId = Date.now();
     
-    // Detect execution mode: Agent Task + Ollama
+    // Analyse through agent execution only.
     const isAgentTask = taskType === 'ai';
     const isOllama = serviceProvider === 'Ollama';
     const useAgentExecution = isAgentTask && isOllama && selectedAgent && selectedDataset && selectedItems.size > 0;
@@ -778,8 +744,8 @@ const Tasks = () => {
         })
       };
     } else {
-      // Existing flow for Human Task
-      endpoint = "/backend/findpatterns_create?";
+      // Human task mode no longer uses legacy model-specific backend flows.
+      endpoint = "";
       
       // Extract up to 3 annotations from chat messages
       const annotationMessages = chatMessages
@@ -799,13 +765,23 @@ const Tasks = () => {
         body: JSON.stringify({ 
           user_id: user.user_id || user.sub,
           test_query: "give me 2x2",
-          analyser_id: selectedAnalyser,
+          agent_id: selectedAgent,
           dataset_id: selectedDataset,
           selected_items: selectedItems.size > 0 ? Array.from(selectedItems) : [],
           max_sentences: maxSentences, // Pass max_sentences
           annotations: annotations // Include annotations in the request
         })
       };
+    }
+
+    if (!useAgentExecution) {
+      setChatMessages(prev => prev.map(msg =>
+        msg.id === newMessageId
+          ? { ...msg, content: msg.content + "\n$ Error: Please select Agent Task, an Agent, and at least one data item." }
+          : msg
+      ));
+      setIsAnalyzing(false);
+      return;
     }
 
     try {
@@ -911,7 +887,7 @@ const Tasks = () => {
     const analysisData = {
       timestamp: new Date().toISOString(),
       user_id: user.user_id || user.sub,
-      analyser: getSelectedAnalyser(),
+      agent: agents.find(a => a._id === selectedAgent) || null,
       dataset: getSelectedDataset(),
       selectedItems: Array.from(selectedItems),
       selectedItemsCount: selectedItems.size,
@@ -931,7 +907,7 @@ const Tasks = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: user.user_id || user.sub,
-          analyser_id: getSelectedAnalyser()?._id,
+          agent_id: selectedAgent,
           dataset_id: getSelectedDataset()?._id,
           selected_items: Array.from(selectedItems),
           chat_messages: chatMessages,
@@ -1157,18 +1133,6 @@ const Tasks = () => {
     // Clear chat messages when changing dataset
     setChatMessages([]);
   };
-
-  const handleAnalyserChange = (analyserId) => {
-    console.log("Analyser selection changed to:", analyserId);
-    setSelectedAnalyser(analyserId);
-    // Clear chat messages when changing analyser
-    setChatMessages([]);
-    // Reset maxSentences to default when changing models
-    setMaxSentences(3);
-  };
-
-
-  
 
   return (
     <main>
@@ -1468,37 +1432,15 @@ const Tasks = () => {
               borderRadius: '6px',
               border: '1px solid #b9b9b9'
             }}>
-              {/* Max Sentences Control - only show for opinion type */}
-              {getSelectedAnalyser() && getSelectedAnalyser().analyser_type === 'opinion' && (
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '0.5rem',
-                  marginBottom: '0.5rem'
-                }}>
-                  <label style={{ 
-                    fontSize: '0.9rem', 
-                    color: '#333',
-                    whiteSpace: 'nowrap'
-                  }}>
-                    Max Sentences:
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="10"
-                    value={maxSentences}
-                    onChange={(e) => setMaxSentences(parseInt(e.target.value) || 3)}
-                    style={{
-                      width: '60px',
-                      padding: '0.25rem 0.5rem',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px',
-                      fontSize: '0.9rem'
-                    }}
-                  />
-                </div>
-              )}
+              <div style={{ display: 'none' }}>
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={maxSentences}
+                  onChange={(e) => setMaxSentences(parseInt(e.target.value) || 3)}
+                />
+              </div>
               
               {/* Annotation Indicator */}
               {(() => {

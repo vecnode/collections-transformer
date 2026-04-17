@@ -15,15 +15,10 @@ def getModeSource():
 
 
 @endpoints_bp.route('/backend/dataset', methods=['GET', 'POST']) 
-def getDataset(analyser_id=None,dataset_id="",includeArtworks=False, includeEmbeddings=False):
+def getDataset(dataset_id="",includeArtworks=False, includeEmbeddings=False):
     try: 
       dataset_id = ObjectId(request.args.get('dataset_id')) if request.args.get('dataset_id') else dataset_id
-      analyser_id = ObjectId(request.args.get('analyser_id')) if request.args.get('analyser_id') else analyser_id
       includeItems = bool(request.args.get('include_items')) if request.args.get('include_items') else bool(includeArtworks)
-
-      if analyser_id!=None:
-        analyser = models.Analyser.get(analyser_id, False,False)
-        dataset_id = analyser["dataset_id"]
 
       dataset = models.Dataset.get(dataset_id,includeItems,False)
 
@@ -89,28 +84,6 @@ def getCategories():
     }),500
 
 
-@endpoints_bp.route('/backend/analysers', methods=['GET']) 
-def getAnalysers():
-  try:
-    user_id = request.args.get('user_id')
-    includeNames = bool(request.args.get('include_names'))
-    includeVersions = bool(request.args.get('include_versions'))
-    analyser_list = models.Analyser.all(user_id,includeNames,includeVersions)
-
-    return jsonify({
-      "status": "200",
-      "data": analyser_list
-    }),200
-
-  except Exception as e:
-    print("ERROR in classifier endpoint")
-    print(f"Error details: {str(e)}")
-    print(traceback.format_exc())
-    return jsonify({
-      "status":"500",
-      "error":str(e) 
-    }),500 
-
 
 @endpoints_bp.route('/backend/category_add', methods=['POST'])
 def createCategory():
@@ -150,42 +123,6 @@ def category_delete():
       "error":str(e) 
     }),500
 
-
-@endpoints_bp.route('/backend/classifier', methods=['GET', 'POST'])
-def classifier():
-  try: 
-    includeNames = bool(request.args.get('include_names')) if request.args.get('include_names') else True
-    if request.args.get('analyser_id') and request.args.get('analyser_id') != None:
-      analyser_id = ObjectId(request.args.get('analyser_id'))
-      classifier = models.Analyser.get(analyser_id,includeNames,False)
-
-    return jsonify({
-      "status": "200",
-      "data": classifier
-    }),200
-
-  except Exception as e:
-    print(e)
-    return jsonify({
-      "status":"500",
-      "error":str(e) 
-    }),500
-
-
-@endpoints_bp.route('/backend/classifier_delete', methods=['POST'])
-def classifier_delete():
-  try:
-    analyser_id = request.args.get('analyser_id')
-    models.Analyser.delete(analyser_id)
-    return jsonify({
-        "status": "200",
-        "message": "Analyser " + str(analyser_id) + " has been deleted"
-    })
-  except Exception as e:
-    return jsonify({
-      "status":"500",
-      "error":str(e) 
-    }),500
 
 
 @endpoints_bp.route('/backend/labelsets', methods=['GET'])

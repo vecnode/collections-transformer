@@ -282,7 +282,6 @@ padding: 0 10px 0 5px;
 }
 
 /* TABLES */
-#analysers,
 #datasets,
 #Labelsets,
 #analysis-history {
@@ -1253,13 +1252,6 @@ width:100%
 width:100%
 }
 
-.edit_analyser {
-width: 100%;
-height: 100%;
-padding: 10px;
-border: 1px solid rgb(185, 185, 185) !important;
-}
-
 p {
 margin-bottom:0
 }
@@ -1316,10 +1308,6 @@ width:100%
 
 .react-tabs__tab[aria-disabled=true]{
 color:rgb(255, 255, 255) !important
-}
-
-.edit_analyser .react-tabs{
-width:100%
 }
 
 .react-tabs__tab-list li{

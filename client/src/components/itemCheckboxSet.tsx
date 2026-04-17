@@ -87,74 +87,12 @@ const updateLabel = (itemContentId, checkboxStatus, onLabelsChanged, labelset_id
     }
 }
 
-const updateExample = (itemContentId, checkboxStatus, onExamplesChanged, analyser_id) => {
-
-  if (analyser_id == ""){
-
-    onExamplesChanged(itemContentId,null)
-
-  } else {
-
-    const requestOptions = {
-        method: 'POST',
-        mode: 'cors',
-        headers: {'Content-Type': 'application/json'}
-    };    
-
-    try {
-      return fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/update_example?" + new URLSearchParams({
-        "analyser_id":analyser_id,
-        "id": itemContentId,
-        "checked": checkboxStatus,
-      }),requestOptions)
-      .then(response => response.json())
-      .then(
-        res => {
-          onExamplesChanged(itemContentId,analyser_id)
-        }
-      )
-    } catch (e){
-      console.log("ERROR")
-      console.log(e)
-    }
-  }
-}
-
-const updateSample = (itemContentId, checkboxStatus, onSampleChanged, analyser_id, setCheckboxStatus) => {
-
-  if (analyser_id == ""){
-
-    onSampleChanged(itemContentId,null)
-
-  } else {
-
-    const requestOptions = {
-        method: 'POST',
-        mode: 'cors',
-        headers: {'Content-Type': 'application/json'}
-    };    
-
-    try {
-      return fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/update_sample?" + new URLSearchParams({
-        "analyser_id":analyser_id,
-        "id": itemContentId,
-        "checked": checkboxStatus,
-      }),requestOptions)
-      .then(response => response.json())
-      .then(
-        res => {
-          onSampleChanged(itemContentId,analyser_id)
-        }
-      )
-    } catch (e){
-      console.log("ERROR")
-      console.log(e)
-    }
-  }
+const updateExample = (itemContentId, checkboxStatus, onExamplesChanged, ref_id) => {
+  onExamplesChanged(itemContentId, ref_id || null)
 }
 
 const ItemCheckboxSet = ({
-    ref_id, // Either analyser_id or labelset_id
+  ref_id,
     checkbox_type,
     item_id, 
     itemLabels, 

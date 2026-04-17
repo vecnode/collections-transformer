@@ -60,18 +60,6 @@ export interface PredictionResult {
   [itemId: string]: string | number | boolean | null;
 }
 
-export interface Analyser {
-  _id?: string;
-  analyser_id?: string;
-  analyser_type?: AnalyserType;
-  dataset_id?: string;
-  labelset_id?: string;
-  owner?: string;
-  predictions?: PredictionResult[];
-  sample_ids?: string[];
-  [key: string]: unknown;
-}
-
 export interface ContentFilterThemeResult {
   filtered: boolean;
   [key: string]: unknown;

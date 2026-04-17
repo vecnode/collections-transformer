@@ -24,7 +24,6 @@ from pathlib import Path
 from config import settings
 
 category_collection = db["category"]
-analyser_collection = db["classifier"]
 dataset_collection = db["dataset"]
 item_collection = db["item"]
 labelset_collection = db["labelset"]
@@ -57,7 +56,6 @@ _MODELS_PART_FILES = [
     "label.py",
     "dataset.py",
     "category.py",
-    "analyser.py",
     "item.py",
     "resultset.py",
     "user.py",
