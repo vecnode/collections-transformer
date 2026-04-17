@@ -16,23 +16,22 @@ uv venv venv
 source venv/bin/activate
 uv pip install -r requirements.txt
 
-# Set up frontend (from root)
+# Set up frontend (from root in another terminal)
 cd client/
 nvm install 20
 nvm use 20
 npm install
 
 # Start services
-# In one terminal:
-cd ..
-npm run dev
+# Terminal 1 (from root, backend):
+cd server/
+python3 app.py
 
-# In another terminal:
-cd client
+# Terminal 2 (from root/client, frontend):
 npm run dev
 ```
 
-Alternatively, use `./scripts/create_server_env.sh` to set up the server environment, or use `environment.yml` with conda.
+Alternatively, use `./scripts/create_server_env.sh` to set up the server environment, or `./scripts/run_server.sh` and `./scripts/run_client.sh` to run them, or use `environment.yml` with conda.
 
 - See `requirements.txt` and `client/package.json` for a full set of dependencies. 
 - Authentication uses Auth0. You can use an existing Auth0 Tenant. Create `.env` files, the following keys are needed.
