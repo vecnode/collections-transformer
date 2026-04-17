@@ -4,9 +4,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
-SERVER_DIR="${ROOT_DIR}/server"
-VENV_DIR="${SERVER_DIR}/venv"
-REQUIREMENTS_FILE="${SERVER_DIR}/requirements.txt"
+VENV_DIR="${ROOT_DIR}/venv"
+REQUIREMENTS_FILE="${ROOT_DIR}/requirements.txt"
 
 if ! command -v uv >/dev/null 2>&1; then
     echo "Error: uv is required to set up the server environment." >&2

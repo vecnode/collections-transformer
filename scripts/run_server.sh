@@ -9,5 +9,5 @@ SERVER_DIR="${ROOT_DIR}/server"
 "${SCRIPT_DIR}/create_server_env.sh"
 
 cd "${SERVER_DIR}"
-source venv/bin/activate
+source "${ROOT_DIR}/venv/bin/activate"
 exec python3 app.py

@@ -11,26 +11,30 @@ Code developed in the context of the UKRI project "Transforming Collections" und
 - Frontend requirement: Node.js >= 18.17.0 (recommended: Node 20 LTS).
 
 ```bash
-# For server (using uv)
-cd server/
+# Set up backend and frontend environments
 uv venv venv
 source venv/bin/activate
 uv pip install -r requirements.txt
 
-# For client
+# Set up frontend (from root)
 cd client/
-
-# if you use nvm
 nvm install 20
 nvm use 20
-
 npm install
+
+# Start services
+# In one terminal:
+cd ..
+npm run dev
+
+# In another terminal:
+cd client
 npm run dev
 ```
 
 Alternatively, use `./scripts/create_server_env.sh` to set up the server environment, or use `environment.yml` with conda.
 
-- See `server/requirements.txt` and `client/package.json` for a full set of dependencies. 
+- See `requirements.txt` and `client/package.json` for a full set of dependencies. 
 - Authentication uses Auth0. You can use an existing Auth0 Tenant. Create `.env` files, the following keys are needed.
 
 ```
