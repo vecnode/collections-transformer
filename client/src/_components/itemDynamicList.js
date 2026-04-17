@@ -6,7 +6,6 @@ import ItemCheckboxSet from "./itemCheckboxSet";
 import ItemScoreSelector from "./itemScoreSelector";
 import { getItemListingID, mergeArrays } from "@/lib/collections/items";
 import { binary_val_to_label, example_val_to_label } from "@/lib/format/labels";
-import { useEffectDebugger } from "@/lib/react/debug";
 import TextHighlighter from "./textHighlighter";
 
 import {

@@ -22,8 +22,4 @@ const getFilterErrorString = (errors, allFiltered) => {
   return error_string;
 };
 
-const extract_no_filtered = (objects) => {
-  return objects.filter((obj) => Object.values(obj)[0] === "content_filter").map((obj) => Object.values(obj)[0]).length;
-};
-
-export { getFilterErrorString, extract_no_filtered };
+export { getFilterErrorString };
