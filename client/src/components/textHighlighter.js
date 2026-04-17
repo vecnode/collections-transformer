@@ -2,7 +2,7 @@
 
 import React, { Component, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { getItemListingID } from '@/lib/collections/items'
+import { getItemListingID } from '@/lib/items'
 import { TextAnnotate } from "react-text-annotate-blend"
 
 const TextHighlighter = ({item_id, fullText, highlight, onItemHighlight, ref_id}) => {

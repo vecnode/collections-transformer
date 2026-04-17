@@ -1,6 +1,6 @@
 'use client'
 
-import { getItemListingID } from '@/lib/collections/items'
+import { getItemListingID } from '@/lib/items'
 import { useEffect, useState } from 'react';
 
 const Checkbox = ({

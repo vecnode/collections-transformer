@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import React, {useEffect} from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from "@/_contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import Link from 'next/link';
 
 

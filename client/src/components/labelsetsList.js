@@ -2,8 +2,8 @@
  
 import { useState, useEffect } from 'react'
 import LoaderButton from './loaderButton';
-import { dateFromObjectId } from '@/lib/time/date';
-import { formatAnalyserType } from '@/lib/format/labels';
+import { dateFromObjectId } from '@/lib/date';
+import { formatAnalyserType } from '@/lib/labels';
 import Link from 'next/link'
 import DatasetModal from './datasetModal';
  

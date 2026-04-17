@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
-import DatasetModal from '../_components/datasetModal';
+import DatasetModal from '../components/datasetModal';
 
-import { useAuth } from "@/_contexts/AuthContext";
-import { withAuth } from "@/_components/withAuth";
+import { useAuth } from "@/contexts/AuthContext";
+import { withAuth } from "@/components/withAuth";
 
 const RadioList = ({ items, name, selectedId, onChange, getLabel }) => (
   <div>

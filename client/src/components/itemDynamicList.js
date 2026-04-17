@@ -4,8 +4,8 @@ import React from "react";
 import { useState, useEffect, useMemo, useReducer, useRef, memo } from "react";
 import ItemCheckboxSet from "./itemCheckboxSet";
 import ItemScoreSelector from "./itemScoreSelector";
-import { getItemListingID, mergeArrays } from "@/lib/collections/items";
-import { binary_val_to_label, example_val_to_label } from "@/lib/format/labels";
+import { getItemListingID, mergeArrays } from "@/lib/items";
+import { binary_val_to_label, example_val_to_label } from "@/lib/labels";
 import TextHighlighter from "./textHighlighter";
 
 import {

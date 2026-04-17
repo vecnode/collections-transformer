@@ -2,7 +2,7 @@
 
 import React, {useEffect, useRef, useState} from 'react'
 import Select from 'react-select';
-import { getItemListingID } from '@/lib/collections/items'
+import { getItemListingID } from '@/lib/items'
 
 const options = [
   { value: 0, label: 0 },

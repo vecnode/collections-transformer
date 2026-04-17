@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/_contexts/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 
 export function withAuth(Component) {
   return function AuthenticatedComponent(props) {

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
-import { useAuth } from "@/_contexts/AuthContext";
-import { formatAnalyserType } from '@/lib/format/labels';
+import { useAuth } from "@/contexts/AuthContext";
+import { formatAnalyserType } from '@/lib/labels';
 import Image from 'next/image';
 import DatasetModal from './datasetModal';
 
