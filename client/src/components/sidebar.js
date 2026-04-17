@@ -8,7 +8,7 @@ import {
   } from "react-pro-sidebar";
 import Link from 'next/link'
 import Image from 'next/image'
-import { useAuth } from "@/_contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import logo from '../../public/ual-logo.png'
 import { useState } from "react";
 

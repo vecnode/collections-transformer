@@ -2,11 +2,11 @@ import Head from 'next/head'
 
 import React, {useEffect, useRef, useState} from 'react'
 import { useSearchParams } from 'next/navigation'
-import { useAuth } from "@/_contexts/AuthContext";
-import { withAuth } from "@/_components/withAuth";
+import { useAuth } from "@/contexts/AuthContext";
+import { withAuth } from "@/components/withAuth";
 
-import DatasetLabeller from '@/_components/datasetLabeller';
-import StatusBox from '@/_components/statusBox';
+import DatasetLabeller from '@/components/datasetLabeller';
+import StatusBox from '@/components/statusBox';
 
 
 

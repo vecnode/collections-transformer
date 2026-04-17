@@ -1,19 +1,19 @@
 import Head from 'next/head'
 import React, {useEffect, useState} from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from "@/_contexts/AuthContext";
-import { withAuth } from "@/_components/withAuth";
-import StatusBox from '@/_components/statusBox';
+import { useAuth } from "@/contexts/AuthContext";
+import { withAuth } from "@/components/withAuth";
+import StatusBox from '@/components/statusBox';
 import { useSearchParams } from 'next/navigation'
 
 
 
-import OverviewAnalyser from '@/_components/overviewanalyser';
+import OverviewAnalyser from '@/components/overviewanalyser';
 
 
-import ErrorBox from '@/_components/errorBox';
+import ErrorBox from '@/components/errorBox';
 
-import { getFilterErrorString } from '@/_helpers/utills';
+import { getFilterErrorString } from '@/lib/contentFilter';
 
 
 const Analyser = () => {

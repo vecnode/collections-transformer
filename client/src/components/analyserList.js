@@ -1,7 +1,8 @@
 'use client'
  
 import Link from 'next/link';
-import { dateFromObjectId, formatAnalyserType } from '@/_helpers/utills';
+import { dateFromObjectId } from '@/lib/date';
+import { formatAnalyserType } from '@/lib/labels';
 
 
 

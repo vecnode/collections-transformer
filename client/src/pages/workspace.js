@@ -1,14 +1,14 @@
 import Head from 'next/head'
 import React, {useEffect, useState} from 'react'
 
-import AnalyserList from '../_components/analyserList'
-import DatasetList from '../_components/datasetList'
-import LabelsetsList from '../_components/labelsetsList'
-import AgentList from '../_components/agentList'
-import StatusBox from '@/_components/statusBox';
-import AnalysisDetailsModal from '@/_components/analysisDetailsModal';
-import { useAuth } from "@/_contexts/AuthContext";
-import { withAuth } from "@/_components/withAuth";
+import AnalyserList from '../components/analyserList'
+import DatasetList from '../components/datasetList'
+import LabelsetsList from '../components/labelsetsList'
+import AgentList from '../components/agentList'
+import StatusBox from '@/components/statusBox';
+import AnalysisDetailsModal from '@/components/analysisDetailsModal';
+import { useAuth } from "@/contexts/AuthContext";
+import { withAuth } from "@/components/withAuth";
 
 
 

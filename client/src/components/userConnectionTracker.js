@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useAuth } from '@/_contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const UserConnectionTracker = () => {
   const { user } = useAuth();

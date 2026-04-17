@@ -29,6 +29,7 @@ import {
   rankItem,
   compareItems,
 } from '@tanstack/match-sorter-utils'
+import { example_val_to_label } from '@/lib/labels'
 
 const fuzzyFilter = (row, columnId, value, addMeta) => {
   // Rank the item

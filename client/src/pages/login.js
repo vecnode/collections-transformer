@@ -3,7 +3,7 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/_contexts/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 
 const Login = () => {
   const [username, setUsername] = useState('')

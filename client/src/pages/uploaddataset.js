@@ -3,11 +3,11 @@
 import Head from 'next/head'
 import React, {useEffect, useState} from 'react'
 
-import { useAuth } from "@/_contexts/AuthContext";
-import { withAuth } from "@/_components/withAuth";
+import { useAuth } from "@/contexts/AuthContext";
+import { withAuth } from "@/components/withAuth";
 import { useRouter } from 'next/navigation'
-import FileUploader from '../_components/fileUploader'
-import StatusBox from '@/_components/statusBox'
+import FileUploader from '../components/fileUploader'
+import StatusBox from '@/components/statusBox'
 
 
 

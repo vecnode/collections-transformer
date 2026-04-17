@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
-import DatasetModal from '../_components/datasetModal';
+import DatasetModal from '../components/datasetModal';
 
 
-import { useAuth } from "@/_contexts/AuthContext";
-import { withAuth } from "@/_components/withAuth";
+import { useAuth } from "@/contexts/AuthContext";
+import { withAuth } from "@/components/withAuth";
 
 // Custom Image Thumbnail Component for Table (from findpatterns.js)
 const ImageThumbnail = ({ itemId, imageStorageId }) => {

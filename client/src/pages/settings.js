@@ -2,8 +2,8 @@
 
 import Head from 'next/head'
 import React, { useState, useEffect } from 'react'
-import { useAuth } from "@/_contexts/AuthContext";
-import { withAuth } from "@/_components/withAuth";
+import { useAuth } from "@/contexts/AuthContext";
+import { withAuth } from "@/components/withAuth";
 
 const Settings = () => {
   const { user, isLoading } = useAuth();
