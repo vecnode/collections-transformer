@@ -1,11 +1,13 @@
 
 
 
-import os
+import logging
 from datetime import datetime
 import re
-os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
-os.environ["PYTORCH_USE_CUDA_DSA"] = "1"
+from config import apply_runtime_environment
+
+
+apply_runtime_environment()
 
 import random
 
@@ -15,6 +17,16 @@ from . import provider_openai as provider_openai
 from . import provider_blip2 as provider_blip2
 
 
+logger = logging.getLogger(__name__)
+
+
+def _log_print(*args, **kwargs):
+  logger.info(" ".join(str(arg) for arg in args))
+
+
+print = _log_print
+
+
 
 
 def init(model):
@@ -22,11 +34,6 @@ def init(model):
     global model_source
 
     model_source=model
-    
-    env_value = os.environ.get("ENVIRONMENT")
-    if env_value is None:
-        env_value = "default"
-    os.environ["ENVIRONMENT"] = env_value
     
     # Initialize all providers - they will all be available
     # User can choose text provider (Ollama/OpenAI) in Settings

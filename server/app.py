@@ -1,6 +1,10 @@
-from api import create_app
-from gevent.pywsgi import WSGIServer
 import argparse
+
+from api import create_app
+from config import configure_logging, settings
+from gevent.pywsgi import WSGIServer
+
+configure_logging()
 
 
 def app(model="dual", port=8080):
@@ -16,8 +20,8 @@ def app(model="dual", port=8080):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-m", "--model", action="store", default="dual")
-parser.add_argument("-p", "--port", action="store", default=8080)
-parser.add_argument("-r", "--reload", action="store", default="False")
+parser.add_argument("-p", "--port", action="store", default=settings.api_port)
+parser.add_argument("-r", "--reload", action="store", default=str(settings.flask_reload))
 args, unknown = parser.parse_known_args()
 model = args.model
 
@@ -27,6 +31,6 @@ if __name__ == '__main__':
 
     app = create_app(args.model)
     # Disable reloader to prevent process from exiting in terminal
-    app.run(debug=True, port=port, use_reloader=False, host='0.0.0.0')
+    app.run(debug=settings.flask_debug, port=port, use_reloader=reload, host=settings.api_host)
 
 

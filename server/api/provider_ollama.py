@@ -1,7 +1,11 @@
-import os
-import requests
+import logging
 import traceback
 from datetime import datetime
+
+import requests
+from config import settings
+
+logger = logging.getLogger(__name__)
 
 ollama_model_option = None
 ollama_base_url = None
@@ -10,60 +14,64 @@ def init_ollama():
     """Initialize Ollama configuration"""
     global ollama_model_option, ollama_base_url
     
-    ollama_model_option = os.environ.get('OLLAMA_MODEL_OPTION', 'gemma3:27b')
-    ollama_base_url = os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')
+    ollama_model_option = settings.ollama_model_option
+    ollama_base_url = settings.ollama_base_url
     
     # Test connection to Ollama
     try:
         response = requests.get(f"{ollama_base_url}/api/tags", timeout=5)
         if response.status_code == 200:
-            print(f"Ollama initialized successfully with model: {ollama_model_option}")
+            logger.info("Ollama initialized successfully with model: %s", ollama_model_option)
         else:
-            print(f"Warning: Ollama connection test returned status {response.status_code}")
+            logger.warning("Ollama connection test returned status %s", response.status_code)
     except Exception as e:
-        print(f"Warning: Could not connect to Ollama at {ollama_base_url}: {e}")
+        logger.warning("Could not connect to Ollama at %s: %s", ollama_base_url, e)
 
 def list_ollama_models():
     """List all available Ollama models"""
     try:
-        ollama_base_url = os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')
-        print(f"Fetching Ollama models from: {ollama_base_url}/api/tags")
+        ollama_base_url = settings.ollama_base_url
+        logger.info("Fetching Ollama models from: %s/api/tags", ollama_base_url)
         response = requests.get(f"{ollama_base_url}/api/tags", timeout=5)
-        
-        print(f"Ollama API response status: {response.status_code}")
+
+        logger.info("Ollama API response status: %s", response.status_code)
         
         if response.status_code == 200:
             data = response.json()
-            print(f"Ollama API response data: {data}")
+            logger.debug("Ollama API response data: %s", data)
             models = []
             if 'models' in data:
                 for model in data['models']:
                     model_name = model.get('name', '')
                     if model_name:
                         models.append(model_name)
-            print(f"Extracted models: {models}")
+            logger.info("Extracted %s Ollama models", len(models))
             return {
                 "status": "200",
                 "models": models
             }
         else:
-            print(f"Ollama API returned non-200 status: {response.status_code}, response: {response.text}")
+            logger.warning(
+                "Ollama API returned non-200 status: %s, response: %s",
+                response.status_code,
+                response.text,
+            )
             return {
                 "status": "400",
                 "error": f"Ollama API returned status {response.status_code}",
                 "models": []
             }
     except requests.exceptions.RequestException as e:
-        print(f"Network error connecting to Ollama: {e}")
-        print(traceback.format_exc())
+        logger.error("Network error connecting to Ollama: %s", e)
+        logger.debug(traceback.format_exc())
         return {
             "status": "400",
             "error": f"Network error connecting to Ollama: {str(e)}",
             "models": []
         }
     except Exception as e:
-        print(f"Exception in list_ollama_models: {e}")
-        print(traceback.format_exc())
+        logger.error("Exception in list_ollama_models: %s", e)
+        logger.debug(traceback.format_exc())
         return {
             "status": "400",
             "error": str(e),
@@ -140,18 +148,16 @@ def get_ollama_gpt_response(primer_message, user_message, max_words=None):
         }
     
     except requests.exceptions.RequestException as e:
-        print("Network exception in get_ollama_gpt_response")
-        print(e)
-        print(traceback.format_exc())
+        logger.error("Network exception in get_ollama_gpt_response: %s", e)
+        logger.debug(traceback.format_exc())
         return {
             "status": "400",
             "error": f"Network error connecting to Ollama: {str(e)}"
         }
     
     except Exception as e:
-        print("exception in get_ollama_gpt_response")
-        print(e)
-        print(traceback.format_exc())
+        logger.exception("Exception in get_ollama_gpt_response")
+        logger.debug(traceback.format_exc())
         return {
             "status": "400",
             "error": str(e)

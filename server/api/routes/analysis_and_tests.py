@@ -216,7 +216,7 @@ def test_openrouter():
                 "error": "Question parameter is required"
             }), 400
 
-        if not os.environ.get('OPENROUTER_API_KEY'):
+        if not settings.openrouter_api_key:
             return jsonify({
                 "status": "400",
                 "error": "OpenRouter is not configured. Please set OPENROUTER_API_KEY in your .env file."
@@ -227,7 +227,7 @@ def test_openrouter():
         response = requests.post(
             url="https://openrouter.ai/api/v1/chat/completions",
             headers={
-                "Authorization": f"Bearer {os.environ.get('OPENROUTER_API_KEY')}",
+                "Authorization": f"Bearer {settings.openrouter_api_key}",
                 "HTTP-Referer": "<YOUR_SITE_URL>",
                 "X-Title": "<YOUR_SITE_NAME>",
             },
@@ -277,7 +277,7 @@ def test_openrouter_image():
                 "status": "400",
                 "error": "Image URL parameter is required"
             }), 400
-        if not os.environ.get('OPENROUTER_API_KEY'):
+        if not settings.openrouter_api_key:
             return jsonify({
                 "status": "400",
                 "error": "OpenRouter is not configured. Please set OPENROUTER_API_KEY in your .env file."
@@ -289,7 +289,7 @@ def test_openrouter_image():
         response = requests.post(
             url="https://openrouter.ai/api/v1/chat/completions",
             headers={
-                "Authorization": f"Bearer {os.environ.get('OPENROUTER_API_KEY')}",
+                "Authorization": f"Bearer {settings.openrouter_api_key}",
                 "Content-Type": "application/json",
                 "HTTP-Referer": "<YOUR_SITE_URL>",
                 "X-Title": "<YOUR_SITE_NAME>",

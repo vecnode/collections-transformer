@@ -1,5 +1,6 @@
 import os
 import re
+import logging
 
 from flask import request
 from flask import jsonify
@@ -14,9 +15,18 @@ from flask import Blueprint
 import traceback
 from . import provider_ollama
 from pathlib import Path
+from config import settings
 
 
 endpoints_bp = Blueprint('endpoints', __name__)
+logger = logging.getLogger(__name__)
+
+
+def _log_print(*args, **kwargs):
+    logger.info(" ".join(str(arg) for arg in args))
+
+
+print = _log_print
 
 
 def parse_json(data):

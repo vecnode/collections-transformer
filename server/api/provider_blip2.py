@@ -1,4 +1,4 @@
-import os
+import logging
 import requests
 from PIL import Image
 from transformers import Blip2Processor, Blip2ForConditionalGeneration
@@ -6,6 +6,17 @@ import traceback
 from datetime import datetime
 import base64
 import io
+from config import settings
+
+
+logger = logging.getLogger(__name__)
+
+
+def _log_print(*args, **kwargs):
+    logger.info(" ".join(str(arg) for arg in args))
+
+
+print = _log_print
 
 blip2_processor = None
 blip2_model = None
@@ -15,7 +26,7 @@ def init_blip2(force_cpu=False):
     """Initialize Blip2 model"""
     global blip2_processor, blip2_model, blip2_model_name
     
-    blip2_model_name = os.environ.get('BLIP2_MODEL_NAME', 'Salesforce/blip2-opt-2.7b')
+    blip2_model_name = settings.blip2_model_name
     
     import torch
     

@@ -72,3 +72,5 @@ server/db.sqlite
 server/wandb/
 
 server/db/
+
+.ruff_cache/

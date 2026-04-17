@@ -1,10 +1,7 @@
-import os
 import logging
-from typing import Optional
 
-from dotenv import load_dotenv
 import gridfs
-
+from config import configure_logging, settings
 from flask import Flask
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -12,19 +9,18 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 
 from . import llm_modelling
 
-
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+configure_logging()
 logger = logging.getLogger(__name__)
 
 # Configuration constants
-DEFAULT_URI = "mongodb://127.0.0.1:27017"
-DEFAULT_DATABASE = "tanc_database"
-DEFAULT_UPLOAD_FOLDER = '/cache'
+DEFAULT_URI = settings.mongodb_uri
+DEFAULT_DATABASE = settings.mongodb_database
+DEFAULT_UPLOAD_FOLDER = settings.upload_folder
 SUPPORTED_MODELS = ["ollama", "blip2", "dual"]
 
 # Global variables
-client: Optional[MongoClient] = None
+client: MongoClient | None = None
 db = None
 grid_fs = None
 
@@ -101,15 +97,14 @@ def setup_flask_app() -> Flask:
     try:
         logger.info("Creating Flask application")
         app = Flask(__name__)
-        # Set secret key for sessions (use environment variable or default)
-        app.secret_key = os.getenv('FLASK_SECRET_KEY', 'local-dev-secret-key-change-in-production')
+        app.secret_key = settings.flask_secret_key
         app.config['SESSION_COOKIE_HTTPONLY'] = True
         app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
         app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 24 hours
         # Configure CORS with credentials support
         logger.info("Configuring CORS")
         # CORS: When using credentials, must specify exact origins (cannot use "*")
-        CORS(app, resources={r"/backend/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"], "supports_credentials": True}}, allow_headers="*", methods=["GET", "POST", "OPTIONS", "PUT", "DELETE"], supports_credentials=True, expose_headers="*")
+        CORS(app, resources={r"/backend/*": {"origins": settings.cors_origins, "supports_credentials": True}}, allow_headers="*", methods=["GET", "POST", "OPTIONS", "PUT", "DELETE"], supports_credentials=True, expose_headers="*")
         logger.info("Flask application created successfully")
         return app
         
@@ -123,15 +118,7 @@ def load_environment_variables() -> None:
     """
     Load environment variables from .env file.
     """
-    try:
-        logger.info("Loading environment variables from .env file")
-        load_dotenv()
-        logger.info("Environment variables loaded successfully")
-    except FileNotFoundError:
-        logger.warning(".env file not found. Using system environment variables.")
-    except Exception as e:
-        logger.error(f"Failed to load environment variables: {e}")
-        raise
+    logger.debug("Environment variables loaded through config module")
 
 
 
@@ -174,8 +161,6 @@ def create_app(model: str = "dual") -> Flask:
     """
     global client, db, grid_fs
     try:
-        print("======================================================")
-        print("======================================================")
         logger.info("Starting Flask application creation")
         # Validate parameters
         validated_model = validate_model_parameter(model)
@@ -193,10 +178,9 @@ def create_app(model: str = "dual") -> Flask:
         # Set up ML modelling
         setup_ml_modelling(validated_model)
         logger.info("Flask application created successfully")
-        print("======================================================")
         return app
     
-    except (ValueError, ConnectionFailure, ImportError) as e:
+    except (ValueError, ConnectionFailure, ImportError):
         # Re-raise specific exceptions
         raise
     except Exception as e:

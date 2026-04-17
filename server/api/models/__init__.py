@@ -1,4 +1,5 @@
 from api import db, grid_fs
+import logging
 
 from bson.objectid import ObjectId
 import bson.binary
@@ -20,6 +21,7 @@ from PIL import Image
 import traceback
 import pytz
 from pathlib import Path
+from config import settings
 
 category_collection = db["category"]
 analyser_collection = db["classifier"]
@@ -35,6 +37,14 @@ analysis_history_collection = db["analysis_history"]
 agent_collection = db["agent"]
 
 formatExamplesInsidePrompt = True
+logger = logging.getLogger(__name__)
+
+
+def _log_print(*args, **kwargs):
+    logger.info(" ".join(str(arg) for arg in args))
+
+
+print = _log_print
 
 
 # Load model domains in-order into this module namespace to preserve legacy API.

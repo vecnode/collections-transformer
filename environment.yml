@@ -1,9 +1,0 @@
-name: collections-transformer
-channels:
-  - conda-forge
-  - defaults
-dependencies:
-  - python=3.12.1
-  - nodejs=18.18.2
-  - uv
-

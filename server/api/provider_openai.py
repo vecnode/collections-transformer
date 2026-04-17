@@ -1,16 +1,19 @@
-import os
+import logging
 from datetime import datetime
+
 import openai
+from config import settings
+
+logger = logging.getLogger(__name__)
 
 openai_model_option = None
 
 def init_openai():
     """Initialize OpenAI configuration"""
     global openai_model_option
-    
-    os.environ['OPENAI_API_KEY'] = os.environ.get('OPENAI_API_KEY')
-    os.environ['OPENAI_API_TYPE'] = os.environ.get('OPENAI_API_TYPE')
-    openai_model_option = os.environ.get('OPENAI_MODEL_OPTION')
+
+    openai.api_key = settings.openai_api_key
+    openai_model_option = settings.openai_model_option
 
 def get_openai_gpt_response(primer_message, user_message, max_words=None):
     """Get response from OpenAI GPT"""
@@ -56,7 +59,6 @@ def get_openai_gpt_response(primer_message, user_message, max_words=None):
             "token":token_usage 
         }
     
-    except Exception as e:
-        print("exception in get_openai_gpt_response")
-        print(e)
+    except Exception:
+        logger.exception("Exception in get_openai_gpt_response")
 

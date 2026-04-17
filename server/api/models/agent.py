@@ -13,7 +13,7 @@ class Agent():
                 "config": config or {
                     "temperature": 0.8,
                     "max_tokens": 1000,
-                    "model": os.environ.get('OLLAMA_MODEL_OPTION', 'gemma3:27b')
+                    "model": settings.ollama_model_option
                 },
                 "functions": []
             }
