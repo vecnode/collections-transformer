@@ -151,11 +151,10 @@ class User():
         return False
     
     def get_user_preferences(user_id):
-        """Get user preferences including text provider"""
+        """Get user preferences (Ollama-only text provider)."""
         user = user_collection.find_one({"user_id": user_id})
         if user:
             preferences = user.get("preferences", {})
-            # Default to "ollama" if not set
             text_provider = preferences.get("text_provider", "ollama")
             return {
                 "text_provider": text_provider
@@ -170,8 +169,8 @@ class User():
         preferences = user.get("preferences", {}) if user else {}
         
         if text_provider is not None:
-            if text_provider not in ["ollama", "openai"]:
-                return False, "Invalid text provider. Must be 'ollama' or 'openai'"
+            if text_provider != "ollama":
+                return False, "Invalid text provider. Must be 'ollama'"
             preferences["text_provider"] = text_provider
         
         update_data = {"preferences": preferences}

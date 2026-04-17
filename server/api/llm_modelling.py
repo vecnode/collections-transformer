@@ -13,7 +13,6 @@ import random
 
 import numpy as np
 
-from . import provider_openai as provider_openai
 from . import provider_blip2 as provider_blip2
 
 
@@ -35,21 +34,13 @@ def init(model):
 
     model_source=model
     
-    # Initialize all providers - they will all be available
-    # User can choose text provider (Ollama/OpenAI) in Settings
-    # Blip2 is always used for images
+    # Initialize all providers used by the platform.
     try:
         from . import provider_ollama as provider_ollama
         provider_ollama.init_ollama()
         print("Ollama initialized (available for text tasks)")
     except Exception as e:
         print(f"Warning: Could not initialize Ollama: {e}")
-    
-    try:
-        provider_openai.init_openai()
-        print("OpenAI initialized (available for text tasks)")
-    except Exception as e:
-        print(f"Warning: Could not initialize OpenAI: {e}")
     
     try:
         provider_blip2.init_blip2()
@@ -307,23 +298,13 @@ def get_batch_predictions(i,test_batch, system_prompt, analyser_type, analyser_f
       batch_end_time = None
       metrics = None
 
-      # Get results from chosen AI provider
-      # Use Ollama for text tasks (default), Blip2 for image tasks
-      if model_source == "openai":
-        model_result = provider_openai.get_openai_gpt_response(system_prompt, user_prompt)
-        if model_result['status']=="200":
-          batch_end_time = model_result["end"]
-          response_text = model_result["res"]
-          token_usage = model_result["token"]
-      else:
-        # Default: Use Ollama for text tasks
-        from . import provider_ollama as provider_ollama
-        provider_ollama.init_ollama()
-        model_result = provider_ollama.get_ollama_gpt_response(system_prompt, user_prompt)
-        if model_result.get('status') == "200":
-          batch_end_time = model_result.get("end")
-          response_text = model_result.get("res", "")
-          token_usage = model_result.get("token")
+      from . import provider_ollama as provider_ollama
+      provider_ollama.init_ollama()
+      model_result = provider_ollama.get_ollama_gpt_response(system_prompt, user_prompt)
+      if model_result.get('status') == "200":
+        batch_end_time = model_result.get("end")
+        response_text = model_result.get("res", "")
+        token_usage = model_result.get("token")
         
 
       if len(response_text)>0:

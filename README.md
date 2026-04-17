@@ -1,5 +1,7 @@
 # Collections Transformer
 
+Under heavy development.
+
 Agent-based platform for multimodal LLM analysis of datasets in the GLAM sector.
 
 Code developed in the context of the UKRI project "Transforming Collections" undertaken at UAL "Towards a National Collection (TaNC)".
@@ -57,7 +59,7 @@ You can also use the helper scripts from the repository root:
 Server settings are centralized in `server/config.py`.
 
 1. Copy `server/.env.template` to `server/.env`.
-2. Fill in the provider keys you plan to use (`OPENAI_API_KEY`, `OPENROUTER_API_KEY`, etc.).
+2. Configure Ollama settings (`OLLAMA_BASE_URL` and `OLLAMA_MODEL_OPTION`).
 3. Adjust runtime values only if needed (`API_PORT`, `MONGODB_URI`, `LOG_LEVEL`, `OLLAMA_BASE_URL`).
 
 Important variables:
@@ -65,31 +67,21 @@ Important variables:
 - `ENVIRONMENT`, `LOG_LEVEL`
 - `API_HOST`, `API_PORT`, `FLASK_DEBUG`, `FLASK_RELOAD`
 - `MONGODB_URI`, `MONGODB_DATABASE`
-- `OPENAI_API_KEY`, `OPENAI_MODEL_OPTION`
 - `OLLAMA_MODEL_OPTION`, `OLLAMA_BASE_URL`
 - `BLIP2_MODEL_NAME`
 
-```
-NEXT_PUBLIC_SERVER_URL = ""
-AUTH0_SECRET = "{AUTH0 SECRET}"
-AUTH0_ISSUER_BASE_URL = "{YOUR TENANT URL}"
-AUTH0_CLIENT_ID = "{AUTH0 CLIENT ID}"
-AUTH0_CLIENT_SECRET = "{AUTH0 CLIENT SECRET}"
-AUTH0_DOMAIN = "{YOUR TENANT URL}"
-```
+
 
 ## Quality checks
-
-The repo includes minimal Python quality tooling configuration in `pyproject.toml` and CI in `.github/workflows/server-quality.yml`.
 
 Run locally:
 
 ```bash
-ruff check server/app.py server/config.py server/api/__init__.py server/api/provider_openai.py server/api/provider_ollama.py
+ruff check server/app.py server/config.py server/api/__init__.py server/api/provider_ollama.py
 pytest
 ```
 
-Models used for inference are gpt4-o for OpenAI API. Alter the keys on the environment files respectively. For Azure the user might add Endpoints via Azure AI Studio.
+Text inference is Ollama-only, with Blip2 used for image processing.
 
 ### Current deployment
 

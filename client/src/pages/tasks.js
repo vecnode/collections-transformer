@@ -455,7 +455,7 @@ const Tasks = () => {
   const [chatMessages, setChatMessages] = useState([]); // New state for chat messages
   const [maxSentences, setMaxSentences] = useState(3); // New state for sentence limit
   const [taskType, setTaskType] = useState(null); // 'human', 'ai', or null
-  const [serviceProvider, setServiceProvider] = useState('Ollama'); // 'Ollama' or 'OpenAI'
+  const [serviceProvider, setServiceProvider] = useState('Ollama');
   // Task is now determined by the selected agent's task_type
   const scrollPositionRef = useRef({ container: null, position: 0 });
 
@@ -755,7 +755,7 @@ const Tasks = () => {
         })
       };
     } else {
-      // Existing flow for Human Task or OpenAI
+      // Existing flow for Human Task
       endpoint = "/backend/findpatterns_create?";
       
       // Extract up to 3 annotations from chat messages
@@ -1221,7 +1221,6 @@ const Tasks = () => {
                 }}
               >
                 <option value="Ollama">Ollama</option>
-                <option value="OpenAI">OpenAI</option>
               </select>
             </div>
             <div style={{ border: '1px solid grey', borderRadius: '5px', padding: '10px', paddingLeft: '20px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

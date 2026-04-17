@@ -82,23 +82,10 @@ def findpatterns_create():
                         if analyser_type == 'opinion':
                             max_words = max_sentences * 20
                         
-                        # Use user's preferred text provider, Blip2 for images
+                        # Use Ollama for text and Blip2 for image-aware tasks.
                         if dataset_format == "text":
-                            # Text-only inference: Use user's preferred provider
-                            user_id = data.get('user_id') or session.get('user_id')
-                            if user_id:
-                                preferences = models.User.get_user_preferences(user_id)
-                                text_provider = preferences.get('text_provider', 'ollama')
-                            else:
-                                text_provider = 'ollama'  # Default
-                            
-                            if text_provider == 'openai':
-                                from .provider_openai import get_openai_gpt_response
-                                llm_response = get_openai_gpt_response(system_prompt, user_prompt, max_words)
-                            else:
-                                # Default to Ollama
-                                provider_ollama.init_ollama()
-                                llm_response = provider_ollama.get_ollama_gpt_response(system_prompt, user_prompt, max_words)
+                            provider_ollama.init_ollama()
+                            llm_response = provider_ollama.get_ollama_gpt_response(system_prompt, user_prompt, max_words)
                         else:
                             # Multimodal inference (images): Use Blip2
                             from . import provider_blip2 as provider_blip2

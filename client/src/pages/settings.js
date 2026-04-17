@@ -11,9 +11,7 @@ const Settings = () => {
   const router = useRouter();
   const [ollamaBackend, setOllamaBackend] = useState('');
   const [ollamaModels, setOllamaModels] = useState([]);
-  const [openaiApiKey, setOpenaiApiKey] = useState('');
   const [loadingModels, setLoadingModels] = useState(true);
-  const [textProvider, setTextProvider] = useState('ollama');
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   
@@ -36,8 +34,8 @@ const Settings = () => {
     }), requestOptions)
       .then(response => response.json())
       .then(res => {
-        if (res.status === 200 && res.data) {
-          setTextProvider(res.data.text_provider || 'ollama');
+        if (res.status !== 200) {
+          console.error('Failed to load preferences:', res.error);
         }
       })
       .catch(error => {
@@ -55,7 +53,7 @@ const Settings = () => {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         user_id: user.user_id || user.sub,
-        text_provider: textProvider
+        text_provider: 'ollama'
       })
     };
     
@@ -126,20 +124,7 @@ const Settings = () => {
           
           <div style={{ border: '1px solid grey', borderRadius: '5px', padding: '10px', paddingLeft: '20px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 'bold' }}>Text Provider:</span>
-            <select
-              value={textProvider}
-              onChange={(e) => setTextProvider(e.target.value)}
-              style={{
-                border: '1px solid grey',
-                borderRadius: '5px',
-                padding: '8px 12px',
-                minWidth: '200px',
-                fontSize: '1rem'
-              }}
-            >
-              <option value="ollama">Ollama</option>
-              <option value="openai">OpenAI</option>
-            </select>
+            <span>Ollama</span>
           </div>
 
           <div style={{ border: '1px solid grey', borderRadius: '5px', padding: '10px', paddingLeft: '20px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -167,23 +152,6 @@ const Settings = () => {
                 <option value="">No models available</option>
               )}
             </select>
-          </div>
-
-          <div style={{ border: '1px solid grey', borderRadius: '5px', padding: '10px', paddingLeft: '20px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 'bold' }}>OpenAI API Key:</span>
-            <input
-              type="password"
-              value={openaiApiKey}
-              onChange={(e) => setOpenaiApiKey(e.target.value)}
-              placeholder="Enter API key"
-              style={{
-                border: '1px solid grey',
-                borderRadius: '5px',
-                padding: '8px 12px',
-                minWidth: '200px',
-                fontSize: '1rem'
-              }}
-            />
           </div>
 
           <div style={{ border: '1px solid grey', borderRadius: '5px', padding: '10px', paddingLeft: '20px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

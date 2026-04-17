@@ -430,39 +430,5 @@ def get_item_image():
 
 
 
-@endpoints_bp.route('/backend/test_openai', methods=['GET'])
-def test_openai():
-    try:
-        question = request.args.get('question')
-        if not question:
-            return jsonify({
-                "status": "400",
-                "error": "Question parameter is required"
-            }), 400
-        from openai import OpenAI
-        client = OpenAI()
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": question}
-            ]
-        )
-        return jsonify({
-            "status": "200",
-            "data": response.choices[0].message.content
-        }), 200
-    except Exception as e:
-        print("ERROR in test_openai endpoint")
-        print(e)
-        return jsonify({
-            "status": "500",
-            "error": str(e)
-        }), 500
-
-
-
-
-
 
 

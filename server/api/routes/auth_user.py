@@ -319,7 +319,7 @@ def get_user_preferences():
 
 @endpoints_bp.route('/backend/user/preferences', methods=['POST', 'OPTIONS'])
 def save_user_preferences():
-    """Save user preferences including text provider"""
+    """Save user preferences (Ollama-only text provider)."""
     if request.method == 'OPTIONS':
         return jsonify({}), 200
     
@@ -334,10 +334,10 @@ def save_user_preferences():
                 "error": "user_id is required"
             }), 400
         
-        if text_provider and text_provider not in ["ollama", "openai"]:
+        if text_provider and text_provider != "ollama":
             return jsonify({
                 "status": "400",
-                "error": "text_provider must be 'ollama' or 'openai'"
+                "error": "text_provider must be 'ollama'"
             }), 400
         
         success, message = models.User.update_user_preferences(user_id, text_provider=text_provider)

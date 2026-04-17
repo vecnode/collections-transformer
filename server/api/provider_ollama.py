@@ -132,7 +132,7 @@ def get_ollama_gpt_response(primer_message, user_message, max_words=None):
         llm_end_time_ms = round(datetime.now().timestamp() * 1000)
         response_text = result["message"]["content"]
         
-        # Ollama doesn't provide token usage in the same format as OpenAI
+        # Ollama token metadata uses a different shape than hosted chat APIs.
         # We'll estimate it or create a simple structure
         token_usage = {
             "prompt_tokens": result.get("prompt_eval_count", 0),
