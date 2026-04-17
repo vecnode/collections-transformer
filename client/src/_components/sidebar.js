@@ -23,6 +23,19 @@ const SideBar = () => {
         <div className="sidebar-container flex">
             <Sidebar collapsed={collapsed}>
                 <div className="sidebar-inner">
+                    <div className="sidebar-header">
+                        {!collapsed && <h4>Collections Transformer</h4>}
+                        <button
+                            type="button"
+                            className="sidebar-collapse-btn"
+                            onClick={() => setCollapsed((prev) => !prev)}
+                            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                        >
+                            <span className="material-symbols-outlined">
+                                {collapsed ? 'chevron_right' : 'chevron_left'}
+                            </span>
+                        </button>
+                    </div>
                     
                     <div className="sidebar-top">
                         <Menu>
