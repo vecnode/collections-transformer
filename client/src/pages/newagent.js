@@ -925,7 +925,7 @@ const NewAgent = () => {
       <div className="container">
 
         {/* Hero — full width, same as home */}
-        <section className="home-hero" style={{ marginBottom: '1.2rem' }}>
+        <section className="home-hero">
           <p className="home-kicker">Ollama · Local Inference</p>
           <h1>Create Agent</h1>
           <p className="home-subtitle">

@@ -1,8 +1,22 @@
 'use client'
 
-import React, {useEffect, useRef, useState, memo, useCallback} from 'react'
-import ItemImage from './itemImage'
-import Image from 'next/image'
+import React, { useEffect, useState, memo, useCallback } from 'react'
+import DatasetModal from './datasetModal'
+
+const ItemImage = ({ image_data }) => {
+    return (
+        <div className="item-image-container">
+            <DatasetModal
+                title={"Image Viewer"}
+                iconName="fullscreen"
+                canCancel={false}
+            >
+                <img className="item-image" src={image_data} />
+            </DatasetModal>
+            <img className="item-image-thumbnail" src={image_data} />
+        </div>
+    )
+}
 
 const ItemImageLoader = ({
     item_id, 

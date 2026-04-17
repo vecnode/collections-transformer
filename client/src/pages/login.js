@@ -49,6 +49,7 @@ const Login = () => {
           <div style={{ width: '45%', maxWidth: '500px', padding: '30px' }}>
             <h1 style={{ textAlign: 'center', marginBottom: '30px' }}>Collections Transformer</h1>
             <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Login</h2>
+            <p style={{ textAlign: 'center', marginBottom: '20px', color: '#555' }}>Local session only (no cloud login)</p>
             
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
               <div>
@@ -92,8 +93,8 @@ const Login = () => {
               </button>
             </form>
             
-            <div style={{ marginTop: '20px', textAlign: 'center' }}>
-              <p>Don't have an account? <a href="/register">Register here</a></p>
+            <div style={{ marginTop: '20px', textAlign: 'center', color: '#666' }}>
+              <p>Use any username/password to start a local session.</p>
             </div>
           </div>
         </div>

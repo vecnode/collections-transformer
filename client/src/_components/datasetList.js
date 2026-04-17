@@ -54,7 +54,8 @@ const DatasetList = ({
   },[datasets])
 
   return (
-    <table id="datasets" className="table table-striped">
+    <div className="ws-table-wrap">
+    <table id="datasets" className="ws-table">
     <thead>
       <tr>
         <th>Name</th>
@@ -99,20 +100,7 @@ const DatasetList = ({
             </td>
             <td>
             { 'owner' in dataset && dataset.owner == user_id ? (
-              <button 
-                onClick={() => onDeleteHandler(dataset)}
-                style={{
-                  padding: '4px 8px',
-                  backgroundColor: 'white',
-                  color: 'black',
-                  border: '1px solid black',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-              >
+              <button className="ws-btn ws-btn--danger" onClick={() => onDeleteHandler(dataset)}>
                 Delete
               </button>
             ) : (
@@ -123,11 +111,9 @@ const DatasetList = ({
         ) : (<></>)
       )
     })}
-      <tr>
-        
-      </tr>
     </tbody>
     </table>
+    </div>
   );
 }
 

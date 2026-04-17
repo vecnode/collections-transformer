@@ -88,7 +88,7 @@ const DatasetPage = () => {
         <div className="container">
 
           {/* Hero — full width, same as home/newagent */}
-          <section className="home-hero" style={{ marginBottom: '1.2rem' }}>
+          <section className="home-hero">
             <p className="home-kicker">Collections Management</p>
             <h1>Dataset</h1>
             <p className="home-subtitle">

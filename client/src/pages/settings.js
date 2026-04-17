@@ -2,13 +2,11 @@
 
 import Head from 'next/head'
 import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAuth } from "@/_contexts/AuthContext";
 import { withAuth } from "@/_components/withAuth";
 
 const Settings = () => {
   const { user, isLoading } = useAuth();
-  const router = useRouter();
   const [ollamaBackend, setOllamaBackend] = useState('');
   const [ollamaModels, setOllamaModels] = useState([]);
   const [loadingModels, setLoadingModels] = useState(true);
@@ -123,7 +121,7 @@ const Settings = () => {
           <hr/>
           
           <div style={{ border: '1px solid grey', borderRadius: '5px', padding: '10px', paddingLeft: '20px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 'bold' }}>Text Provider:</span>
+            <span style={{ fontWeight: 'bold' }}>LLM Provider:</span>
             <span>Ollama</span>
           </div>
 
@@ -154,33 +152,6 @@ const Settings = () => {
             </select>
           </div>
 
-          <div style={{ border: '1px solid grey', borderRadius: '5px', padding: '10px', paddingLeft: '20px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 'bold' }}>MongoDB Inspector:</span>
-            <button
-              onClick={() => router.push('/db')}
-              style={{
-                border: '1px solid grey',
-                borderRadius: '5px',
-                padding: '8px 12px',
-                minWidth: '200px',
-                fontSize: '1rem',
-                backgroundColor: 'transparent',
-                color: 'black',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s ease'
-              }}
-              onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-            >
-              Open
-            </button>
-          </div>
-
-          <div style={{ border: '1px solid grey', borderRadius: '5px', padding: '10px', paddingLeft: '20px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 'bold' }}>Change Password:</span>
-            <div></div>
-          </div>
-
           <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px' }}>
             {saveMessage && (
               <span style={{ color: saveMessage.includes('successfully') ? 'green' : 'red', fontSize: '0.9rem' }}>
@@ -204,7 +175,7 @@ const Settings = () => {
               onMouseEnter={(e) => !saving && (e.target.style.backgroundColor = '#f5f5f5')}
               onMouseLeave={(e) => !saving && (e.target.style.backgroundColor = 'transparent')}
             >
-              {saving ? 'Saving...' : 'Save'}
+              {saving ? 'Saving' : 'Save'}
             </button>
           </div>
         </div>

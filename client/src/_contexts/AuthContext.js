@@ -3,6 +3,24 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext(null)
+const LOCAL_AUTH_KEY = 'collections-transformer-local-user'
+
+const normalizeLocalUser = (data) => {
+  const username = data?.username || data?.name || 'local-user'
+  const email = data?.email || `${username}@local`
+  const userId = data?.user_id || data?.sub || username
+
+  return {
+    sub: userId,
+    user_id: userId,
+    username,
+    email,
+    name: data?.name || username,
+    nickname: data?.nickname || username,
+    role: data?.role || 'local-user',
+    affiliation: data?.affiliation || 'local'
+  }
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -10,37 +28,23 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    // Check if user is already logged in
+    // Restore local session from browser storage.
     verifySession()
   }, [])
 
   const verifySession = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL || ''}/backend/auth/verify`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' }
-      })
-      
-      const data = await response.json()
-      if (data.authenticated && data.data) {
-        setUser({
-          sub: data.data.user_id,
-          user_id: data.data.user_id,
-          username: data.data.username,
-          email: data.data.email,
-          name: data.data.username,
-          nickname: data.data.username,
-          role: data.data.role,
-          affiliation: data.data.affiliation
-        })
+      const raw = typeof window !== 'undefined' ? window.localStorage.getItem(LOCAL_AUTH_KEY) : null
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        setUser(normalizeLocalUser(parsed))
         setError(null)
       } else {
         setUser(null)
       }
     } catch (err) {
-      console.error('Session verification error:', err)
+      console.error('Local session verification error:', err)
       setUser(null)
       setError(null)
     } finally {
@@ -52,30 +56,24 @@ export function AuthProvider({ children }) {
     try {
       setIsLoading(true)
       setError(null)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL || ''}/backend/auth/login`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      })
-      
-      const data = await response.json()
-      if (data.status === '200' && data.data) {
-        setUser({
-          sub: data.data.user_id,
-          user_id: data.data.user_id,
-          username: data.data.username,
-          email: data.data.email,
-          name: data.data.username,
-          nickname: data.data.username
-        })
-        return { success: true }
-      } else {
-        setError(data.error || 'Login failed')
-        return { success: false, error: data.error || 'Login failed' }
+      const trimmedUsername = (username || '').trim()
+      const trimmedPassword = (password || '').trim()
+
+      if (!trimmedUsername || !trimmedPassword) {
+        const loginError = 'Please enter both username and password'
+        setError(loginError)
+        return { success: false, error: loginError }
       }
+
+      const nextUser = normalizeLocalUser({ username: trimmedUsername })
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(LOCAL_AUTH_KEY, JSON.stringify(nextUser))
+      }
+
+      setUser(nextUser)
+      return { success: true }
     } catch (err) {
-      const errorMsg = 'Failed to connect to server'
+      const errorMsg = 'Failed to create local session'
       setError(errorMsg)
       return { success: false, error: errorMsg }
     } finally {
@@ -87,30 +85,25 @@ export function AuthProvider({ children }) {
     try {
       setIsLoading(true)
       setError(null)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL || ''}/backend/auth/register`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password })
-      })
-      
-      const data = await response.json()
-      if (data.status === '200' && data.data) {
-        setUser({
-          sub: data.data.user_id,
-          user_id: data.data.user_id,
-          username: data.data.username,
-          email: data.data.email,
-          name: data.data.username,
-          nickname: data.data.username
-        })
-        return { success: true }
-      } else {
-        setError(data.error || 'Registration failed')
-        return { success: false, error: data.error || 'Registration failed' }
+      const trimmedUsername = (username || '').trim()
+      const trimmedEmail = (email || '').trim()
+      const trimmedPassword = (password || '').trim()
+
+      if (!trimmedUsername || !trimmedEmail || !trimmedPassword) {
+        const registerError = 'Please complete username, email, and password'
+        setError(registerError)
+        return { success: false, error: registerError }
       }
+
+      const nextUser = normalizeLocalUser({ username: trimmedUsername, email: trimmedEmail })
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(LOCAL_AUTH_KEY, JSON.stringify(nextUser))
+      }
+
+      setUser(nextUser)
+      return { success: true }
     } catch (err) {
-      const errorMsg = 'Failed to connect to server'
+      const errorMsg = 'Failed to create local account'
       setError(errorMsg)
       return { success: false, error: errorMsg }
     } finally {
@@ -119,18 +112,12 @@ export function AuthProvider({ children }) {
   }
 
   const logout = async () => {
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL || ''}/backend/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' }
-      })
-    } catch (err) {
-      console.error('Logout error:', err)
-    } finally {
-      setUser(null)
-      setError(null)
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(LOCAL_AUTH_KEY)
     }
+
+    setUser(null)
+    setError(null)
   }
 
   return (

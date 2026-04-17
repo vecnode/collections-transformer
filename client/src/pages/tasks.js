@@ -1,9 +1,32 @@
 import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
-import RadioList from '../_components/radioList';
 import DatasetModal from '../_components/datasetModal';
 
 import { useAuth } from "@/_contexts/AuthContext";
 import { withAuth } from "@/_components/withAuth";
+
+const RadioList = ({ items, name, selectedId, onChange, getLabel }) => (
+  <div>
+    {items.map(item => (
+      <label
+        key={item._id || item.id}
+        style={{
+          display: 'block',
+          marginBottom: '0px',
+          fontSize: 'small'
+        }}
+      >
+        <input
+          type="radio"
+          name={name}
+          value={item._id || item.id}
+          checked={selectedId === (item._id || item.id)}
+          onChange={() => onChange(item._id || item.id)}
+        />
+        <span style={{ marginLeft: '3px' }}>{getLabel(item)}</span>
+      </label>
+    ))}
+  </div>
+)
 
 // Custom Image Thumbnail Component for Table
 const ImageThumbnail = ({ itemId, imageStorageId }) => {

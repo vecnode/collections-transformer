@@ -19,7 +19,8 @@ const LabelsetList = ({
   });
 
   return (
-    <table id="Labelsets" className="table table-striped">
+    <div className="ws-table-wrap">
+    <table id="Labelsets" className="ws-table">
     <thead>
       <tr>
         <th>Name</th>
@@ -62,20 +63,7 @@ const LabelsetList = ({
           </td>
           <td>
           { labelset['owner'] == user.sub ? (
-              <button 
-                onClick={() => onDeleteHandler(labelset)}
-                style={{
-                  padding: '4px 8px',
-                  backgroundColor: 'white',
-                  color: 'black',
-                  border: '1px solid black',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-              >
+              <button className="ws-btn ws-btn--danger" onClick={() => onDeleteHandler(labelset)}>
                 Delete
               </button>
           ) : (
@@ -85,11 +73,9 @@ const LabelsetList = ({
         </tr>
       )
     })}
-      <tr>
-        
-      </tr>
     </tbody>
     </table>
+    </div>
   );
 }
 

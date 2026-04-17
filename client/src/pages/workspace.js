@@ -42,11 +42,7 @@ const Workspace = () => {
     const [labelsetToDelete, setLabelsetToDelete] = useState(null)
     const [showAgentDeleteModal, setShowAgentDeleteModal] = useState(false)
     const [agentToDelete, setAgentToDelete] = useState(null)
-    const [showTasks, setShowTasks] = useState(false)
-    const [showModels, setShowModels] = useState(false)
-    const [showAgents, setShowAgents] = useState(false)
-    const [showDatasets, setShowDatasets] = useState(false)
-    const [showAnnotations, setShowAnnotations] = useState(false)
+    const [activeTab, setActiveTab] = useState('history')
 
     useEffect(() => {
       getAnalysers()
@@ -416,6 +412,14 @@ const Workspace = () => {
     };
     
     const displayName = user.name === user.email ? user.nickname : user.name;
+    const hasAgentLoadingPlaceholder = agents.some(agent => agent && agent._id === 'Loading...');
+    const realAgentsCount = agents.filter(agent => agent && agent._id && agent._id !== 'Loading...').length;
+    const hasAnalyserLoadingPlaceholder = analysers.some(analyser => analyser && analyser.id === 'Loading...');
+    const realAnalysersCount = analysers.filter(analyser => analyser && analyser.id !== 'Loading...').length;
+    const hasDatasetLoadingPlaceholder = datasets.some(dataset => dataset && dataset.id === 'Loading...');
+    const realDatasetsCount = datasets.filter(dataset => dataset && dataset.id !== 'Loading...').length;
+    const hasLabelsetLoadingPlaceholder = labelsets.some(labelset => labelset && labelset.id === 'Loading...');
+    const realLabelsetsCount = labelsets.filter(labelset => labelset && labelset.id !== 'Loading...').length;
 
     return (
       <>
@@ -423,23 +427,22 @@ const Workspace = () => {
         <title>{title}</title>
       </Head>
 
-        {/* Hero — full width */}
-        <section className="home-hero" style={{ animationDelay: '0ms' }}>
-          <span className="home-kicker">Operations Dashboard</span>
-          <h1 className="home-title">Workspace</h1>
-          <p className="home-subtitle">
-            Signed in as <strong>{displayName}</strong>
-            {lastConnection && (
-              <> &mdash; last active {new Date(lastConnection).toLocaleString('en-GB', {
-                day: '2-digit', month: '2-digit', year: 'numeric',
-                hour: '2-digit', minute: '2-digit', hour12: false
-              })}</>
-            )}
-          </p>
-        </section>
+        <main className="ws-main">
+          <div className="container ws-shell">
 
-        <main>
-          <div className="ws-shell">
+            <section className="home-hero">
+              <span className="home-kicker">Operations Dashboard</span>
+              <h1 className="home-title">Workspace</h1>
+              <p className="home-subtitle">
+                Signed in as <strong>{displayName}</strong>
+                {lastConnection && (
+                  <> &mdash; last active {new Date(lastConnection).toLocaleString('en-GB', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', hour12: false
+                  })}</>
+                )}
+              </p>
+            </section>
 
             {/* Stat strip */}
             <div className="ws-stat-strip" style={{ animationDelay: '60ms' }}>
@@ -465,36 +468,47 @@ const Workspace = () => {
               </div>
             </div>
 
-            {/* Tasks card */}
-            <div className="agent-card" style={{ animationDelay: '120ms' }}>
-              <div className="agent-card-header">
-                <span className="agent-card-icon material-symbols-outlined">task_alt</span>
-                <div>
-                  <div className="agent-card-title">Analysis History</div>
-                  <div style={{ fontSize: '0.82rem', color: 'var(--ink-muted)', marginTop: '2px' }}>
-                    Saved runs from the Tasks page
-                  </div>
-                </div>
-                <button className="agent-card-toggle ms-auto" onClick={() => setShowTasks(!showTasks)}>
-                  <span className="material-symbols-outlined">{showTasks ? 'expand_less' : 'expand_more'}</span>
+            {/* Tab bar */}
+            <div className="ws-tabs">
+              {[
+                { id: 'history',     icon: 'task_alt',    label: 'Analysis History',  sub: 'Saved runs from the Tasks page' },
+                { id: 'agents',      icon: 'smart_toy',   label: 'Agents',            sub: 'Ollama model configurations' },
+                { id: 'analysers',   icon: 'analytics',   label: 'Analysers',         sub: 'Configured analysis pipelines' },
+                { id: 'datasets',    icon: 'folder_open', label: 'Datasets',          sub: 'Uploaded media collections' },
+                { id: 'annotations', icon: 'label',       label: 'Annotation Sets',   sub: 'Label schemas and category sets' },
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  className={`ws-tab${activeTab === tab.id ? ' ws-tab--active' : ''}`}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  <span className="material-symbols-outlined ws-tab-icon">{tab.icon}</span>
+                  <span className="ws-tab-label">{tab.label}</span>
+                  <span className="ws-tab-sub">{tab.sub}</span>
                 </button>
-              </div>
-              {showTasks && (
-                <div className="agent-card-body">
-                  <div className="ws-table-wrap">
-                    <table className="ws-table">
-                      <thead>
-                        <tr>
-                          <th>Date</th>
-                          <th>Task</th>
-                          <th>Dataset</th>
-                          <th>Status</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {analysisHistory.length > 0 ? (
-                          analysisHistory.map((analysis) => {
+              ))}
+            </div>
+
+            {/* Tab panel */}
+            <div className="agent-card ws-panel-card">
+              <div className="agent-card-body ws-panel-body">
+                {activeTab === 'history' && (
+                  analysisHistory.length === 0 ? (
+                    <div className="ws-empty">No saved analysis history yet. Save your first analysis from the Tasks page.</div>
+                  ) : (
+                    <div className="ws-table-wrap">
+                      <table className="ws-table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Task</th>
+                            <th>Dataset</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {analysisHistory.map((analysis) => {
                             const formattedDate = new Date(analysis.created_at).toLocaleDateString('en-GB', {
                               day: '2-digit', month: '2-digit', year: 'numeric',
                               hour: '2-digit', minute: '2-digit'
@@ -517,101 +531,49 @@ const Workspace = () => {
                                 </td>
                               </tr>
                             );
-                          })
-                        ) : (
-                          <tr>
-                            <td colSpan="5" className="ws-empty">No saved analysis history yet. Save your first analysis from the Tasks page.</td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )
+                )}
+                {activeTab === 'agents' && (
+                  <div className="ws-list-body">
+                    {!hasAgentLoadingPlaceholder && realAgentsCount === 0 ? (
+                      <div className="ws-empty">No agents yet. Create your first agent from the New Agent page.</div>
+                    ) : (
+                      <AgentList user_id={user.user_id || user.sub} agents={agents} onDeleteHandler={confirmDeleteAgent}/>
+                    )}
                   </div>
-                </div>
-              )}
-            </div>
-
-            {/* Agents card */}
-            <div className="agent-card" style={{ animationDelay: '160ms' }}>
-              <div className="agent-card-header">
-                <span className="agent-card-icon material-symbols-outlined">smart_toy</span>
-                <div>
-                  <div className="agent-card-title">Agents</div>
-                  <div style={{ fontSize: '0.82rem', color: 'var(--ink-muted)', marginTop: '2px' }}>
-                    Ollama model configurations
+                )}
+                {activeTab === 'analysers' && (
+                  <div className="ws-list-body">
+                    {!hasAnalyserLoadingPlaceholder && realAnalysersCount === 0 ? (
+                      <div className="ws-empty">No analysers yet. Create your first analyser from the New Agent page.</div>
+                    ) : (
+                      <AnalyserList user_id={user.user_id || user.sub} analysers={analysers} onDeleteHandler={confirmDeleteAnalyser}/>
+                    )}
                   </div>
-                </div>
-                <button className="agent-card-toggle ms-auto" onClick={() => setShowAgents(!showAgents)}>
-                  <span className="material-symbols-outlined">{showAgents ? 'expand_less' : 'expand_more'}</span>
-                </button>
+                )}
+                {activeTab === 'datasets' && (
+                  <div className="ws-list-body">
+                    {!hasDatasetLoadingPlaceholder && realDatasetsCount === 0 ? (
+                      <div className="ws-empty">No datasets yet. Upload your first dataset to get started.</div>
+                    ) : (
+                      <DatasetList user_id={user.user_id || user.sub} datasets={datasets} onDeleteHandler={confirmDeleteDataset}/>
+                    )}
+                  </div>
+                )}
+                {activeTab === 'annotations' && (
+                  <div className="ws-list-body">
+                    {!hasLabelsetLoadingPlaceholder && realLabelsetsCount === 0 ? (
+                      <div className="ws-empty">No annotation sets yet. Create a label schema to begin annotating.</div>
+                    ) : (
+                      <LabelsetsList user={user} labelsets={labelsets} onDeleteHandler={confirmDeleteLabelset}/>
+                    )}
+                  </div>
+                )}
               </div>
-              {showAgents && (
-                <div className="agent-card-body ws-list-body">
-                  <AgentList user_id={user.user_id || user.sub} agents={agents} onDeleteHandler={confirmDeleteAgent}/>
-                </div>
-              )}
-            </div>
-
-            {/* Analysers card */}
-            <div className="agent-card" style={{ animationDelay: '200ms' }}>
-              <div className="agent-card-header">
-                <span className="agent-card-icon material-symbols-outlined">analytics</span>
-                <div>
-                  <div className="agent-card-title">Analysers</div>
-                  <div style={{ fontSize: '0.82rem', color: 'var(--ink-muted)', marginTop: '2px' }}>
-                    Configured analysis pipelines
-                  </div>
-                </div>
-                <button className="agent-card-toggle ms-auto" onClick={() => setShowModels(!showModels)}>
-                  <span className="material-symbols-outlined">{showModels ? 'expand_less' : 'expand_more'}</span>
-                </button>
-              </div>
-              {showModels && (
-                <div className="agent-card-body ws-list-body">
-                  <AnalyserList user_id={user.user_id || user.sub} analysers={analysers} onDeleteHandler={confirmDeleteAnalyser}/>
-                </div>
-              )}
-            </div>
-
-            {/* Datasets card */}
-            <div className="agent-card" style={{ animationDelay: '240ms' }}>
-              <div className="agent-card-header">
-                <span className="agent-card-icon material-symbols-outlined">folder_open</span>
-                <div>
-                  <div className="agent-card-title">Datasets</div>
-                  <div style={{ fontSize: '0.82rem', color: 'var(--ink-muted)', marginTop: '2px' }}>
-                    Uploaded media collections
-                  </div>
-                </div>
-                <button className="agent-card-toggle ms-auto" onClick={() => setShowDatasets(!showDatasets)}>
-                  <span className="material-symbols-outlined">{showDatasets ? 'expand_less' : 'expand_more'}</span>
-                </button>
-              </div>
-              {showDatasets && (
-                <div className="agent-card-body ws-list-body">
-                  <DatasetList user_id={user.user_id || user.sub} datasets={datasets} onDeleteHandler={confirmDeleteDataset}/>
-                </div>
-              )}
-            </div>
-
-            {/* Annotations card */}
-            <div className="agent-card" style={{ animationDelay: '280ms' }}>
-              <div className="agent-card-header">
-                <span className="agent-card-icon material-symbols-outlined">label</span>
-                <div>
-                  <div className="agent-card-title">Annotation Sets</div>
-                  <div style={{ fontSize: '0.82rem', color: 'var(--ink-muted)', marginTop: '2px' }}>
-                    Label schemas and category sets
-                  </div>
-                </div>
-                <button className="agent-card-toggle ms-auto" onClick={() => setShowAnnotations(!showAnnotations)}>
-                  <span className="material-symbols-outlined">{showAnnotations ? 'expand_less' : 'expand_more'}</span>
-                </button>
-              </div>
-              {showAnnotations && (
-                <div className="agent-card-body ws-list-body">
-                  <LabelsetsList user={user} labelsets={labelsets} onDeleteHandler={confirmDeleteLabelset}/>
-                </div>
-              )}
             </div>
 
             {status !== 'Unknown' && (

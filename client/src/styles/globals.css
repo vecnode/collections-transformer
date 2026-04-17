@@ -286,7 +286,7 @@ padding: 0 10px 0 5px;
 #datasets,
 #Labelsets,
 #analysis-history {
-border: 1px solid black;
+border: none;
 border-radius: 12px;
 }
 
@@ -702,6 +702,7 @@ border: 1px solid var(--line-soft);
 border-radius: 12px;
 background: linear-gradient(140deg, #fbfcfd 0%, #f2f5f7 100%);
 animation: reveal-up 450ms ease-out;
+margin-bottom: 1.2rem;
 }
 
 .home-kicker {
@@ -1663,8 +1664,8 @@ color: black;
 }
 
 thead {
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
+  border-top: none;
+  border-bottom: none;
     background-color: #ffffff;
 }
 
@@ -2226,13 +2227,107 @@ code {
 
 /* ─── Workspace (ws-*) ──────────────────────────────────────────────────── */
 
-.ws-shell {
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem 3rem;
+.page-content:has(.ws-main) {
+  overflow: hidden;
+}
+
+.ws-main {
+  height: calc(100vh - 30px);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+}
+
+.ws-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  padding-top: 0.5rem;
+  padding-bottom: 1.5rem;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Tab bar */
+.ws-tabs {
+  display: flex;
+  flex-direction: row;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.ws-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  flex: 0 1 190px;
+  min-width: 165px;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: var(--bg-elevated, #fff);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.ws-tab:hover {
+  background: #f2f5f7;
+}
+
+.ws-tab--active {
+  border-color: var(--black, #111);
+  background: #f2f5f7;
+}
+
+.ws-tab-icon {
+  font-size: 1rem;
+  color: var(--ink-muted);
+}
+
+.ws-tab--active .ws-tab-icon {
+  color: var(--black, #111);
+}
+
+.ws-tab-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--black, #111);
+}
+
+.ws-tab-sub {
+  font-size: 0.68rem;
+  color: var(--ink-muted);
+}
+
+.ws-panel-card {
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ws-panel-body {
+  width: 100%;
+  box-sizing: border-box;
+  border-top: none;
+  margin-top: 0;
+  padding: 0.95rem 1rem 1rem;
+  max-height: none;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.ws-panel-body > .ws-table-wrap,
+.ws-panel-body > .ws-list-body {
+  width: 100%;
+  min-height: 0;
 }
 
 .ws-stat-strip {
@@ -2269,24 +2364,31 @@ code {
 
 .ws-table-wrap {
   overflow-x: auto;
-  border-radius: 8px;
+  overflow-y: visible;
+  max-height: none;
+  border-radius: 10px;
   border: 1px solid var(--line-soft);
+  background: var(--bg-elevated);
 }
 
 .ws-table {
   width: 100%;
+  min-width: 760px;
   border-collapse: collapse;
   font-size: 0.875rem;
 }
 
 .ws-table thead th {
-  background: var(--bg-canvas);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f3f6f8;
   color: var(--ink-muted);
   font-weight: 600;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 0.6rem 1rem;
+  padding: 0.72rem 1rem;
   border-bottom: 1px solid var(--line-soft);
   white-space: nowrap;
 }
@@ -2296,18 +2398,28 @@ code {
   transition: background 0.12s ease;
 }
 
+.ws-table tbody tr:nth-child(even) {
+  background: rgba(17, 19, 23, 0.02);
+}
+
 .ws-table tbody tr:last-child {
   border-bottom: none;
 }
 
 .ws-table tbody tr:hover {
-  background: var(--bg-canvas);
+  background: #e8f1f5;
 }
 
 .ws-table td {
-  padding: 0.65rem 1rem;
+  padding: 0.72rem 1rem;
   color: var(--ink-primary);
   vertical-align: middle;
+  border-right: 1px solid rgba(17, 19, 23, 0.06);
+}
+
+.ws-table td:last-child,
+.ws-table thead th:last-child {
+  border-right: none;
 }
 
 .ws-badge {
@@ -2391,7 +2503,29 @@ code {
 }
 
 @media (max-width: 900px) {
-  .ws-shell { padding: 1rem 0.75rem 2rem; }
+  .ws-shell {
+    gap: 1.4rem;
+    padding-top: 0.5rem;
+    padding-bottom: 1.5rem;
+  }
+  .ws-main {
+    height: calc(100vh - 20px);
+  }
+  .ws-tabs {
+    gap: 0.35rem;
+  }
+  .ws-tab {
+    flex: 1 1 calc(50% - 0.35rem);
+    min-width: 140px;
+    padding: 0.5rem 0.65rem;
+  }
+  .ws-panel-body {
+    padding: 0.75rem;
+    max-height: none;
+  }
+  .ws-table-wrap {
+    max-height: none;
+  }
   .ws-stat { flex: 1 1 90px; padding: 0.75rem 1rem; }
   .ws-stat-value { font-size: 1.3rem; }
 }

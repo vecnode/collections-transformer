@@ -1,8 +1,57 @@
 'use client'
 
-import Checkbox from './checkbox';
 import {getItemListingID} from '../_helpers/utills'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+const Checkbox = ({
+  outer_id,
+  id,
+  initialValue,
+  isDisabled,
+  onChecked,
+  label,
+  ref_id,
+  isAsync = true
+}) => {
+  const [checked, setChecked] = useState(false)
+  const [status, setStatus] = useState('none')
+
+  useEffect(() => {
+    if (label == 'positive') {
+      setChecked(initialValue == 1)
+    } else if (label == 'negative') {
+      setChecked(initialValue === 0 && initialValue !== '' && initialValue !== null)
+    } else {
+      setChecked(initialValue == 1)
+    }
+
+    setStatus('none')
+  }, [initialValue, label])
+
+  const onChangeHandler = (e) => {
+    if (isAsync) {
+      setStatus('saving')
+    }
+
+    onChecked(e, ref_id)
+    setChecked(JSON.parse(e.target.checked))
+  }
+
+  if (status == 'saving') {
+    return (
+      <p id={outer_id} key={outer_id}>
+        <input type="checkbox" id={id} disabled={true} checked={checked} onChange={onChangeHandler}></input>
+        <span id={id + '-checkbox-loading-icon'} className="spinner-border text-primary" role="status"></span>
+      </p>
+    )
+  }
+
+  return (
+    <p id={outer_id} key={outer_id}>
+      <input type="checkbox" id={id} disabled={isDisabled} checked={checked} onChange={onChangeHandler}></input>
+    </p>
+  )
+}
 
 const updateLabel = (itemContentId, checkboxStatus, onLabelsChanged, labelset_id, isExclude=false) => {
 

@@ -1,13 +1,10 @@
 'use client'
 
 import React from "react";
-import { useState, useEffect, useMemo, useReducer, useRef, useCallbac, memo } from "react";
+import { useState, useEffect, useMemo, useReducer, useRef, memo } from "react";
 import ItemCheckboxSet from "./itemCheckboxSet";
-import ItemPredictions from "./itemPredictions";
-import Item from "./item";
-import ItemTextInput from "./itemTextInput";
 import ItemScoreSelector from "./itemScoreSelector";
-import { mergeArrays, binary_val_to_label, example_val_to_label, useEffectDebugger } from "@/_helpers/utills";
+import { getItemListingID, mergeArrays, binary_val_to_label, example_val_to_label, useEffectDebugger } from "@/_helpers/utills";
 import TextHighlighter from "./textHighlighter";
 
 import {
@@ -20,6 +17,74 @@ import {
 } from '@tanstack/match-sorter-utils'
 import DynamicList from "./dynamicList";
 import ItemImageLoader from "./itemImageLoader";
+
+const getItemPredictionID = (item_index, item_component_index) => {
+  const itemTypeRef = "text"
+  return [itemTypeRef, "prediction", "artwork", String(item_index), itemTypeRef, String(item_component_index)].join("-")
+}
+
+const ItemPredictions = ({
+  item_id,
+  predictions
+}) => {
+  const id = getItemPredictionID(item_id, 0)
+
+  if (predictions != undefined && predictions.length > 0) {
+    return predictions.map((prediction, index) => {
+      const predictionId = getItemPredictionID(item_id, index)
+      const inner_id = ["p", predictionId].join("-")
+
+      return (
+        <span key={predictionId}>
+          <p id={inner_id} className="textChunk">
+            {prediction}
+          </p>
+        </span>
+      )
+    })
+  }
+
+  return <span key={id}></span>
+}
+
+const Item = ({
+  item_id,
+  itemContent,
+  label = null,
+  status = null
+}) => {
+  return itemContent.map((content, index) => {
+    const id = getItemListingID(item_id, index)
+    const key = label != null ? `${label}-${id}` : id
+
+    return (
+      <span id={key} key={id}>
+        <p className={status != null ? "textChunk " + status : "textChunk"}>
+          {content.text}
+        </p>
+      </span>
+    )
+  })
+}
+
+const ItemTextInput = ({
+  ref_id,
+  item_id,
+  itemContent,
+  onInputComplete
+}) => {
+  const handleChange = (e) => {
+    onInputComplete(ref_id, e.target.id, e.target.value)
+  }
+
+  const id = getItemListingID(item_id, 0)
+
+  return (
+    <span key={id}>
+      <textarea id={id} rows="3" cols="10" defaultValue={itemContent} onBlur={handleChange} />
+    </span>
+  )
+}
 
 const columnHelper = createColumnHelper()
 
