@@ -7,6 +7,7 @@ import ItemScoreSelector from "./itemScoreSelector";
 import { getItemListingID, mergeArrays } from "@/lib/items";
 import { binary_val_to_label, example_val_to_label } from "@/lib/labels";
 import TextHighlighter from "./textHighlighter";
+import type { Dataset, Labelset, PredictionResult } from "@/types";
 
 import {
   flexRender,
@@ -89,6 +90,32 @@ const ItemTextInput = ({
 
 const columnHelper = createColumnHelper()
 
+interface ItemDynamicListProps {
+  labelset_id?: string;
+  labelset_type?: string;
+  dataset?: Dataset;
+  labelset?: Labelset;
+  examples?: string[];
+  predictions?: PredictionResult[];
+  sample_ids?: string[];
+  enableLabelling?: boolean;
+  enableExampleSelection?: boolean;
+  enableSampleSelection?: boolean;
+  showLabels?: boolean;
+  showPredictions?: boolean;
+  showExamples?: boolean;
+  showSample?: boolean;
+  showGrade?: boolean;
+  showRobotItems?: boolean;
+  onLabelsChanged?: (...args: unknown[]) => void;
+  onExamplesChanged?: (...args: unknown[]) => void;
+  onSampleChanged?: (...args: unknown[]) => void;
+  analyser_id?: string | null;
+  expand_mode?: string;
+  useTab?: boolean;
+  model_source?: string;
+}
+
 const ItemDynamicList = ({
     labelset_id,
     labelset_type,
@@ -113,7 +140,7 @@ const ItemDynamicList = ({
     expand_mode="",
     useTab,
     model_source=""
-}) => {
+  }: ItemDynamicListProps) => {
 
   const [columnVisibility, setColumnVisibility] = useState({
     'example':false,

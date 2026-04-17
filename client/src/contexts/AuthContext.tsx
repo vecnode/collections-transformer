@@ -1,11 +1,33 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import type { AuthResult, User } from '@/types'
 
-const AuthContext = createContext(null)
+type LocalUserSeed = Partial<User> & {
+  username?: string
+  name?: string
+  email?: string
+  user_id?: string
+  sub?: string
+  nickname?: string
+  role?: string
+  affiliation?: string
+}
+
+interface AuthContextValue {
+  user: User | null
+  isLoading: boolean
+  error: string | null
+  login: (username: string, password: string) => Promise<AuthResult>
+  register: (username: string, email: string, password: string) => Promise<AuthResult>
+  logout: () => Promise<void>
+  verifySession: () => Promise<void>
+}
+
+const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 const LOCAL_AUTH_KEY = 'collections-transformer-local-user'
 
-const normalizeLocalUser = (data) => {
+const normalizeLocalUser = (data: LocalUserSeed = {}): User => {
   const username = data?.username || data?.name || 'local-user'
   const email = data?.email || `${username}@local`
   const userId = data?.user_id || data?.sub || username
@@ -22,10 +44,10 @@ const normalizeLocalUser = (data) => {
   }
 }
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     // Restore local session from browser storage.
@@ -52,7 +74,7 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const login = async (username, password) => {
+  const login = async (username: string, password: string): Promise<AuthResult> => {
     try {
       setIsLoading(true)
       setError(null)
@@ -81,7 +103,7 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const register = async (username, email, password) => {
+  const register = async (username: string, email: string, password: string): Promise<AuthResult> => {
     try {
       setIsLoading(true)
       setError(null)
@@ -111,7 +133,7 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     if (typeof window !== 'undefined') {
       window.localStorage.removeItem(LOCAL_AUTH_KEY)
     }

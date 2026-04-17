@@ -1,7 +1,15 @@
 'use client'
  
 import ItemDynamicList from './itemDynamicList'
-import { useState, useEffect } from 'react'
+import type { Dataset, Labelset } from '@/types'
+
+interface DatasetLabellerProps {
+  dataset?: Dataset
+  labelset?: Labelset
+  showLabels: boolean
+  enableLabelling: boolean
+  onLabelsChanged: (...args: unknown[]) => void
+}
 
 const DatasetLabeller = ({
     dataset={
@@ -10,11 +18,11 @@ const DatasetLabeller = ({
       artworks:[],
       dataset_type: ""
     },
-    labelset=[],
+    labelset={ _id: '', labels: [] },
     showLabels,
     enableLabelling,
     onLabelsChanged
-  }) => {
+  }: DatasetLabellerProps) => {
 
     return (
 
