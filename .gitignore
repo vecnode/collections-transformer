@@ -1,0 +1,74 @@
+# -----------------------------
+# OS / Editor noise
+# -----------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -----------------------------
+# Logs
+# -----------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# -----------------------------
+# Python
+# -----------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# -----------------------------
+# Node / Frontend
+# -----------------------------
+node_modules/
+.next/
+dist/
+build/
+coverage/
+
+# -----------------------------
+# Environment / secrets
+# Keep templates committed
+# -----------------------------
+.env
+.env.*
+!.env.template
+!.env.local.template
+
+# Repo-local env files
+client/.backup.envlocal
+client/.env.development
+client/.env.local
+client/.env.production
+server/.env
+
+# -----------------------------
+# Local databases / runtime artifacts
+# -----------------------------
+*.sqlite
+*.sqlite3
+server/db.sqlite
+server/wandb/
+
+server/db/
