@@ -15,9 +15,9 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 
 if [ ! -d "${VENV_DIR}" ]; then
-    echo "Creating server virtual environment with uv..."
+    echo "Creating server virtual environment with uv."
     uv venv "${VENV_DIR}"
 fi
 
-echo "Installing server dependencies with uv..."
+echo "Installing server dependencies with uv."
 uv pip install --python "${VENV_DIR}/bin/python" -r "${REQUIREMENTS_FILE}"
