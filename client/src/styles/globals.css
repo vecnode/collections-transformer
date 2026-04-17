@@ -157,7 +157,7 @@ padding: 15px;
 width: 100%;
 margin-left: var(--sidebar-width);
 min-height: 100vh;
-background-color: #ffffff;
+background-color: rgb(216, 216, 216);
 max-width: calc(100vw - var(--sidebar-width));
 }
 
