@@ -1,29 +1,35 @@
-# Collections Transformer 0.1
+# Collections Transformer
 
-LLM-powered platform designed to assist users working with collections and datasets. This repository contains the preliminary design of an open LLM-based platform to assess collections in the GLAM sector. Code developed as part of the project "Transforming Collections" undertaken at UAL "Towards a National Collection (TaNC)".
+Agent-based platform for multimodal LLM analysis of datasets in the GLAM sector.
 
-Version of the website is currently active at:  
-https://collectionstransforming.com/
-
-Ubuntu 22.04.1 LTS  
-AMD EPYC 7713 64-Core Processor  
-Linode Akamai Cloud  
+Code developed in the context of the UKRI project "Transforming Collections" undertaken at UAL "Towards a National Collection (TaNC)".
 
 
 
-## Application Setup
+## Reproduce
+
+- Frontend requirement: Node.js >= 18.17.0 (recommended: Node 20 LTS).
 
 ```bash
+# For server
 cd server/
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
+# For client
+cd client/
 
+# if you use nvm
+nvm install 20
+nvm use 20
 
+npm install
+npm run dev
 ```
 
-See `server/requirements.txt` and `client/package.json` for a full set of dependencies. Authentication uses Auth0. You can use an existing Auth0 Tenant. Create `.env` files, the following keys are needed.
+- See `server/requirements.txt` and `client/package.json` for a full set of dependencies. 
+- Authentication uses Auth0. You can use an existing Auth0 Tenant. Create `.env` files, the following keys are needed.
 
 ```
 NEXT_PUBLIC_SERVER_URL = ""
@@ -36,8 +42,19 @@ AUTH0_DOMAIN = "{YOUR TENANT URL}"
 
 Models used for inference are gpt4-o for OpenAI API. Alter the keys on the environment files respectively. For Azure the user might add Endpoints via Azure AI Studio.
 
+### Current deployment
 
-## Useful MongoDB commands
+Testing
+
+
+### Original deployment
+
+Ubuntu 22.04.1 LTS  
+AMD EPYC 7713 64-Core Processor  
+Linode Akamai Cloud  
+
+
+### Useful MongoDB commands
 ```
 $ mongosh
 $ use my_database

@@ -66,7 +66,7 @@ fi
 
 # Launch server first
 echo "Launching server (python3 app.py) in terminal window..."
-gnome-terminal --title="Server - Collections Transformer" --working-directory="$SERVER_DIR" -- bash -c "source venv/bin/activate && python3 app.py; exec bash" &
+"$TERMINAL_CMD" --title="Server - Collections Transformer" --working-directory="$SERVER_DIR" $TERMINAL_OPTS bash -c "source venv/bin/activate && python3 app.py; exec bash" &
 TERMINAL_PIDS+=($!)
 
 # Wait 4 seconds for server to start and AI models to initialize
@@ -75,7 +75,16 @@ sleep 4
 
 # Launch client in second terminal window
 echo "Launching client (npm run dev) in terminal window..."
-gnome-terminal --title="Client - Collections Transformer" --working-directory="$CLIENT_DIR" -- bash -c "npm run dev; exec bash" &
+"$TERMINAL_CMD" --title="Client - Collections Transformer" --working-directory="$CLIENT_DIR" $TERMINAL_OPTS bash -c "\
+if [ -s \"$HOME/.nvm/nvm.sh\" ]; then \
+    source \"$HOME/.nvm/nvm.sh\" && nvm use >/dev/null 2>&1 || nvm install; \
+fi; \
+if [ ! -d node_modules ]; then \
+    echo \"Installing client dependencies...\"; \
+    npm install; \
+fi; \
+npm run dev; \
+exec bash" &
 TERMINAL_PIDS+=($!)
 
 echo ""
