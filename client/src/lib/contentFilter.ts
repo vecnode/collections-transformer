@@ -1,13 +1,15 @@
-const getFilterErrorString = (errors, allFiltered) => {
+import type { ContentFilterError } from "@/types";
+
+const getFilterErrorString = (errors: ContentFilterError[], allFiltered: boolean): string => {
   let error_string =
     allFiltered === false
       ? "Some predictions were not processed due to the following flagged themes: "
       : "All predictions were not processed due to the following flagged themes: ";
 
-  let themes = [];
+  let themes: string[] = [];
   errors.forEach((e) => {
-    if (e.error.code == "content_filter") {
-      const content_filter_results = e.error.inner_error.content_filter_results;
+    if (e.error?.code == "content_filter") {
+      const content_filter_results = e.error?.inner_error?.content_filter_results ?? {};
       for (const [key, value] of Object.entries(content_filter_results)) {
         if (value.filtered) {
           const theme = key.replace("_", " ");

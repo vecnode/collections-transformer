@@ -1,4 +1,6 @@
-const binary_val_to_label = (val) => {
+import type { AnalyserType } from "@/types";
+
+const binary_val_to_label = (val: string | number | boolean): "positive" | "negative" | "" => {
   if (val.toString() == "1") {
     return "positive";
   }
@@ -8,7 +10,7 @@ const binary_val_to_label = (val) => {
   return "";
 };
 
-const example_val_to_label = (val) => {
+const example_val_to_label = (val: string | number | boolean): "●" | "----" | "" => {
   if (val == 1) {
     return "●";
   }
@@ -18,7 +20,7 @@ const example_val_to_label = (val) => {
   return "";
 };
 
-const formatAnalyserType = (analyser_type) => {
+const formatAnalyserType = (analyser_type: AnalyserType): string => {
   if (analyser_type == "binary") {
     return "Classify True or False";
   }

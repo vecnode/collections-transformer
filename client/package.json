@@ -1,5 +1,5 @@
 {
-  "name": "collections-transformer", 
+  "name": "collections-transformer",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -10,7 +10,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.5.0",
@@ -35,10 +36,13 @@
     "react-text-annotate-blend": "^1.1.0"
   },
   "devDependencies": {
+    "@types/node": "20.19.39",
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
     "env-cmd": "^10.1.0",
     "eslint": "^8",
     "eslint-config-next": "14.0.4",
-    "next": "^14.2.22"
+    "next": "^14.2.22",
+    "typescript": "^5.8.3"
   }
 }
-
