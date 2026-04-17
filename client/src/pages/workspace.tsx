@@ -397,7 +397,7 @@ const Workspace = () => {
               </div>
               <div className="ws-stat">
                 <span className="ws-stat-value">{labelsets.length}</span>
-                <span className="ws-stat-label">Annotation sets</span>
+                <span className="ws-stat-label">Annotations</span>
               </div>
             </div>
 
@@ -407,7 +407,7 @@ const Workspace = () => {
                 { id: 'history',     icon: 'task_alt',    label: 'Analysis History',  sub: 'Saved runs from the Tasks page' },
                 { id: 'agents',      icon: 'smart_toy',   label: 'Agents',            sub: 'Ollama model configurations' },
                 { id: 'datasets',    icon: 'folder_open', label: 'Datasets',          sub: 'Uploaded media collections' },
-                { id: 'annotations', icon: 'label',       label: 'Annotation Sets',   sub: 'Label schemas and category sets' },
+                { id: 'annotations', icon: 'label',       label: 'Annotations',       sub: 'Label schemas and category sets' },
               ].map(tab => (
                 <button
                   key={tab.id}
