@@ -47,7 +47,7 @@ const SideBar = () => {
                             <MenuItem icon={<span className='material-symbols-outlined'>psychology</span>} component={<Link href="/newagent" />}> New Agent </MenuItem>
                             
                             
-                            <MenuItem icon={<span className='material-symbols-outlined'>upload</span>} component={<Link href="/uploaddataset" />}> New Dataset </MenuItem>
+                            <MenuItem icon={<span className='material-symbols-outlined'>upload</span>} component={<Link href="/dataset" />}> Dataset </MenuItem>
 
                             <MenuItem icon={<span className='material-symbols-outlined'>pattern</span>} component={<Link href="/tasks" />}> Tasks </MenuItem>
                             

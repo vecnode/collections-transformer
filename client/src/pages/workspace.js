@@ -415,219 +415,212 @@ const Workspace = () => {
       }
     };
     
+    const displayName = user.name === user.email ? user.nickname : user.name;
+
     return (
       <>
       <Head>
         <title>{title}</title>
       </Head>
-        <main>
-            <div className="container">
-              <h1>Workspace</h1>
-              <hr/>
 
-              <h5>Username: {user.name === user.email ? user.nickname : user.name}</h5>
-              {lastConnection && (
-                <div style={{marginTop: "5px", fontSize: "0.9em", color: "#666"}}>
-                  Last connection: {new Date(lastConnection).toLocaleTimeString('en-GB', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false
-                  })}
+        {/* Hero — full width */}
+        <section className="home-hero" style={{ animationDelay: '0ms' }}>
+          <span className="home-kicker">Operations Dashboard</span>
+          <h1 className="home-title">Workspace</h1>
+          <p className="home-subtitle">
+            Signed in as <strong>{displayName}</strong>
+            {lastConnection && (
+              <> &mdash; last active {new Date(lastConnection).toLocaleString('en-GB', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', hour12: false
+              })}</>
+            )}
+          </p>
+        </section>
+
+        <main>
+          <div className="ws-shell">
+
+            {/* Stat strip */}
+            <div className="ws-stat-strip" style={{ animationDelay: '60ms' }}>
+              <div className="ws-stat">
+                <span className="ws-stat-value">{analysisHistory.length}</span>
+                <span className="ws-stat-label">Analysis runs</span>
+              </div>
+              <div className="ws-stat">
+                <span className="ws-stat-value">{agents.length}</span>
+                <span className="ws-stat-label">Agents</span>
+              </div>
+              <div className="ws-stat">
+                <span className="ws-stat-value">{datasets.length}</span>
+                <span className="ws-stat-label">Datasets</span>
+              </div>
+              <div className="ws-stat">
+                <span className="ws-stat-value">{labelsets.length}</span>
+                <span className="ws-stat-label">Annotation sets</span>
+              </div>
+              <div className="ws-stat">
+                <span className="ws-stat-value">{analysers.filter(a => a.id !== 'Loading...').length}</span>
+                <span className="ws-stat-label">Analysers</span>
+              </div>
+            </div>
+
+            {/* Tasks card */}
+            <div className="agent-card" style={{ animationDelay: '120ms' }}>
+              <div className="agent-card-header">
+                <span className="agent-card-icon material-symbols-outlined">task_alt</span>
+                <div>
+                  <div className="agent-card-title">Analysis History</div>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--ink-muted)', marginTop: '2px' }}>
+                    Saved runs from the Tasks page
+                  </div>
+                </div>
+                <button className="agent-card-toggle ms-auto" onClick={() => setShowTasks(!showTasks)}>
+                  <span className="material-symbols-outlined">{showTasks ? 'expand_less' : 'expand_more'}</span>
+                </button>
+              </div>
+              {showTasks && (
+                <div className="agent-card-body">
+                  <div className="ws-table-wrap">
+                    <table className="ws-table">
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Task</th>
+                          <th>Dataset</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {analysisHistory.length > 0 ? (
+                          analysisHistory.map((analysis) => {
+                            const formattedDate = new Date(analysis.created_at).toLocaleDateString('en-GB', {
+                              day: '2-digit', month: '2-digit', year: 'numeric',
+                              hour: '2-digit', minute: '2-digit'
+                            });
+                            return (
+                              <tr key={analysis._id}>
+                                <td>{formattedDate}</td>
+                                <td>{analysis.analyser_name || 'Unknown'}</td>
+                                <td>{analysis.dataset_name || 'Unknown'}</td>
+                                <td>
+                                  <span className={`ws-badge ws-badge--${(analysis.status || 'completed').toLowerCase()}`}>
+                                    {analysis.status || 'Completed'}
+                                  </span>
+                                </td>
+                                <td>
+                                  <div className="ws-action-row">
+                                    <button className="ws-btn ws-btn--ghost" onClick={() => viewAnalysisDetails(analysis)}>View</button>
+                                    <button className="ws-btn ws-btn--danger" onClick={() => confirmDeleteAnalysis(analysis)}>Delete</button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        ) : (
+                          <tr>
+                            <td colSpan="5" className="ws-empty">No saved analysis history yet. Save your first analysis from the Tasks page.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
-
-              <br></br>
-
-              <div style={{ border: '1px solid black', borderRadius: '5px', padding: '20px', marginBottom: '2rem' }}>
-                <h3>Analytics</h3>
-
-                <hr></hr>
-                
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <h5 style={{ margin: 0 }}>Tasks</h5>
-                  <button
-                    onClick={() => setShowTasks(!showTasks)}
-                    style={{
-                      padding: '6px 12px',
-                      backgroundColor: 'white',
-                      color: 'black',
-                      border: '1px solid black',
-                      borderRadius: '5px',
-                      cursor: 'pointer',
-                      fontSize: '1rem'
-                    }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-                  >
-                    {showTasks ? 'Hide' : 'Show'}
-                  </button>
-                </div>
-                {showTasks && (
-                <div style={{ marginBottom: '2rem' }}>
-                  <table id="analysis-history" className="table table-striped">
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Task</th>
-                        <th>Dataset</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {analysisHistory.length > 0 ? (
-                        analysisHistory.map((analysis) => {
-                          const analysisDate = new Date(analysis.created_at);
-                          const formattedDate = analysisDate.toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          });
-                          
-                          return (
-                            <tr key={analysis._id}>
-                              <td>{formattedDate}</td>
-                              <td>{analysis.analyser_name || 'Unknown'}</td>
-                              <td>{analysis.dataset_name || 'Unknown'}</td>
-                              <td>{analysis.status || 'Completed'}</td>
-                              <td>
-                                
-                                <button 
-                                  onClick={() => viewAnalysisDetails(analysis)}
-                                  style={{
-                                    padding: '4px 8px',
-                                    backgroundColor: 'white',
-                                    color: 'black',
-                                    border: '1px solid black',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    fontSize: '12px',
-                                    marginRight: '5px',
-                                  }}
-                                  onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-                                  onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-                                >
-                                  View
-                                </button>
-                                <button 
-                                  onClick={() => confirmDeleteAnalysis(analysis)}
-                                  style={{
-                                    padding: '4px 8px',
-                                    backgroundColor: 'white',
-                                    color: 'black',
-                                    border: '1px solid black',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    fontSize: '12px',
-                                  }}
-                                  onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-                                  onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-                                >
-                                  Delete
-                                </button>
-                                
-                              </td>
-                            </tr>
-                          );
-                        })
-                      ) : (
-                        <tr>
-                          <td colSpan="5" style={{ textAlign: 'center', color: '#666' }}>
-                            No saved analysis history yet. Save your first analysis from the Tasks page.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-                )}
-
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', marginTop: '20px' }}>
-                  <h5 style={{ margin: 0 }}>Agents</h5>
-                  <button
-                    onClick={() => setShowAgents(!showAgents)}
-                    style={{
-                      padding: '6px 12px',
-                      backgroundColor: 'white',
-                      color: 'black',
-                      border: '1px solid black',
-                      borderRadius: '5px',
-                      cursor: 'pointer',
-                      fontSize: '1rem'
-                    }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-                  >
-                    {showAgents ? 'Hide' : 'Show'}
-                  </button>
-                </div>
-                {showAgents && (
-                <AgentList user_id={user.user_id || user.sub} agents={agents} onDeleteHandler={confirmDeleteAgent}/>
-                )}
-              </div>
-
-              <div style={{ border: '1px solid black', borderRadius: '5px', padding: '20px', marginBottom: '2rem' }}>
-                <h3>Media</h3>
-                
-                <hr></hr>
-                
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <h5 style={{ margin: 0 }}>Datasets</h5>
-                  <button
-                    onClick={() => setShowDatasets(!showDatasets)}
-                    style={{
-                      padding: '6px 12px',
-                      backgroundColor: 'white',
-                      color: 'black',
-                      border: '1px solid black',
-                      borderRadius: '5px',
-                      cursor: 'pointer',
-                      fontSize: '1rem'
-                    }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-                  >
-                    {showDatasets ? 'Hide' : 'Show'}
-                  </button>
-                </div>
-                {showDatasets && (
-                <DatasetList user_id={user.user_id || user.sub} datasets={datasets} onDeleteHandler={confirmDeleteDataset}/>
-                )}
-
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', marginTop: '20px' }}>
-                  <h5 style={{ margin: 0 }}>Annotations</h5>
-                  <button
-                    onClick={() => setShowAnnotations(!showAnnotations)}
-                    style={{
-                      padding: '6px 12px',
-                      backgroundColor: 'white',
-                      color: 'black',
-                      border: '1px solid black',
-                      borderRadius: '5px',
-                      cursor: 'pointer',
-                      fontSize: '1rem'
-                    }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-                  >
-                    {showAnnotations ? 'Hide' : 'Show'}
-                  </button>
-                </div>
-                {showAnnotations && (
-                <LabelsetsList user={user} labelsets={labelsets} onDeleteHandler={confirmDeleteLabelset}/>
-                )}
-              </div>
-              {status != "Unknown" ? (
-                <StatusBox text={status}></StatusBox>
-              ) : (<></>)}
-
             </div>
+
+            {/* Agents card */}
+            <div className="agent-card" style={{ animationDelay: '160ms' }}>
+              <div className="agent-card-header">
+                <span className="agent-card-icon material-symbols-outlined">smart_toy</span>
+                <div>
+                  <div className="agent-card-title">Agents</div>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--ink-muted)', marginTop: '2px' }}>
+                    Ollama model configurations
+                  </div>
+                </div>
+                <button className="agent-card-toggle ms-auto" onClick={() => setShowAgents(!showAgents)}>
+                  <span className="material-symbols-outlined">{showAgents ? 'expand_less' : 'expand_more'}</span>
+                </button>
+              </div>
+              {showAgents && (
+                <div className="agent-card-body ws-list-body">
+                  <AgentList user_id={user.user_id || user.sub} agents={agents} onDeleteHandler={confirmDeleteAgent}/>
+                </div>
+              )}
+            </div>
+
+            {/* Analysers card */}
+            <div className="agent-card" style={{ animationDelay: '200ms' }}>
+              <div className="agent-card-header">
+                <span className="agent-card-icon material-symbols-outlined">analytics</span>
+                <div>
+                  <div className="agent-card-title">Analysers</div>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--ink-muted)', marginTop: '2px' }}>
+                    Configured analysis pipelines
+                  </div>
+                </div>
+                <button className="agent-card-toggle ms-auto" onClick={() => setShowModels(!showModels)}>
+                  <span className="material-symbols-outlined">{showModels ? 'expand_less' : 'expand_more'}</span>
+                </button>
+              </div>
+              {showModels && (
+                <div className="agent-card-body ws-list-body">
+                  <AnalyserList user_id={user.user_id || user.sub} analysers={analysers} onDeleteHandler={confirmDeleteAnalyser}/>
+                </div>
+              )}
+            </div>
+
+            {/* Datasets card */}
+            <div className="agent-card" style={{ animationDelay: '240ms' }}>
+              <div className="agent-card-header">
+                <span className="agent-card-icon material-symbols-outlined">folder_open</span>
+                <div>
+                  <div className="agent-card-title">Datasets</div>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--ink-muted)', marginTop: '2px' }}>
+                    Uploaded media collections
+                  </div>
+                </div>
+                <button className="agent-card-toggle ms-auto" onClick={() => setShowDatasets(!showDatasets)}>
+                  <span className="material-symbols-outlined">{showDatasets ? 'expand_less' : 'expand_more'}</span>
+                </button>
+              </div>
+              {showDatasets && (
+                <div className="agent-card-body ws-list-body">
+                  <DatasetList user_id={user.user_id || user.sub} datasets={datasets} onDeleteHandler={confirmDeleteDataset}/>
+                </div>
+              )}
+            </div>
+
+            {/* Annotations card */}
+            <div className="agent-card" style={{ animationDelay: '280ms' }}>
+              <div className="agent-card-header">
+                <span className="agent-card-icon material-symbols-outlined">label</span>
+                <div>
+                  <div className="agent-card-title">Annotation Sets</div>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--ink-muted)', marginTop: '2px' }}>
+                    Label schemas and category sets
+                  </div>
+                </div>
+                <button className="agent-card-toggle ms-auto" onClick={() => setShowAnnotations(!showAnnotations)}>
+                  <span className="material-symbols-outlined">{showAnnotations ? 'expand_less' : 'expand_more'}</span>
+                </button>
+              </div>
+              {showAnnotations && (
+                <div className="agent-card-body ws-list-body">
+                  <LabelsetsList user={user} labelsets={labelsets} onDeleteHandler={confirmDeleteLabelset}/>
+                </div>
+              )}
+            </div>
+
+            {status !== 'Unknown' && (
+              <div style={{ marginTop: '1rem' }}>
+                <StatusBox text={status} />
+              </div>
+            )}
+
+          </div>
         </main>
 
         {/* Analysis Details Modal */}

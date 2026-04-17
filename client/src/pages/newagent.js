@@ -923,82 +923,114 @@ const NewAgent = () => {
   return (
     <main>
       <div className="container">
-        <h1>Create Agent</h1>
-        <hr/>
 
-        <h5>Name</h5>
-        <input
-          type="text"
-          className="patterns-left-input"
-          value={aiName}
-          onChange={(e) => setAiName(e.target.value)}
-          placeholder="Enter name"
-        />
+        {/* Hero — full width, same as home */}
+        <section className="home-hero" style={{ marginBottom: '1.2rem' }}>
+          <p className="home-kicker">Ollama · Local Inference</p>
+          <h1>Create Agent</h1>
+          <p className="home-subtitle">
+            Define an agent that runs a structured analysis task over a dataset using a local language model.
+          </p>
+        </section>
 
-        <h5>Agent Objective</h5>
-        <textarea
-          className="patterns-left-input"
-          style={{ minHeight: '100px' }}
-          value={taskDescription}
-          onChange={(e) => setTaskDescription(e.target.value)}
-          placeholder="Describe the objective of the agent. e.g.: Analyse the image(s) for human figures"
-        />
+        <div className="agent-shell">
 
-        <h5>Task Type</h5>
-        <select
-          className="patterns-left-input"
-          value={taskType}
-          onChange={(e) => setTaskType(e.target.value)}
-          style={{
-            border: '1px solid grey',
-            borderRadius: '5px',
-            padding: '8px 12px',
-            minWidth: '200px',
-            fontSize: '1rem'
-          }}
-        >
-          <option value="Text Detection (T/F)">Text Detection (T/F)</option>
-          <option value="Text Detection (text)">Text Detection (text)</option>
-          <option value="Image Detection (T/F)">Image Detection (T/F)</option>
-          <option value="Image Detection (text)">Image Detection (text)</option>
-        </select>
-
-        <div style={{ border: '1px solid black', borderRadius: '5px', padding: '20px', marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h5 style={{ margin: 0 }}>Examples</h5>
-            <button
-              onClick={() => setShowExamples(!showExamples)}
-              style={{
-                padding: '6px 12px',
-                backgroundColor: 'white',
-                color: 'black',
-                border: '1px solid black',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontSize: '1rem'
-              }}
-              onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-            >
-              {showExamples ? 'Hide' : 'Show'}
-            </button>
+        {/* Identity card */}
+        <section className="agent-card">
+          <div className="agent-card-header">
+            <span className="agent-card-icon material-symbols-outlined">psychology</span>
+            <div>
+              <h2 className="agent-card-title">Agent Identity</h2>
+              <p className="agent-card-subtitle">Give the agent a clear name and the type of task it will perform.</p>
+            </div>
           </div>
-          {showExamples && (
-            <>
-              <br></br>
-              <h5>Example Guide</h5>
-              <textarea
-                className="patterns-left-input"
-                style={{ minHeight: '100px' }}
-                value={labellingGuide}
-                onChange={(e) => setLabellingGuide(e.target.value)}
-                placeholder="Describe what positive and negative labels mean, what context to consider, and what the examples represent (e.g., 'Positive examples show abstract art with specific symbols from abstract movements. Negative examples are representational art or non-abstract styles. Consider color usage, geometric shapes, and techniques.')"
-              />
 
-              <h5>Example Dataset</h5>
-              <div style={{ marginBottom: '1rem' }}>
-                <select 
-                  className="patterns-left-input"
+          <div className="agent-field">
+            <label className="agent-label">Name</label>
+            <input
+              type="text"
+              className="agent-input"
+              value={aiName}
+              onChange={(e) => setAiName(e.target.value)}
+              placeholder="e.g. Abstract Art Detector"
+            />
+          </div>
+
+          <div className="agent-field">
+            <label className="agent-label">Task Type</label>
+            <select
+              className="agent-input agent-select"
+              value={taskType}
+              onChange={(e) => setTaskType(e.target.value)}
+            >
+              <option value="Text Detection (T/F)">Text Detection (T/F)</option>
+              <option value="Text Detection (text)">Text Detection (text)</option>
+              <option value="Image Detection (T/F)">Image Detection (T/F)</option>
+              <option value="Image Detection (text)">Image Detection (text)</option>
+            </select>
+            <p className="agent-hint">
+              <strong>T/F</strong> tasks return a boolean decision. <strong>text</strong> tasks return a free-form answer.
+            </p>
+          </div>
+        </section>
+
+        {/* Objective card */}
+        <section className="agent-card">
+          <div className="agent-card-header">
+            <span className="agent-card-icon material-symbols-outlined">target</span>
+            <div>
+              <h2 className="agent-card-title">Agent Objective</h2>
+              <p className="agent-card-subtitle">Describe precisely what the agent should look for or decide.</p>
+            </div>
+          </div>
+
+          <div className="agent-field">
+            <label className="agent-label">Objective</label>
+            <textarea
+              className="agent-input agent-textarea"
+              value={taskDescription}
+              onChange={(e) => setTaskDescription(e.target.value)}
+              placeholder="e.g. Analyse the image(s) for the presence of human figures. Return true if any human figure is visible."
+            />
+          </div>
+        </section>
+
+        {/* Examples card (collapsible) */}
+        <section className="agent-card agent-card-collapsible">
+          <button
+            type="button"
+            className="agent-card-toggle"
+            onClick={() => setShowExamples(!showExamples)}
+            aria-expanded={showExamples}
+          >
+            <div className="agent-card-header" style={{ pointerEvents: 'none' }}>
+              <span className="agent-card-icon material-symbols-outlined">dataset</span>
+              <div>
+                <h2 className="agent-card-title">Training Examples <span className="agent-badge">Optional</span></h2>
+                <p className="agent-card-subtitle">Attach labelled examples from a dataset to guide the agent prompt.</p>
+              </div>
+            </div>
+            <span className="material-symbols-outlined agent-toggle-chevron">
+              {showExamples ? 'expand_less' : 'expand_more'}
+            </span>
+          </button>
+
+          {showExamples && (
+            <div className="agent-card-body">
+              <div className="agent-field">
+                <label className="agent-label">Example Guide</label>
+                <textarea
+                  className="agent-input agent-textarea"
+                  value={labellingGuide}
+                  onChange={(e) => setLabellingGuide(e.target.value)}
+                  placeholder="Describe what positive and negative labels mean. e.g. Positive: abstract art with geometric shapes. Negative: representational or figurative works."
+                />
+              </div>
+
+              <div className="agent-field">
+                <label className="agent-label">Example Dataset</label>
+                <select
+                  className="agent-input agent-select"
                   value={selectedDataset || ''}
                   onChange={(e) => handleDatasetChange(e.target.value)}
                 >
@@ -1011,9 +1043,9 @@ const NewAgent = () => {
                 </select>
               </div>
 
-              <h5>Example Data Items</h5>
-              <div style={{ marginBottom: '1rem' }}>
-                <DatasetModal 
+              <div className="agent-field">
+                <label className="agent-label">Example Data Items</label>
+                <DatasetModal
                   onPressHandler={handleSelectDataElements}
                   title="Example Data Items"
                   buttonText="Select"
@@ -1029,15 +1061,13 @@ const NewAgent = () => {
                       fontSize: '1rem',
                       transition: 'background-color 0.2s ease'
                     },
-                    buttonHoverStyle: {
-                      backgroundColor: '#f5f5f5'
-                    },
+                    buttonHoverStyle: { backgroundColor: '#f5f5f5' },
                     dialogClassName: 'custom-modal-80'
                   }}
                 >
                   <div className="data-elements-modal">
                     {loadingDataset ? (
-                      <p>Loading dataset data...</p>
+                      <p>Loading dataset data…</p>
                     ) : selectedDatasetData ? (
                       <DatasetTable dataset={selectedDatasetData} />
                     ) : (
@@ -1045,49 +1075,39 @@ const NewAgent = () => {
                     )}
                   </div>
                 </DatasetModal>
-                
+
                 {selectedExamples.length > 0 && (
-                  <SelectedExamplesDisplay 
-                    selectedExamples={selectedExamples} 
-                    datasetData={selectedDatasetData} 
-                    onClearAll={handleDeselectAll} 
+                  <SelectedExamplesDisplay
+                    selectedExamples={selectedExamples}
+                    datasetData={selectedDatasetData}
+                    onClearAll={handleDeselectAll}
                     itemLabels={itemLabels}
                     onLabelChange={handleLabelChange}
                   />
                 )}
               </div>
-            </>
+            </div>
           )}
-        </div>
-        
+        </section>
 
-        <hr/>
+        {/* Submit row */}
+        <section className="agent-submit-row">
+          <button className="agent-submit-btn" onClick={handleCreateClick}>
+            <span className="material-symbols-outlined">add_circle</span>
+            Create Agent
+          </button>
+          <p className="agent-submit-note">
+            The agent will be stored in your workspace and can be assigned to analysis runs from there.
+          </p>
+        </section>
 
-        <button 
-          onClick={handleCreateClick}
-          style={{
-            backgroundColor: 'transparent',
-            color: 'black',
-            border: '1px solid grey',
-            borderRadius: '5px',
-            padding: '8px 12px',
-            minWidth: '200px',
-            fontSize: '1rem',
-            transition: 'background-color 0.2s ease',
-            cursor: 'pointer'
-          }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-        >
-          Create Agent
-        </button>
-
-        {/* Text Modal */}
-        {showTextModal && (
-          <TextModal text={selectedText} onClose={() => setShowTextModal(false)} />
-        )}
-
+        </div>{/* /agent-shell */}
       </div>
+
+      {/* Text Modal */}
+      {showTextModal && (
+        <TextModal text={selectedText} onClose={() => setShowTextModal(false)} />
+      )}
     </main>
   );
 };

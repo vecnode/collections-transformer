@@ -24,17 +24,17 @@ const Home = () => {
       {
         href: '/workspace',
         label: 'Workspace',
-        description: 'Review datasets, analysers, labelsets and operational history.'
+        description: 'Review datasets, agents, analysis and history.'
       },
       {
         href: '/newagent',
         label: 'New Agent',
-        description: 'Create focused analysis agents and configure behavior quickly.'
+        description: 'Create agents and configure analysis.'
       },
       {
-        href: '/uploaddataset',
-        label: 'New Dataset',
-        description: 'Upload and prepare source material for analysis workflows.'
+        href: '/dataset',
+        label: 'Dataset',
+        description: 'Upload and prepare datasets for analysis workflows.'
       },
       {
         href: '/tasks',
@@ -44,7 +44,7 @@ const Home = () => {
       {
         href: '/user',
         label: 'Profile',
-        description: 'Inspect your account information and latest usage context.'
+        description: 'Inspect your account information and context.'
       },
       {
         href: '/settings',
@@ -62,17 +62,17 @@ const Home = () => {
         <main>
             <div className="container home-shell">
               <section className="home-hero">
-                <p className="home-kicker">Collections Operations Console</p>
+                <p className="home-kicker">Operations Console</p>
                 <h1>Collections Transformer</h1>
                 <p className="home-subtitle">
-                    Professional tooling for structured analysis, dataset management, and supervised transformation flows.
+                    Agent-based platform for multimodal analysis of datasets in the GLAM sector.
                 </p>
               </section>
 
               <section className="home-command-center">
                 <div className="home-command-header">
-                  <h2>Jump To Function</h2>
-                  <p>Welcome {user.username || user.name}. Start from any core area below.</p>
+                  <h2>Console</h2>
+                  <p>Welcome {user.username || user.name}. Start from any task below.</p>
                 </div>
 
                 <div className="home-jump-grid">
@@ -89,11 +89,11 @@ const Home = () => {
               <section className="home-summary-strip">
                 <div>
                   <h3>Clear workflow</h3>
-                  <p>Ingest datasets, build agents, run analyses, and review outputs without context switching.</p>
+                  <p>Upload datasets, create agents, run analysis, and review the outputs.</p>
                 </div>
                 <div>
-                  <h3>Serious visual mode</h3>
-                  <p>A restrained palette, high contrast text, and precise spacing for focused operation.</p>
+                  <h3>Local Inference (Ollama)</h3>
+                  <p>Swap LLMs and configure settings to use new language models.</p>
                 </div>
               </section>
             </div>
