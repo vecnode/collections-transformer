@@ -1,17 +1,40 @@
-FROM python:3.11-slim
+FROM python:3.11-slim AS builder
 
 WORKDIR /server
 
-# System deps for Pillow, pymongo, etc.
-RUN apt-get update && apt-get install -y --no-install-recommends \
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+# Build deps only in builder stage.
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
     gcc libffi-dev libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m venv /opt/venv
+RUN --mount=type=cache,target=/root/.cache/pip \
+    /opt/venv/bin/pip install -r requirements.txt
 
+
+FROM python:3.11-slim AS runtime
+
+WORKDIR /server
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH=/opt/venv/bin:$PATH
+
+# Minimal runtime libs; no compiler toolchain in final image.
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /opt/venv /opt/venv
 COPY server/ .
-
-ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8000

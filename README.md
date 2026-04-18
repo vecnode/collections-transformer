@@ -13,14 +13,7 @@ Code developed in the context of the UKRI project "Transforming Collections" und
 
 - Frontend requirement: Node.js >= 18.17.0 (recommended: Node 20 LTS).
 
-```bash
-# Docker-first setup (recommended)
-cd docker/
-docker compose up --build
 
-# Stop services
-docker compose down
-```
 
 ```bash
 # Set up backend and frontend environments
@@ -54,14 +47,14 @@ You can also use the helper scripts from the repository root:
 ./scripts/run_client.sh
 ```
 
-**Setup alternatives:**
-- Use `./scripts/create_server_env.sh` to set up just the server environment
-- Use `./scripts/run_server.sh` (dev mode) or `./scripts/run_server_prod.sh` (production) to start the server
-- Use `./scripts/run_client.sh` to start the client
-- Use `environment.yml` with conda to set up environments
+```bash
+# Docker-first setup (recommended)
+cd docker/
+docker compose up --build
 
-- See `requirements.txt` and `client/package.json` for a full set of dependencies. 
-- Authentication uses Auth0. You can use an existing Auth0 Tenant. Create `.env` files, the following keys are needed.
+# Stop services
+docker compose down
+```
 
 ## Server configuration
 
