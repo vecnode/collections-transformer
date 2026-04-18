@@ -14,6 +14,15 @@ Code developed in the context of the UKRI project "Transforming Collections" und
 - Frontend requirement: Node.js >= 18.17.0 (recommended: Node 20 LTS).
 
 ```bash
+# Docker-first setup (recommended)
+cd docker/
+docker compose up --build
+
+# Stop services
+docker compose down
+```
+
+```bash
 # Set up backend and frontend environments
 uv venv venv
 source venv/bin/activate

@@ -1,0 +1,25 @@
+# VCS and editor
+.git
+.gitignore
+.vscode
+
+# Python environments and caches
+venv
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
+
+# Node artifacts
+client/node_modules
+client/.next
+client/tsconfig.tsbuildinfo
+
+# Local data / backups
+server/db/migration_backups
+server/db/sqlite2json
+
+# Misc
+*.log
+.DS_Store
