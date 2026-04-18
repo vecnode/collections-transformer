@@ -11,14 +11,10 @@ SERVER_DIR="${ROOT_DIR}/server"
 cd "${SERVER_DIR}"
 source "${ROOT_DIR}/venv/bin/activate"
 
-# Run with Gunicorn in production mode
-# Using gevent workers for async support
-gunicorn \
-  --worker-class gevent \
+# Run with Uvicorn in production mode (multiple workers)
+uvicorn app.main:app \
+  --host 0.0.0.0 \
+  --port "${API_PORT:-8080}" \
   --workers 4 \
-  --worker-connections 1000 \
-  --bind 0.0.0.0:8080 \
-  --timeout 120 \
-  --access-logfile - \
-  --error-logfile - \
-  'api:create_app()'
+  --timeout-keep-alive 120 \
+  --access-log

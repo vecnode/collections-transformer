@@ -1,6 +1,15 @@
 accelerate==1.2.1
 annotated-types==0.7.0
 anyio==4.8.0
+
+# FastAPI stack
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+python-multipart==0.0.20
+
+# Redis async client
+redis[asyncio]==5.2.1
+
 blinker==1.9.0
 certifi==2024.12.14
 charset-normalizer==3.4.1

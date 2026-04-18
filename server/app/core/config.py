@@ -1,34 +1,32 @@
-import logging
 import os
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 
 from dotenv import load_dotenv
 
-ROOT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent  # server/
 
 
-def _to_bool(value: str, default: bool = False) -> bool:
+def _to_bool(value: str | None, default: bool = False) -> bool:
     if value is None:
         return default
     return str(value).strip().lower() in {"1", "true", "yes", "on"}
 
 
-def _split_csv(value: str, default: list[str]) -> list[str]:
+def _split_csv(value: str | None, default: list[str]) -> list[str]:
     if not value:
         return default
     return [item.strip() for item in value.split(",") if item.strip()]
 
 
 @dataclass(frozen=True)
-class Settings:
+class AppSettings:
     environment: str
     log_level: str
     api_host: str
     api_port: int
-    flask_debug: bool
-    flask_reload: bool
-    flask_secret_key: str
+    secret_key: str
     cors_origins: list[str]
 
     mongodb_uri: str
@@ -39,29 +37,27 @@ class Settings:
 
     ollama_model_option: str
     ollama_base_url: str
-
     blip2_model_name: str
 
     cuda_launch_blocking: str
     pytorch_use_cuda_dsa: str
 
 
-def load_settings() -> Settings:
+def load_app_settings() -> AppSettings:
     env_file = ROOT_DIR / ".env"
     if env_file.exists():
         load_dotenv(env_file)
     else:
         load_dotenv()
 
-    return Settings(
+    return AppSettings(
         environment=os.getenv("ENVIRONMENT", "dev"),
         log_level=os.getenv("LOG_LEVEL", "INFO"),
         api_host=os.getenv("API_HOST", "0.0.0.0"),
         api_port=int(os.getenv("API_PORT", "8080")),
-        flask_debug=_to_bool(os.getenv("FLASK_DEBUG"), default=True),
-        flask_reload=_to_bool(os.getenv("FLASK_RELOAD"), default=False),
-        flask_secret_key=os.getenv(
-            "FLASK_SECRET_KEY", "local-dev-secret-key-change-in-production"
+        secret_key=os.getenv(
+            "SECRET_KEY",
+            os.getenv("FLASK_SECRET_KEY", "local-dev-secret-key-change-in-production"),
         ),
         cors_origins=_split_csv(
             os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"),
@@ -79,18 +75,12 @@ def load_settings() -> Settings:
     )
 
 
-settings = load_settings()
+app_settings = load_app_settings()
 
 
-def configure_logging() -> None:
-    level = getattr(logging, settings.log_level.upper(), logging.INFO)
+def configure_app_logging() -> None:
+    level = getattr(logging, app_settings.log_level.upper(), logging.INFO)
     logging.basicConfig(
         level=level,
         format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     )
-
-
-def apply_runtime_environment() -> None:
-    os.environ.setdefault("ENVIRONMENT", settings.environment)
-    os.environ.setdefault("CUDA_LAUNCH_BLOCKING", settings.cuda_launch_blocking)
-    os.environ.setdefault("PYTORCH_USE_CUDA_DSA", settings.pytorch_use_cuda_dsa)
