@@ -13,7 +13,15 @@ Code developed in the context of the UKRI project "Transforming Collections" und
 
 - Frontend requirement: Node.js >= 18.17.0 (recommended: Node 20 LTS).
 
+### Recommended: Mixed Mode (Containers + Local Development)
 
+```bash
+# Terminal 1: Start Docker infrastructure
+docker compose -f docker/docker-compose.yml up redis mongodb worker
+
+# Terminal 2: Run your platform
+./start_platform.sh
+```
 
 ```bash
 # Set up backend and frontend environments
@@ -39,7 +47,6 @@ python3 app.py
 npm run dev
 ```
 
-You can also use the helper scripts from the repository root:
 
 ```bash
 ./scripts/create_server_env.sh
@@ -47,13 +54,14 @@ You can also use the helper scripts from the repository root:
 ./scripts/run_client.sh
 ```
 
+### Full Docker Setup (All containerized)
+
 ```bash
-# Docker-first setup (recommended)
-cd docker/
-docker compose up --build
+# Start all services
+docker compose -f docker/docker-compose.yml up --build
 
 # Stop services
-docker compose down
+docker compose -f docker/docker-compose.yml down
 ```
 
 ## Server configuration
