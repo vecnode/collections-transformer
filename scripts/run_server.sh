@@ -10,4 +10,4 @@ SERVER_DIR="${ROOT_DIR}/server"
 
 cd "${SERVER_DIR}"
 source "${ROOT_DIR}/venv/bin/activate"
-exec python3 app.py
+exec uvicorn app.main:app --host 0.0.0.0 --port "${API_PORT:-8080}" --reload
