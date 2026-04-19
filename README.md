@@ -16,14 +16,9 @@ Code developed in the context of the UKRI project "Transforming Collections" und
 ### Recommended: Mixed Mode (Containers + Local Development)
 
 ```bash
-# 1. Place your SQLite file (optional)
-cp ~/my_old_data/db.sqlite server/db/db.sqlite
-
 # 2. Start Docker
-docker compose -f docker/docker-compose.yml up redis mongodb worker
+docker compose -f docker/docker-compose.yml up -d --build
 
-# 3. Start the app
-./start_platform.sh
 ```
 
 ### Fast Mongo Seed Workflow (Recommended for Repeated Deployments)
@@ -31,6 +26,8 @@ docker compose -f docker/docker-compose.yml up redis mongodb worker
 Build a Mongo-native seed archive once from `server/db/db.sqlite`, then reuse it for fast container restores.
 
 ```bash
+# 1. Place your SQLite file (optional)
+cp ~/my_old_data/db.sqlite server/db/db.sqlite
 # One-time: build seed archive (this can take time)
 ./scripts/build_seed_archive_from_sqlite.sh
 

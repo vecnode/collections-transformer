@@ -19,10 +19,17 @@ if [[ ! -f "${SEED_ARCHIVE}" ]]; then
   exit 0
 fi
 
-existing_count=$(mongosh "${MONGO_URI}/${DB_NAME}" --quiet --eval "db.dataset.countDocuments()" 2>/dev/null || echo 0)
-if [[ "${existing_count}" != "0" ]]; then
-  echo "[mongo-seed] Database already populated (${existing_count} datasets). Skipping restore."
+dataset_count=$(mongosh "${MONGO_URI}/${DB_NAME}" --quiet --eval "db.dataset.countDocuments()" 2>/dev/null || echo 0)
+item_count=$(mongosh "${MONGO_URI}/${DB_NAME}" --quiet --eval "db.item.countDocuments()" 2>/dev/null || echo 0)
+labelset_count=$(mongosh "${MONGO_URI}/${DB_NAME}" --quiet --eval "db.labelset.countDocuments()" 2>/dev/null || echo 0)
+
+if [[ "${dataset_count}" != "0" && "${item_count}" != "0" ]]; then
+  echo "[mongo-seed] Database already populated (${dataset_count} datasets, ${item_count} items). Skipping restore."
   exit 0
+fi
+
+if [[ "${dataset_count}" != "0" && "${item_count}" == "0" ]]; then
+  echo "[mongo-seed] Detected partial database (${dataset_count} datasets, ${item_count} items, ${labelset_count} labelsets). Re-seeding from archive."
 fi
 
 echo "[mongo-seed] Restoring seed archive into ${DB_NAME}..."
@@ -33,5 +40,7 @@ mongorestore \
   --nsInclude "${DB_NAME}.*" \
   --drop
 
-restored_count=$(mongosh "${MONGO_URI}/${DB_NAME}" --quiet --eval "db.dataset.countDocuments()" 2>/dev/null || echo 0)
-echo "[mongo-seed] Restore complete. Dataset count: ${restored_count}"
+restored_dataset_count=$(mongosh "${MONGO_URI}/${DB_NAME}" --quiet --eval "db.dataset.countDocuments()" 2>/dev/null || echo 0)
+restored_item_count=$(mongosh "${MONGO_URI}/${DB_NAME}" --quiet --eval "db.item.countDocuments()" 2>/dev/null || echo 0)
+restored_labelset_count=$(mongosh "${MONGO_URI}/${DB_NAME}" --quiet --eval "db.labelset.countDocuments()" 2>/dev/null || echo 0)
+echo "[mongo-seed] Restore complete. dataset=${restored_dataset_count}, item=${restored_item_count}, labelset=${restored_labelset_count}"

@@ -4,6 +4,7 @@
 import logging
 from datetime import datetime
 import re
+import threading
 from config import apply_runtime_environment
 
 
@@ -42,11 +43,17 @@ def init(model):
     except Exception as e:
         print(f"Warning: Could not initialize Ollama: {e}")
     
-    try:
+    def _warmup_blip2():
+      try:
         provider_blip2.init_blip2()
         print("Blip2 initialized (always used for image tasks)")
-    except Exception as e:
+      except Exception as e:
         print(f"Warning: Could not initialize Blip2: {e}")
+
+    # Blip2 loading is expensive and can block API readiness for minutes.
+    # Warm it up in the background; image requests still lazy-init on demand.
+    threading.Thread(target=_warmup_blip2, daemon=True).start()
+    print("Blip2 warm-up started in background")
 
     print("======================================================")
     print("================= SERVER INITIALISED =================")
