@@ -7,8 +7,12 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - redis
-      - mongodb
+      redis:
+        condition: service_started
+      mongodb:
+        condition: service_started
+      mongo-seed:
+        condition: service_completed_successfully
     volumes:
       - ../server/db:/app/server/db
     environment:
@@ -25,8 +29,12 @@ services:
       dockerfile: docker/Dockerfile.server
     command: python -m app.worker
     depends_on:
-      - redis
-      - mongodb
+      redis:
+        condition: service_started
+      mongodb:
+        condition: service_started
+      mongo-seed:
+        condition: service_completed_successfully
     volumes:
       - ../server/db:/app/server/db
     environment:
@@ -62,6 +70,21 @@ services:
     volumes:
       - mongo_data:/data/db
     restart: unless-stopped
+
+  mongo-seed:
+    image: mongo:7
+    depends_on:
+      mongodb:
+        condition: service_started
+    volumes:
+      - ../server/db:/seed
+      - ../scripts:/scripts:ro
+    environment:
+      MONGO_URI: mongodb://mongodb:27017
+      DB_NAME: tanc_database
+      SEED_ARCHIVE: /seed/tanc_database.archive.gz
+    command: ["bash", "/scripts/restore_mongo_seed.sh"]
+    restart: "no"
 
 volumes:
   redis_data:

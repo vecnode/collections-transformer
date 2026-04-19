@@ -26,6 +26,33 @@ docker compose -f docker/docker-compose.yml up redis mongodb worker
 ./start_platform.sh
 ```
 
+### Fast Mongo Seed Workflow (Recommended for Repeated Deployments)
+
+Build a Mongo-native seed archive once from `server/db/db.sqlite`, then reuse it for fast container restores.
+
+```bash
+# One-time: build seed archive (this can take time)
+./scripts/build_seed_archive_from_sqlite.sh
+
+# Produces:
+# server/db/tanc_database.archive.gz
+```
+
+After that, fresh deployments use the archive automatically:
+
+```bash
+# Fresh startup (mongo-seed restores if database is empty)
+docker compose -f docker/docker-compose.yml up redis mongodb worker
+
+# Start app locally
+./start_platform.sh
+```
+
+Notes:
+- `mongo-seed` restores from `server/db/tanc_database.archive.gz` only when Mongo is empty.
+- If Mongo already has data, seed restore is skipped.
+- This avoids repeated heavy SQLite-to-Mongo migrations on normal restarts.
+
 ```bash
 # Set up backend and frontend environments
 uv venv venv

@@ -35,6 +35,12 @@ def _auto_migrate_database(_db):
     Called during application startup.
     """
     try:
+        # Fast path: seeded/populated MongoDB should skip all heavy startup work.
+        existing_datasets = _db["dataset"].count_documents({})
+        if existing_datasets > 0:
+            logger.info("MongoDB already populated (%d datasets), skipping SQLite export/migration", existing_datasets)
+            return
+
         root_dir = Path(_SERVER_DIR).parent
         scripts_dir = root_dir / "scripts"
         if str(scripts_dir) not in sys.path:
@@ -69,7 +75,7 @@ def _auto_migrate_database(_db):
             with dataset_json.open("r", encoding="utf-8") as f:
                 source_dataset_count = len(json.load(f))
 
-        target_dataset_count = _db["dataset"].count_documents({})
+        target_dataset_count = existing_datasets
         if target_dataset_count >= source_dataset_count and source_dataset_count > 0:
             logger.info(
                 "MongoDB dataset count (%d) matches/exceeds source (%d), skipping migration",
