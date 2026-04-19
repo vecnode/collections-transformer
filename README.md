@@ -18,6 +18,9 @@ sudo systemctl stop mongod
 # Start all services
 docker compose -f docker/docker-compose.yml up -d --build
 
+# App entrypoint
+# http://localhost
+
 # Stop services
 docker compose -f docker/docker-compose.yml down
 ```
@@ -70,6 +73,9 @@ Runtime settings are loaded from `.env` (project root), using:
 2. Set the values you need for your environment.
 3. Restart containers/services after changing env vars.
 
+For Docker deployments, set `OLLAMA_BASE_URL` to a network-reachable endpoint from containers.
+Default in compose is `http://host.docker.internal:11434`.
+
 Important variables:
 
 - `ENVIRONMENT`, `LOG_LEVEL`
@@ -89,10 +95,31 @@ Inference providers:
 
 Current Docker Compose topology (`docker/docker-compose.yml`):
 
-- `client` (Next.js) on `:3000`
-- `api` (FastAPI) on `:8080`
+- `caddy` (reverse proxy / edge) on `:80` (public entrypoint)
+- `client` (Next.js, internal)
+- `api` (FastAPI, internal)
 - `worker` (background job processor)
 - `mongodb` on `:27017`
 - `redis` on `:6379`
 - `mongo-seed` (one-shot seed restore)
+
+Proxy routing:
+
+- `/` -> `client:3000`
+- `/backend*` -> `api:8080`
+- `/api*` -> `api:8080`
+
+Connection flow for deployment:
+
+- Browser -> `caddy` -> `client`
+- Browser -> `caddy` -> `api` (`/backend` and `/api` routes)
+- `api` <-> `mongodb`
+- `api` <-> `redis`
+- `worker` <-> `redis` and `mongodb`
+- `api` <-> Ollama (`OLLAMA_BASE_URL`, external or reachable network endpoint)
+
+Notes:
+
+- Public entrypoint is `http://localhost` (via Caddy on port 80)
+- `api` and `client` are intentionally internal-only in this deployment mode
 

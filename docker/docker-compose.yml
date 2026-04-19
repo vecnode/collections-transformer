@@ -4,8 +4,6 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.server
     command: uvicorn app.main:app --host 0.0.0.0 --port 8080
-    ports:
-      - "8080:8080"
     depends_on:
       redis:
         condition: service_started
@@ -19,8 +17,13 @@ services:
       MONGODB_URI: mongodb://mongodb:27017
       MONGODB_DATABASE: tanc_database
       REDIS_URL: redis://redis:6379/0
-      CORS_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost,http://127.0.0.1}
       API_PORT: "8080"
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL_OPTION: ${OLLAMA_MODEL_OPTION:-gemma3:27b}
+      BLIP2_MODEL_NAME: ${BLIP2_MODEL_NAME:-Salesforce/blip2-opt-2.7b}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
 
   worker:
@@ -41,18 +44,32 @@ services:
       MONGODB_URI: mongodb://mongodb:27017
       MONGODB_DATABASE: tanc_database
       REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL_OPTION: ${OLLAMA_MODEL_OPTION:-gemma3:27b}
+      BLIP2_MODEL_NAME: ${BLIP2_MODEL_NAME:-Salesforce/blip2-opt-2.7b}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
 
   client:
     build:
       context: ..
       dockerfile: docker/Dockerfile.client
-    ports:
-      - "3000:3000"
     depends_on:
       - api
-    environment:
-      NEXT_PUBLIC_SERVER_URL: http://api:8080
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    depends_on:
+      - client
+      - api
+    ports:
+      - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
     restart: unless-stopped
 
   redis:
@@ -89,3 +106,5 @@ services:
 volumes:
   redis_data:
   mongo_data:
+  caddy_data:
+  caddy_config:
