@@ -16,10 +16,13 @@ Code developed in the context of the UKRI project "Transforming Collections" und
 ### Recommended: Mixed Mode (Containers + Local Development)
 
 ```bash
-# Terminal 1: Start Docker infrastructure
+# 1. Place your SQLite file (optional)
+cp ~/my_old_data/db.sqlite server/db/db.sqlite
+
+# 2. Start Docker
 docker compose -f docker/docker-compose.yml up redis mongodb worker
 
-# Terminal 2: Run your platform
+# 3. Start the app
 ./start_platform.sh
 ```
 
