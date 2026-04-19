@@ -20,10 +20,6 @@ dev = [
   "isort>=5.13.2",
 ]
 
-[tool.pytest.ini_options]
-testpaths = ["server/tests"]
-python_files = ["test_*.py"]
-
 [tool.ruff]
 line-length = 100
 target-version = "py312"

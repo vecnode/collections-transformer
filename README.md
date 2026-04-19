@@ -118,7 +118,6 @@ Run locally:
 
 ```bash
 ruff check server/app.py server/config.py server/api/__init__.py server/api/provider_ollama.py
-pytest
 ```
 
 Text inference is Ollama-only, with Blip2 used for image processing.

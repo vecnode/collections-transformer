@@ -142,6 +142,41 @@ class MigrationManager:
             self.stats["documents_imported"] += result.inserted_count
             self.stats["collections_imported"] += 1
 
+    def create_indexes(self) -> None:
+        """Create indexes on id fields to speed up lookups during reference updates."""
+        try:
+            collections_to_index = ["classifier", "dataset", "category", "artwork", "text_label"]
+            for collection_name in collections_to_index:
+                collection = self.db[collection_name]
+                if collection.count_documents({}) == 0:
+                    continue
+                try:
+                    collection.create_index("id", unique=False, background=False)
+                    print(f"Created index on {collection_name}.id")
+                except Exception:
+                    # Index may already exist, which is fine
+                    pass
+        except Exception as exc:
+            print(f"Warning: Could not create indexes: {exc}")
+
+    def create_refactor_indexes(self) -> None:
+        """Create indexes used by refactor_collections duplicate checks and joins."""
+        try:
+            self.db["artwork"].create_index("dataset_id", background=False)
+            self.db["artwork"].create_index("old_dataset_id", background=False)
+            self.db["item"].create_index("old_item_id", background=False)
+            self.db["label"].create_index(
+                [
+                    ("dataset_id", 1),
+                    ("item_id", 1),
+                    ("analyser_id", 1),
+                    ("content_position", 1),
+                ],
+                background=False,
+            )
+        except Exception as exc:
+            print(f"Warning: Could not create refactor indexes: {exc}")
+
     def update_references(self) -> None:
         try:
             category_collection = self.db["category"]
@@ -228,6 +263,8 @@ class MigrationManager:
 
     def refactor_collections(self) -> None:
         try:
+            self.create_refactor_indexes()
+
             dataset_collection = self.db["dataset"]
             analyser_collection = self.db["classifier"]
             old_item_collection = self.db["artwork"]
@@ -426,6 +463,7 @@ def run_migration(
         if reset_existing:
             manager.reset_target_collections()
         manager.import_collections()
+        manager.create_indexes()
         manager.update_references()
         manager.refactor_collections()
         manager.verify_migration()
