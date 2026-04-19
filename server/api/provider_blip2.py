@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def _log_print(*args, **kwargs):
-    logger.info(" ".join(str(arg) for arg in args))
+    logger.debug(" ".join(str(arg) for arg in args))
 
 
 print = _log_print

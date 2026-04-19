@@ -61,11 +61,14 @@ npm run dev
 
 ## Server configuration
 
-Server settings are centralized in `server/config.py`.
+Runtime settings are loaded from `.env` (project root), using:
 
-1. Copy `.env.template` to `.env` (project root).
-2. Configure Ollama settings (`OLLAMA_BASE_URL` and `OLLAMA_MODEL_OPTION`).
-3. Adjust runtime values only if needed (`API_PORT`, `MONGODB_URI`, `LOG_LEVEL`, `OLLAMA_BASE_URL`).
+- `server/app/core/config.py` (FastAPI app and worker)
+- `server/config.py` (legacy compatibility entrypoints)
+
+1. Copy `.env.template` to `.env` in the project root.
+2. Set the values you need for your environment.
+3. Restart containers/services after changing env vars.
 
 Important variables:
 
@@ -77,38 +80,19 @@ Important variables:
 - `OLLAMA_MODEL_OPTION`, `OLLAMA_BASE_URL`
 - `BLIP2_MODEL_NAME`
 
+Inference providers:
 
-
-## Quality checks
-
-Run locally:
-
-```bash
-ruff check server/app.py server/config.py server/api/__init__.py server/api/provider_ollama.py
-```
-
-Text inference is Ollama-only, with Blip2 used for image processing.
+- Text inference: Ollama (`OLLAMA_BASE_URL`, `OLLAMA_MODEL_OPTION`)
+- Image inference: Blip2 (`BLIP2_MODEL_NAME`, default `Salesforce/blip2-opt-2.7b`)
 
 ### Current deployment
 
-Testing
+Current Docker Compose topology (`docker/docker-compose.yml`):
 
-
-### Original deployment
-
-Ubuntu 22.04.1 LTS  
-AMD EPYC 7713 64-Core Processor  
-Linode Akamai Cloud  
-
-
-### Useful MongoDB commands
-```
-$ mongosh
-$ use my_database
-$ show collections
-# Inspect dataset by name
-$ db.dataset.find({"name": "set_1"})
-# Count datasets
-$ db.dataset.countDocuments()
-```
+- `client` (Next.js) on `:3000`
+- `api` (FastAPI) on `:8080`
+- `worker` (background job processor)
+- `mongodb` on `:27017`
+- `redis` on `:6379`
+- `mongo-seed` (one-shot seed restore)
 
