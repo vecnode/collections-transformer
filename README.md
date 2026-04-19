@@ -11,44 +11,27 @@ Code developed in the context of the UKRI project "Transforming Collections" und
 
 ## Reproduce
 
-- Frontend requirement: Node.js >= 18.17.0 (recommended: Node 20 LTS).
-
-### Recommended: Mixed Mode (Containers + Local Development)
 
 ```bash
-# 2. Start Docker
+sudo systemctl stop mongod
+
+# Start all services
 docker compose -f docker/docker-compose.yml up -d --build
 
+# Stop services
+docker compose -f docker/docker-compose.yml down
 ```
 
-### Fast Mongo Seed Workflow (Recommended for Repeated Deployments)
-
-Build a Mongo-native seed archive once from `server/db/db.sqlite`, then reuse it for fast container restores.
-
 ```bash
-# 1. Place your SQLite file (optional)
+# Migrate your SQLite file (optional)
 cp ~/my_old_data/db.sqlite server/db/db.sqlite
-# One-time: build seed archive (this can take time)
 ./scripts/build_seed_archive_from_sqlite.sh
-
-# Produces:
 # server/db/tanc_database.archive.gz
 ```
 
 After that, fresh deployments use the archive automatically:
 
-```bash
-# Fresh startup (mongo-seed restores if database is empty)
-docker compose -f docker/docker-compose.yml up redis mongodb worker
-
-# Start app locally
-./start_platform.sh
-```
-
-Notes:
-- `mongo-seed` restores from `server/db/tanc_database.archive.gz` only when Mongo is empty.
-- If Mongo already has data, seed restore is skipped.
-- This avoids repeated heavy SQLite-to-Mongo migrations on normal restarts.
+### Manual
 
 ```bash
 # Set up backend and frontend environments
@@ -75,35 +58,22 @@ npm run dev
 ```
 
 
-```bash
-./scripts/create_server_env.sh
-./scripts/run_server.sh
-./scripts/run_client.sh
-```
-
-### Full Docker Setup (All containerized)
-
-```bash
-# Start all services
-docker compose -f docker/docker-compose.yml up --build
-
-# Stop services
-docker compose -f docker/docker-compose.yml down
-```
 
 ## Server configuration
 
 Server settings are centralized in `server/config.py`.
 
-1. Copy `server/.env.template` to `server/.env`.
+1. Copy `.env.template` to `.env` (project root).
 2. Configure Ollama settings (`OLLAMA_BASE_URL` and `OLLAMA_MODEL_OPTION`).
 3. Adjust runtime values only if needed (`API_PORT`, `MONGODB_URI`, `LOG_LEVEL`, `OLLAMA_BASE_URL`).
 
 Important variables:
 
 - `ENVIRONMENT`, `LOG_LEVEL`
-- `API_HOST`, `API_PORT`, `FLASK_DEBUG`, `FLASK_RELOAD`
+- `API_HOST`, `API_PORT`, `API_RELOAD`, `SECRET_KEY`
 - `MONGODB_URI`, `MONGODB_DATABASE`
+- `REDIS_URL`
+- `NEXT_PUBLIC_SERVER_URL`
 - `OLLAMA_MODEL_OPTION`, `OLLAMA_BASE_URL`
 - `BLIP2_MODEL_NAME`
 

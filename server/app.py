@@ -11,7 +11,7 @@ configure_logging()
 parser = argparse.ArgumentParser()
 parser.add_argument("-m", "--model", action="store", default="dual")
 parser.add_argument("-p", "--port", action="store", default=settings.api_port)
-parser.add_argument("-r", "--reload", action="store", default=str(settings.flask_reload))
+parser.add_argument("-r", "--reload", action="store", default=str(settings.api_reload))
 args, unknown = parser.parse_known_args()
 
 

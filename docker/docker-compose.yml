@@ -52,7 +52,7 @@ services:
     depends_on:
       - api
     environment:
-      NEXT_PUBLIC_API_URL: http://api:8080
+      NEXT_PUBLIC_SERVER_URL: http://api:8080
     restart: unless-stopped
 
   redis:

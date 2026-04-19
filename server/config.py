@@ -5,7 +5,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-ROOT_DIR = Path(__file__).resolve().parent
+SERVER_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SERVER_DIR.parent
 
 
 def _to_bool(value: str, default: bool = False) -> bool:
@@ -26,9 +27,8 @@ class Settings:
     log_level: str
     api_host: str
     api_port: int
-    flask_debug: bool
-    flask_reload: bool
-    flask_secret_key: str
+    api_reload: bool
+    secret_key: str
     cors_origins: list[str]
 
     mongodb_uri: str
@@ -47,9 +47,13 @@ class Settings:
 
 
 def load_settings() -> Settings:
-    env_file = ROOT_DIR / ".env"
-    if env_file.exists():
-        load_dotenv(env_file)
+    # Prefer a shared root-level .env, fallback to server/.env for compatibility.
+    root_env_file = PROJECT_ROOT / ".env"
+    server_env_file = SERVER_DIR / ".env"
+    if root_env_file.exists():
+        load_dotenv(root_env_file)
+    elif server_env_file.exists():
+        load_dotenv(server_env_file)
     else:
         load_dotenv()
 
@@ -58,11 +62,8 @@ def load_settings() -> Settings:
         log_level=os.getenv("LOG_LEVEL", "INFO"),
         api_host=os.getenv("API_HOST", "0.0.0.0"),
         api_port=int(os.getenv("API_PORT", "8080")),
-        flask_debug=_to_bool(os.getenv("FLASK_DEBUG"), default=True),
-        flask_reload=_to_bool(os.getenv("FLASK_RELOAD"), default=False),
-        flask_secret_key=os.getenv(
-            "FLASK_SECRET_KEY", "local-dev-secret-key-change-in-production"
-        ),
+        api_reload=_to_bool(os.getenv("API_RELOAD"), default=False),
+        secret_key=os.getenv("SECRET_KEY", "local-dev-secret-key-change-in-production"),
         cors_origins=_split_csv(
             os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"),
             ["http://localhost:3000", "http://127.0.0.1:3000"],

@@ -5,7 +5,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent  # server/
+SERVER_DIR = Path(__file__).resolve().parent.parent.parent  # server/
+PROJECT_ROOT = SERVER_DIR.parent
 
 
 def _to_bool(value: str | None, default: bool = False) -> bool:
@@ -44,9 +45,13 @@ class AppSettings:
 
 
 def load_app_settings() -> AppSettings:
-    env_file = ROOT_DIR / ".env"
-    if env_file.exists():
-        load_dotenv(env_file)
+    # Prefer a shared root-level .env, fallback to server/.env for compatibility.
+    root_env_file = PROJECT_ROOT / ".env"
+    server_env_file = SERVER_DIR / ".env"
+    if root_env_file.exists():
+        load_dotenv(root_env_file)
+    elif server_env_file.exists():
+        load_dotenv(server_env_file)
     else:
         load_dotenv()
 
@@ -55,10 +60,7 @@ def load_app_settings() -> AppSettings:
         log_level=os.getenv("LOG_LEVEL", "INFO"),
         api_host=os.getenv("API_HOST", "0.0.0.0"),
         api_port=int(os.getenv("API_PORT", "8080")),
-        secret_key=os.getenv(
-            "SECRET_KEY",
-            os.getenv("FLASK_SECRET_KEY", "local-dev-secret-key-change-in-production"),
-        ),
+        secret_key=os.getenv("SECRET_KEY", "local-dev-secret-key-change-in-production"),
         cors_origins=_split_csv(
             os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"),
             ["http://localhost:3000", "http://127.0.0.1:3000"],
