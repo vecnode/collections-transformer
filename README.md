@@ -12,60 +12,88 @@ Code developed in the context of the UKRI project "Transforming Collections" und
 ## Reproduce
 
 ```bash
+# 1) Use docker profile env
+cp .env.docker.template .env
+
+# 2) Optional: avoid host Mongo conflict if installed locally
 sudo systemctl stop mongod
 
-# Start all services
+# 3) Start full stack
 docker compose -f docker/docker-compose.yml up -d --build
 
-# App entrypoint
+# 4) Smoke checks
+curl -sS http://localhost/api/v1/health
+curl -sS http://localhost/api/v1/readiness
+
+# 5) App entrypoint
 # http://localhost
 
-# Stop services
+# 6) Stop services when finished
 docker compose -f docker/docker-compose.yml down
 ```
 
 
-### Manual
+## Manual
 
 ```bash
-c
+# 1) Use local profile env
+cp .env.local.template .env
+
+# 2) Backend dependencies (one-time)
+uv venv venv
+source venv/bin/activate
+uv pip install -r requirements.txt
+
+# 3) Frontend dependencies (one-time)
+cd client/
+nvm install 20
+nvm use 20
+npm install
+cd ..
+
+# 4) Start backend with reload (Terminal 1)
+./scripts/run_server.sh
+
+# 5) Start frontend dev server (Terminal 2)
+./scripts/run_client.sh
+
+# 6) Local dev URLs
+# Frontend: http://localhost:3000
+# API:      http://localhost:8080/api/v1/health
+
+# Optional quick API checks
+curl -sS http://localhost:8080/api/v1/health
+curl -sS http://localhost:8080/api/v1/readiness
 ```
 
 
 
 ## Server configuration
 
-Runtime settings are loaded from `.env` (project root), using:
+Runtime settings are read from `.env` in the project root.
 
-- `server/app/core/config.py` (FastAPI app and worker)
-- `server/config.py` (legacy compatibility entrypoints)
-
-1. Choose an environment profile template and copy it to `.env` in the project root:
+Quick setup:
 
 ```bash
-# Local/manual backend + frontend dev
+# Local dev profile
 cp .env.local.template .env
 
-# Docker deployment via compose + caddy
+# Docker profile (compose + caddy)
 cp .env.docker.template .env
 ```
 
-2. If you need a single generic baseline, `.env.template` is also available.
-3. Set the values you need for your environment.
-4. Restart containers/services after changing env vars.
 
-Profile guidance:
+Profile behavior:
 
 - Local profile (`.env.local.template`)
-	- Uses localhost datastore URLs (`127.0.0.1`, `localhost`).
-	- Sets `NEXT_PUBLIC_SERVER_URL=http://localhost:8080` for manual frontend-to-backend calls.
+  - Datastores on localhost (`127.0.0.1`, `localhost`)
+  - `NEXT_PUBLIC_SERVER_URL=http://localhost:8080`
 - Docker profile (`.env.docker.template`)
-	- Uses container service DNS (`mongodb`, `redis`) for backend runtime.
-	- Sets `NEXT_PUBLIC_SERVER_URL=http://localhost` so browser traffic goes through Caddy.
-	- Uses `OLLAMA_BASE_URL=http://host.docker.internal:11434` by default.
+  - Datastores on container DNS (`mongodb`, `redis`)
+  - `NEXT_PUBLIC_SERVER_URL=http://localhost` (browser via Caddy)
+  - `OLLAMA_BASE_URL=http://host.docker.internal:11434` by default
 
-For Docker deployments, set `OLLAMA_BASE_URL` to a network-reachable endpoint from containers.
-Default in compose is `http://host.docker.internal:11434`.
+For Docker, `OLLAMA_BASE_URL` must be reachable from containers.
 
 Important variables:
 
@@ -82,41 +110,7 @@ Inference providers:
 - Text inference: Ollama (`OLLAMA_BASE_URL`, `OLLAMA_MODEL_OPTION`)
 - Image inference: Blip2 (`BLIP2_MODEL_NAME`, default `Salesforce/blip2-opt-2.7b`)
 
-### Current deployment
 
-Current Docker Compose topology (`docker/docker-compose.yml`):
-
-- `caddy` (reverse proxy / edge) on `:80` (public entrypoint)
-- `client` (Next.js, internal)
-- `api` (FastAPI, internal)
-- `worker` (background job processor)
-- `mongodb` on `:27017`
-- `redis` on `:6379`
-- `mongo-seed` (one-shot seed restore)
-
-Proxy routing:
-
-- `/` -> `client:3000`
-- `/backend*` -> `api:8080`
-- `/api*` -> `api:8080`
-
-### API contract convergence
-
-Canonical API surface is versioned under `/api/v1/*`.
-
-- Native v1 routes: `/api/v1/health`, `/api/v1/readiness`, `/api/v1/transforms*`
-- Backend application routes: `/api/v1/backend/*`
-
-Examples:
-
-- `/api/v1/backend/agents`
-- `/api/v1/backend/datasets`
-- `/api/v1/backend/analysis/*`
-- `/api/v1/backend/user/*`
-- `/api/v1/backend/ollama/models`
-
-Legacy `/backend/*` endpoints have been removed from the FastAPI application.
-New integrations should target `/api/v1/*` only.
 
 ### Bruno API collection
 
