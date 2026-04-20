@@ -10,6 +10,7 @@ from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException
 
+from app.api_responses import success_response
 from app.infra.redis_client import get_redis
 from app.schemas.transforms import TransformJobStatus, TransformRequest
 
@@ -35,7 +36,7 @@ async def create_transform(payload: TransformRequest):
     await redis.hset(f"{JOB_KEY_PREFIX}{job_id}", mapping=job_data)
     await redis.lpush(QUEUE_KEY, job_id)
     logger.info("Transform job %s enqueued", job_id)
-    return {"job_id": job_id, "status": "queued"}
+    return success_response(data={"job_id": job_id, "status": "queued"}, status_code=202)
 
 
 @router.get("/{job_id}", response_model=TransformJobStatus)
@@ -49,4 +50,4 @@ async def get_transform_status(job_id: str):
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
 
-    return TransformJobStatus(job_id=job_id, **job)
+    return success_response(data=TransformJobStatus(job_id=job_id, **job).model_dump())

@@ -21,6 +21,7 @@ if _SERVER_DIR not in sys.path:
     sys.path.insert(0, _SERVER_DIR)
 
 from app.core.config import app_settings, configure_app_logging
+from app.api_responses import error_response
 
 configure_app_logging()
 logger = logging.getLogger(__name__)
@@ -164,8 +165,9 @@ def create_app(model: str = "dual") -> "FastAPI":
     global _active_model
     _active_model = model
 
-    from fastapi import FastAPI
+    from fastapi import FastAPI, HTTPException, Request
     from fastapi.middleware.cors import CORSMiddleware
+    from fastapi.exceptions import RequestValidationError
     from starlette.middleware.sessions import SessionMiddleware
 
     from app.routers.v1 import router as v1_router
@@ -199,6 +201,34 @@ def create_app(model: str = "dual") -> "FastAPI":
     # Canonical contract: all backend routes are available under /api/v1/*.
     application.include_router(v1_router)
     application.include_router(backend_router, prefix="/api/v1")
+
+    @application.exception_handler(HTTPException)
+    async def http_exception_handler(_request: Request, exc: HTTPException):
+        details = exc.detail if not isinstance(exc.detail, str) else None
+        message = exc.detail if isinstance(exc.detail, str) else "HTTP error"
+        return error_response(
+            message=message,
+            status_code=exc.status_code,
+            details=details,
+        )
+
+    @application.exception_handler(RequestValidationError)
+    async def validation_exception_handler(_request: Request, exc: RequestValidationError):
+        return error_response(
+            message="Request validation failed",
+            status_code=422,
+            code="validation_error",
+            details=exc.errors(),
+        )
+
+    @application.exception_handler(Exception)
+    async def unhandled_exception_handler(_request: Request, exc: Exception):
+        logger.exception("Unhandled application error")
+        return error_response(
+            message="Internal server error",
+            status_code=500,
+            code="internal_server_error",
+        )
 
     return application
 
