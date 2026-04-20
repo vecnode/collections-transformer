@@ -1,4 +1,4 @@
-"""Labelset routes (/backend/labelset*)."""
+"""Labelset and label update routes used by the current frontend."""
 import json
 import logging
 
@@ -37,64 +37,6 @@ async def labelsets(request: Request):
         return {"status": "500", "error": str(exc)}
 
 
-@router.get("/labelset")
-async def labelset(request: Request):
-    try:
-        models = _models()
-        p = request.query_params
-        labelset_id = ObjectId(p.get("labelset_id"))
-        include_labels = bool(p.get("include_labels"))
-        ls = models.Labelset.get(None, labelset_id, include_labels)
-        return {"status": "200", "data": ls}
-    except Exception as exc:
-        return {"status": "500", "error": str(exc)}
-
-
-@router.get("/labelset_copy")
-async def labelset_copy(request: Request):
-    try:
-        models = _models()
-        p = request.query_params
-        labelset_id = ObjectId(p.get("labelset_id"))
-        owner_id = p.get("owner_id")
-        new_name = p.get("name")
-        existing = models.Labelset.get(None, labelset_id)
-        new_id = models.Labelset.create(owner_id, existing["dataset_id"], existing["label_type"], new_name)
-        models.Label.copy_all(labelset_id, new_id, None)
-        return {"status": "200", "data": str(new_id)}
-    except Exception as exc:
-        return {"status": "500", "error": str(exc)}
-
-
-@router.get("/labelset_new")
-async def labelset_new(request: Request):
-    try:
-        models = _models()
-        p = request.query_params
-        name = p.get("name")
-        ltype = p.get("type")
-        dataset_id = ObjectId(p.get("dataset_id"))
-        analyser_id = ObjectId(p.get("analyser_id")) if p.get("analyser_id") else None
-        owner_id = p.get("owner_id")
-        new_id = models.Labelset.create(owner_id, dataset_id, ltype, name, analyser_id)
-        return {"status": "200", "data": str(new_id)}
-    except Exception as exc:
-        return {"status": "500", "error": str(exc)}
-
-
-@router.get("/labelset_update")
-async def labelset_update(request: Request):
-    try:
-        models = _models()
-        p = request.query_params
-        labelset_id = ObjectId(p.get("labelset_id"))
-        update_data = json.loads(p.get("data"))
-        models.Labelset.update(labelset_id, update_data, False)
-        return {"status": "200", "message": f"Labelset {labelset_id} updated"}
-    except Exception as exc:
-        return {"status": "500", "error": str(exc)}
-
-
 @router.post("/labelset_delete")
 async def labelset_delete(request: Request):
     try:
@@ -103,4 +45,67 @@ async def labelset_delete(request: Request):
         models.Labelset.delete(labelset_id)
         return {"status": "200", "message": f"Labelset {labelset_id} deleted"}
     except Exception as exc:
+        return {"status": "500", "error": str(exc)}
+
+
+def _parse_item_listing_id(raw_id: str) -> tuple[str, str, str]:
+    label_subtype = None
+    listing_id = raw_id
+
+    if "-checkbox-" in raw_id:
+        label_subtype, listing_id = raw_id.split("-checkbox-", 1)
+
+    parts = listing_id.split("-")
+    if len(parts) < 4 or parts[0] != "artwork":
+        raise ValueError("Unsupported item identifier format")
+
+    item_id = parts[1]
+    content_type = parts[2]
+    return item_id, content_type, label_subtype
+
+
+@router.get("/update_label")
+@router.post("/update_label")
+async def update_label(request: Request):
+    try:
+        models = _models()
+        params = request.query_params
+        labelset_id = params.get("labelset_id")
+        raw_id = params.get("id")
+
+        if not labelset_id or not raw_id:
+            return {"status": "400", "error": "labelset_id and id are required"}
+
+        item_id, content_type, label_subtype = _parse_item_listing_id(raw_id)
+        labelset = models.Labelset.get(None, labelset_id)
+        label_type = labelset.get("label_type")
+
+        options = {}
+        if label_subtype is not None:
+            options["label_subtype"] = label_subtype
+        if "checked" in params:
+            options["ticked"] = params.get("checked") == "true"
+        if "exclude" in params:
+            options["exclude"] = str(params.get("exclude")).lower()
+        if "score" in params:
+            score = params.get("score")
+            options["score"] = score if score == "empty" else int(score)
+        if "rationale" in params:
+            options["rationale"] = params.get("rationale")
+        if "highlight" in params:
+            options["highlight"] = json.loads(params.get("highlight"))
+
+        models.Label.update(
+            label_type,
+            ObjectId(labelset_id),
+            ObjectId(item_id),
+            raw_id,
+            content_type,
+            options,
+        )
+        return {"status": "200", "message": "Label updated"}
+    except ValueError as exc:
+        return {"status": "400", "error": str(exc)}
+    except Exception as exc:
+        logger.error("update_label: %s", exc)
         return {"status": "500", "error": str(exc)}

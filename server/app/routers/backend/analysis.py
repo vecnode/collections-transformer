@@ -1,4 +1,4 @@
-"""Analysis history routes (/backend/analysis/*, /backend/item)."""
+"""Analysis history and item routes used by the current frontend."""
 import logging
 
 from bson.objectid import ObjectId
@@ -94,4 +94,21 @@ async def get_item(request: Request):
         return {"status": "200", "data": formatted_item}
     except Exception as exc:
         logger.error("get_item: %s", exc)
+        return {"status": "500", "error": str(exc)}
+
+
+@router.get("/item_image")
+async def get_item_image(request: Request):
+    try:
+        models = _models()
+        item_id = request.query_params.get("item_id")
+        image_storage_id = request.query_params.get("image_storage_id")
+
+        if not item_id or not image_storage_id:
+            return {"status": "400", "error": "item_id and image_storage_id are required"}
+
+        image_data = models.Item.getImage(item_id, image_storage_id)
+        return {"status": "200", "data": image_data.decode("utf-8") if isinstance(image_data, bytes) else image_data}
+    except Exception as exc:
+        logger.error("get_item_image: %s", exc)
         return {"status": "500", "error": str(exc)}
