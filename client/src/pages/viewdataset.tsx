@@ -9,6 +9,128 @@ import StatusBox from '@/components/statusBox';
 import type { Dataset, CollectionItem } from '@/types';
 
 
+const ItemThumbnail = ({ itemId, imageStorageId }: { itemId: string; imageStorageId: string }) => {
+    const [loadState, setLoadState] = useState<'loading' | 'ready' | 'error'>('loading')
+    const [image, setImage] = useState('')
+
+    useEffect(() => {
+      let isCancelled = false
+
+      const getImage = async () => {
+        setLoadState('loading')
+
+        try {
+          const response = await fetch((process.env.NEXT_PUBLIC_SERVER_URL || '') + '/api/v1/backend/item_image?' + new URLSearchParams({
+            item_id: itemId,
+            image_storage_id: imageStorageId
+          }), {
+            method: 'GET',
+            mode: 'cors',
+            headers: {'Content-Type': 'application/json'}
+          })
+
+          const res = await response.json()
+          if (!isCancelled && res.status === '200') {
+            setImage('data:image/jpeg;base64,' + res.data)
+            setLoadState('ready')
+          } else if (!isCancelled) {
+            setLoadState('error')
+          }
+        } catch {
+          if (!isCancelled) {
+            setLoadState('error')
+          }
+        }
+      }
+
+      void getImage()
+
+      return () => {
+        isCancelled = true
+      }
+    }, [imageStorageId, itemId])
+
+    if (loadState === 'loading') {
+      return (
+        <div style={{
+          marginTop: '0.25rem',
+          padding: '0.5rem',
+          backgroundColor: '#fff',
+          borderRadius: '2px',
+          height: '140px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--ink-muted)',
+          fontSize: '0.85rem'
+        }}>
+          Loading image...
+        </div>
+      )
+    }
+
+    if (loadState === 'error') {
+      return (
+        <div style={{
+          marginTop: '0.25rem',
+          padding: '0.5rem',
+          backgroundColor: '#fff',
+          borderRadius: '2px',
+          height: '140px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--ink-muted)',
+          fontSize: '0.85rem'
+        }}>
+          Image unavailable
+        </div>
+      )
+    }
+
+    return (
+      <div style={{
+        marginTop: '0.25rem',
+        padding: '0.5rem',
+        backgroundColor: '#fff',
+        borderRadius: '2px',
+        height: '140px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden'
+      }}>
+        <img
+          src={image}
+          alt="Item thumbnail"
+          style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+        />
+      </div>
+    )
+}
+
+const ImageReferencePreview = ({ filename }: { filename: string }) => {
+    return (
+      <div style={{
+        marginTop: '0.25rem',
+        padding: '0.5rem',
+        backgroundColor: '#fff',
+        borderRadius: '2px',
+        height: '140px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        color: 'var(--ink-muted)'
+      }}>
+        <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.35rem' }}>Image reference</div>
+        <div style={{ fontSize: '0.8rem', wordBreak: 'break-word' }}>{filename}</div>
+      </div>
+    )
+}
+
+
 
 
 
@@ -30,6 +152,7 @@ const ViewDataset = () => {
 
     const [datasetStatus, setDatasetStatus] = useState("")
     const [dataset_id, setDatasetId] = useState("")
+    const [selectedItem, setSelectedItem] = useState<CollectionItem | null>(null)
 
 
     const getDataset = (dataset_id: string) => {
@@ -47,13 +170,6 @@ const ViewDataset = () => {
         .then(response => response.json())
         .then(
           res => {
-            console.log("=== API Response ===", res);
-            console.log("Dataset data:", res.data);
-            console.log("Artworks:", res.data.artworks);
-            if (res.data.artworks && res.data.artworks.length > 0) {
-              console.log("First item:", res.data.artworks[0]);
-            }
-            
             const artworks = res.data.artworks || res.data.items || [];
             const artworkCount = res.data.artwork_count || artworks.length;
             setDatasetStatus("Loaded "+artworkCount+" data records");
@@ -65,8 +181,8 @@ const ViewDataset = () => {
             setDataset(datasetToSet as Dataset);
           }
         )
-      } catch (e){
-        console.log("Error fetching dataset:", e)
+      } catch {
+        setDatasetStatus("Failed to load dataset")
       }
     }
 
@@ -82,6 +198,17 @@ const ViewDataset = () => {
         setDatasetId(param_dataset_id)
       }
     },[])
+
+    useEffect(() => {
+      if (dataset.artworks && dataset.artworks.length > 0) {
+        setSelectedItem((current: CollectionItem | null) => {
+          if (current && dataset.artworks.some((item: CollectionItem) => item._id === current._id)) {
+            return current
+          }
+          return dataset.artworks[0]
+        })
+      }
+    }, [dataset.artworks])
 
 
     const getItemPreview = (item: CollectionItem): string => {
@@ -137,6 +264,115 @@ const ViewDataset = () => {
         : `Item ${item._id?.substring(0, 8) ?? 'unknown'}`;
     };
 
+    const looksLikeImageFilename = (value: string | undefined): boolean => {
+      return typeof value === 'string' && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(value.trim());
+    };
+
+    const hasImageContent = (item: CollectionItem): boolean => {
+      if (!item.content || !Array.isArray(item.content)) {
+        return false;
+      }
+
+      return item.content.some((content: NonNullable<CollectionItem['content']>[number]) => {
+        const imageStorageId = content.content_value?.image_storage_id;
+        const textValue = content.content_value?.text;
+        const urlValue = content.content_value?.url;
+        const contentValue = typeof textValue === 'string' ? textValue : urlValue;
+
+        return content.content_type === 'image'
+          || typeof imageStorageId === 'string'
+          || looksLikeImageFilename(contentValue);
+      });
+    };
+
+    const hasTextContent = (item: CollectionItem): boolean => {
+      if (!item.content || !Array.isArray(item.content)) {
+        return false;
+      }
+
+      return item.content.some((content: NonNullable<CollectionItem['content']>[number]) => {
+        const textValue = content.content_value?.text;
+        return content.content_type === 'text'
+          && typeof textValue === 'string'
+          && textValue.trim() !== ''
+          && !looksLikeImageFilename(textValue);
+      });
+    };
+
+    const getDatasetTypeFromItems = (): string => {
+      if (!dataset.artworks || dataset.artworks.length === 0) return 'Mixed';
+      
+      const hasText = dataset.artworks.some((item: CollectionItem) => hasTextContent(item));
+      const hasImage = dataset.artworks.some((item: CollectionItem) => hasImageContent(item));
+      
+      if (hasText && hasImage) return 'Mixed';
+      if (hasText) return 'text';
+      if (hasImage) return 'image';
+      return 'Mixed';
+    };
+
+    const getDisplayDatasetType = (): string => {
+      const detectedType = getDatasetTypeFromItems();
+      const declaredType = typeof dataset.dataset_type === 'string' ? dataset.dataset_type.toLowerCase() : '';
+
+      if (!declaredType || declaredType === 'mixed' || declaredType === 'text' || declaredType === 'image') {
+        return detectedType;
+      }
+
+      return dataset.dataset_type || detectedType;
+    };
+
+    const getItemContentValue = (item: CollectionItem): string => {
+      if (item.content && Array.isArray(item.content) && item.content.length > 0) {
+        const textContent = item.content.find((content: NonNullable<CollectionItem['content']>[number]) => content.content_type === 'text' && content.content_value?.text);
+        if (textContent?.content_value?.text) {
+          return textContent.content_value.text;
+        }
+
+        const firstContent = item.content[0];
+        if (typeof firstContent.content_value?.text === 'string') {
+          return firstContent.content_value.text;
+        }
+        if (typeof firstContent.content_value?.url === 'string') {
+          return firstContent.content_value.url;
+        }
+      }
+      return '-';
+    };
+
+    const getItemImageStorageId = (item: CollectionItem): string | null => {
+      if (!item.content || !Array.isArray(item.content)) {
+        return null;
+      }
+
+      const imageContent = item.content.find((content: NonNullable<CollectionItem['content']>[number]) => typeof content.content_value?.image_storage_id === 'string');
+      return imageContent?.content_value?.image_storage_id ?? null;
+    };
+
+    const getImageReferenceName = (item: CollectionItem): string | null => {
+      if (!item.content || !Array.isArray(item.content)) {
+        return null;
+      }
+
+      const referenceContent = item.content.find((content: NonNullable<CollectionItem['content']>[number]) => {
+        const textValue = content.content_value?.text;
+        const urlValue = content.content_value?.url;
+        return looksLikeImageFilename(typeof textValue === 'string' ? textValue : urlValue);
+      });
+
+      if (!referenceContent) {
+        return null;
+      }
+
+      const textValue = referenceContent.content_value?.text;
+      const urlValue = referenceContent.content_value?.url;
+      return typeof textValue === 'string' ? textValue : (typeof urlValue === 'string' ? urlValue : null);
+    };
+
+    const isItemImage = (item: CollectionItem): boolean => {
+      return getItemImageStorageId(item) !== null || getImageReferenceName(item) !== null;
+    };
+
     return (
 
       <>
@@ -164,7 +400,7 @@ const ViewDataset = () => {
               <span className="ws-stat-label">Total Items</span>
             </div>
             <div className="ws-stat">
-              <span className="ws-stat-value">{dataset.dataset_type || 'Mixed'}</span>
+              <span className="ws-stat-value">{getDisplayDatasetType()}</span>
               <span className="ws-stat-label">Dataset Type</span>
             </div>
             <div className="ws-stat">
@@ -186,23 +422,45 @@ const ViewDataset = () => {
                     Showing {dataset.artworks.length} items
                   </div>
 
-                  {/* Debug panel - show first item structure */}
+                  {/* Item details panel */}
                   {dataset.artworks.length > 0 && (
                     <div style={{
                       marginBottom: '1rem',
                       padding: '0.75rem',
                       backgroundColor: '#f0f0f0',
                       border: '1px solid #ccc',
-                      borderRadius: '4px',
-                      fontSize: '0.75rem',
-                      fontFamily: 'monospace',
-                      maxHeight: '200px',
-                      overflowY: 'auto'
+                      borderRadius: '4px'
                     }}>
-                      <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>Debug - First Item Structure:</div>
-                      <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                        {JSON.stringify(dataset.artworks[0], null, 2)}
-                      </pre>
+                      <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                        {selectedItem ? `Item #${selectedItem.position !== undefined ? selectedItem.position : dataset.artworks.indexOf(selectedItem) + 1}` : 'Item'}
+                      </div>
+                      {selectedItem || dataset.artworks[0] ? (
+                        <div style={{ fontSize: '0.85rem', lineHeight: '1.5' }}>
+                          <div style={{ marginBottom: '0.5rem' }}>
+                            <strong>ID:</strong> {(selectedItem || dataset.artworks[0])._id || '-'}
+                          </div>
+                          <div style={{ marginBottom: '0.5rem' }}>
+                            <strong>Position:</strong> {(selectedItem || dataset.artworks[0]).position !== undefined ? (selectedItem || dataset.artworks[0]).position : dataset.artworks.indexOf(selectedItem || dataset.artworks[0]) + 1}
+                          </div>
+                          <div>
+                            <strong>Content:</strong> 
+                            {getItemImageStorageId(selectedItem || dataset.artworks[0]) ? (
+                              <ItemThumbnail
+                                itemId={(selectedItem || dataset.artworks[0])._id}
+                                imageStorageId={getItemImageStorageId(selectedItem || dataset.artworks[0]) || ''}
+                              />
+                            ) : isItemImage(selectedItem || dataset.artworks[0]) ? (
+                              <ImageReferencePreview
+                                filename={getImageReferenceName(selectedItem || dataset.artworks[0]) || 'Unknown image'}
+                              />
+                            ) : (
+                              <div style={{ marginTop: '0.25rem', padding: '0.5rem', backgroundColor: '#fff', borderRadius: '2px', fontSize: '0.8rem', maxHeight: '150px', overflowY: 'auto', wordBreak: 'break-word' }}>
+                                {getItemContentValue(selectedItem || dataset.artworks[0])}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
                   )}
 
@@ -218,12 +476,31 @@ const ViewDataset = () => {
                       </thead>
                       <tbody>
                         {dataset.artworks.map((item: CollectionItem, index: number) => {
-                          const contentType = item.content && item.content.length > 0 
-                            ? item.content[0].content_type || 'unknown'
-                            : 'unknown';
+                          const contentType = isItemImage(item)
+                            ? 'image'
+                            : (hasTextContent(item) ? 'text' : 'unknown');
                           const itemName = getItemPreview(item);
+                          const isSelected = selectedItem?._id === item._id;
                           return (
-                            <tr key={item._id || index}>
+                            <tr 
+                              key={item._id || index}
+                              onClick={() => setSelectedItem(item)}
+                              style={{ 
+                                cursor: 'pointer',
+                                backgroundColor: isSelected ? '#e8e8e8' : 'transparent',
+                                transition: 'background-color 0.2s'
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isSelected) {
+                                  (e.currentTarget as HTMLTableRowElement).style.backgroundColor = '#f5f5f5';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!isSelected) {
+                                  (e.currentTarget as HTMLTableRowElement).style.backgroundColor = 'transparent';
+                                }
+                              }}
+                            >
                               <td>{item.position !== undefined && item.position !== null ? item.position : index + 1}</td>
                               <td style={{ fontWeight: 500 }}>{itemName}</td>
                               <td style={{ fontSize: '0.85rem', color: 'var(--ink-muted)' }}>{contentType}</td>
