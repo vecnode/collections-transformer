@@ -15,7 +15,8 @@ Code developed in the context of the UKRI project "Transforming Collections" und
 # 1) Use docker profile env
 cp .env.docker.template .env
 
-# 2) Optional: avoid host Mongo conflict if installed locally
+# 2) Optional: avoid host Mongo port conflict if installed locally
+# Only do this for the Docker workflow below.
 sudo systemctl stop mongod
 
 # 3) Start full stack
@@ -39,25 +40,31 @@ docker compose -f docker/docker-compose.yml down
 # 1) Use local profile env
 cp .env.local.template .env
 
-# 2) Backend dependencies (one-time)
+# 2) Ensure MongoDB for local/manual mode
+./scripts/ensure_mongodb.sh
+
+# 2b) First-time local data restore so datasets, annotations and agents exist
+./scripts/restore_local_seed_data.sh
+
+# 3) Backend dependencies (one-time)
 uv venv venv
 source venv/bin/activate
 uv pip install -r requirements.txt
 
-# 3) Frontend dependencies (one-time)
+# 4) Frontend dependencies (one-time)
 cd client/
 nvm install 20
 nvm use 20
 npm install
 cd ..
 
-# 4) Start backend with reload (Terminal 1)
+# 5) Start backend with reload (Terminal 1)
 ./scripts/run_server.sh
 
-# 5) Start frontend dev server (Terminal 2)
+# 6) Start frontend dev server (Terminal 2)
 ./scripts/run_client.sh
 
-# 6) Local dev URLs
+# 7) Local dev URLs
 # Frontend: http://localhost:3000
 # API:      http://localhost:8080/api/v1/health
 
@@ -87,6 +94,10 @@ Profile behavior:
 
 - Local profile (`.env.local.template`)
   - Datastores on localhost (`127.0.0.1`, `localhost`)
+  - Requires MongoDB listening on `127.0.0.1:27017`
+  - `./scripts/ensure_mongodb.sh` will start `mongod` when available via systemd
+  - `./scripts/restore_local_seed_data.sh` restores the bundled seed archive into local MongoDB
+  - Redis is optional for app startup
   - `NEXT_PUBLIC_SERVER_URL=http://localhost:8080`
 - Docker profile (`.env.docker.template`)
   - Datastores on container DNS (`mongodb`, `redis`)
