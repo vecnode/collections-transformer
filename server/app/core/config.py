@@ -32,6 +32,7 @@ class AppSettings:
 
     mongodb_uri: str
     mongodb_database: str
+    migrate_legacy_on_startup: bool
     upload_folder: str
 
     redis_url: str
@@ -67,6 +68,7 @@ def load_app_settings() -> AppSettings:
         ),
         mongodb_uri=os.getenv("MONGODB_URI", "mongodb://127.0.0.1:27017"),
         mongodb_database=os.getenv("MONGODB_DATABASE", "tanc_database"),
+        migrate_legacy_on_startup=_to_bool(os.getenv("MIGRATE_LEGACY_ON_STARTUP"), default=False),
         upload_folder=os.getenv("UPLOAD_FOLDER", "/cache"),
         redis_url=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
         ollama_model_option=os.getenv("OLLAMA_MODEL_OPTION", "gemma3:27b"),

@@ -2,7 +2,7 @@
 
 Startup order matters:
 1. Connect to MongoDB
-2. Connect to Redis (optional – gracefully degraded if unavailable)
+2. Connect to Redis (optional)
 3. Initialize ML providers (optional)
 4. Register routers
 """
@@ -12,8 +12,11 @@ import argparse
 import logging
 import os
 import sys
-from pathlib import Path
+from typing import TYPE_CHECKING
 from contextlib import asynccontextmanager
+
+if TYPE_CHECKING:
+    from fastapi import FastAPI
 
 # Ensure the server/ directory is on sys.path so app modules are importable.
 _SERVER_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -30,89 +33,6 @@ logger = logging.getLogger(__name__)
 _active_model: str = "dual"
 
 
-def _auto_migrate_database(_db):
-    """
-    Auto-migrate SQLite/JSON data to MongoDB if MongoDB is empty.
-    Called during application startup.
-    """
-    try:
-        # Fast path: seeded/populated MongoDB should skip all heavy startup work.
-        existing_datasets = _db["dataset"].count_documents({})
-        if existing_datasets > 0:
-            logger.info("MongoDB already populated (%d datasets), skipping SQLite export/migration", existing_datasets)
-            return
-
-        root_dir = Path(_SERVER_DIR).parent
-        scripts_dir = root_dir / "scripts"
-        if str(scripts_dir) not in sys.path:
-            sys.path.insert(0, str(scripts_dir))
-
-        db_sqlite = root_dir / "server" / "db" / "db.sqlite"
-        json_dir = root_dir / "server" / "db" / "sqlite2json"
-
-        if db_sqlite.exists():
-            from export_sqlite_to_json import export_sqlite_to_json  # noqa: PLC0415, E402
-
-            exported = export_sqlite_to_json()
-            if exported:
-                logger.info("SQLite export completed from %s", db_sqlite)
-            else:
-                logger.warning("SQLite export failed from %s", db_sqlite)
-
-        if not json_dir.exists():
-            logger.warning("No JSON export directory found at %s", json_dir)
-            return
-        
-        json_files_found = list(json_dir.glob("*.json"))
-        if not json_files_found:
-            logger.warning("No JSON export files found in %s", json_dir)
-            return
-
-        source_dataset_count = 0
-        dataset_json = json_dir / "dataset.json"
-        if dataset_json.exists():
-            import json  # noqa: PLC0415
-
-            with dataset_json.open("r", encoding="utf-8") as f:
-                source_dataset_count = len(json.load(f))
-
-        target_dataset_count = existing_datasets
-        if target_dataset_count >= source_dataset_count and source_dataset_count > 0:
-            logger.info(
-                "MongoDB dataset count (%d) matches/exceeds source (%d), skipping migration",
-                target_dataset_count,
-                source_dataset_count,
-            )
-            return
-
-        logger.info(
-            "Starting migration because MongoDB dataset count (%d) is behind source (%d)",
-            target_dataset_count,
-            source_dataset_count,
-        )
-
-        from migrate_sqlite_to_mongodb import MigrationManager  # noqa: PLC0415, E402
-        
-        manager = MigrationManager()
-        manager.client = _db.client
-        manager.db = _db
-
-        manager.create_backup()
-        manager.validate_json_files()
-        manager.reset_target_collections()
-        manager.import_collections()
-        manager.update_references()
-        manager.refactor_collections()
-        manager.verify_migration()
-        manager.print_summary()
-        
-        logger.info("✓ Auto-migration completed successfully")
-        
-    except Exception as exc:
-        logger.warning("Auto-migration skipped or failed (this is okay for fresh installs): %s", exc)
-        # Don't fail startup if migration fails - allow app to start fresh
-
-
 @asynccontextmanager
 async def lifespan(app):
     """Startup / shutdown lifecycle for FastAPI."""
@@ -121,14 +41,18 @@ async def lifespan(app):
     # ------------------------------------------------------------------
     from app.infra import mongodb  # noqa: PLC0415
 
-    _client, _db, _grid_fs = mongodb.connect(
+    _client, _db, _ = mongodb.connect(
         app_settings.mongodb_uri, app_settings.mongodb_database
     )
 
     # ------------------------------------------------------------------
-    # 1b. Auto-migrate SQLite/JSON data if needed
+    # 1b. Optional legacy migration flag (disabled by default)
     # ------------------------------------------------------------------
-    _auto_migrate_database(_db)
+    if app_settings.migrate_legacy_on_startup:
+        logger.warning(
+            "MIGRATE_LEGACY_ON_STARTUP=true, but in-app auto-migration is disabled. "
+            "Run migration scripts manually."
+        )
 
     # ------------------------------------------------------------------
     # 2. Redis (optional)
