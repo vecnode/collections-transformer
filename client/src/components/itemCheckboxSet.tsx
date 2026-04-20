@@ -73,7 +73,7 @@ const updateLabel = (itemContentId, checkboxStatus, onLabelsChanged, labelset_id
     }
 
     try {
-      return fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/update_label?" + new URLSearchParams(params),requestOptions)
+      return fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/update_label?" + new URLSearchParams(params),requestOptions)
       .then(response => response.json())
       .then(
         res => {

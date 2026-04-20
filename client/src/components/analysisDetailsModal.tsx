@@ -23,7 +23,7 @@ const AnalysisDetailsModal = ({
       setLoadState("loading");
 
       try {
-        const response = await fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/item_image?" + new URLSearchParams({
+        const response = await fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/item_image?" + new URLSearchParams({
           item_id: itemId,
           image_storage_id: imgStorageId
         }), requestOptions);

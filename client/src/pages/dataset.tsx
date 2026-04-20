@@ -61,7 +61,7 @@ const DatasetPage = () => {
       ? new URLSearchParams({ owner_id: user.user_id || user.sub, dataset_type })
       : new URLSearchParams({ owner_id: user.user_id || user.sub, dataset_type, image_upload_type })
 
-    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/dataset_new?" + params, requestOptions)
+    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/dataset_new?" + params, requestOptions)
       .then(() => {
         setUploadStatus("Upload complete!")
         router.push("/")

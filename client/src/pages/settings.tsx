@@ -27,7 +27,7 @@ const Settings = () => {
       headers: {'Content-Type': 'application/json'}
     };
     
-    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/user/preferences?" + new URLSearchParams({
+    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/user/preferences?" + new URLSearchParams({
       user_id: user.user_id || user.sub
     }), requestOptions)
       .then(response => response.json())
@@ -55,7 +55,7 @@ const Settings = () => {
       })
     };
     
-    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/user/preferences", requestOptions)
+    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/user/preferences", requestOptions)
       .then(response => response.json())
       .then(res => {
         if (res.status === 200) {
@@ -81,7 +81,7 @@ const Settings = () => {
       headers: {'Content-Type': 'application/json'}
     };
     
-    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/ollama/models", requestOptions)
+    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/ollama/models", requestOptions)
       .then(response => response.json())
       .then(res => {
         console.log('Ollama models response:', res);

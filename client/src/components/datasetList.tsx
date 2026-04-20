@@ -16,7 +16,7 @@ const DatasetList = ({
 
   const getDatasetStatus = async (datasetID) => {
     if (datasetID != "Loading..."){
-      let response = await fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/dataset_status?" + new URLSearchParams({
+      let response = await fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/dataset_status?" + new URLSearchParams({
         dataset_id:datasetID
       }))
       let data = await response.json()

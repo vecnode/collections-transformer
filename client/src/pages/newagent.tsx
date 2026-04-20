@@ -22,7 +22,7 @@ const ImageThumbnail = ({ itemId, imageStorageId }) => {
     setLoadState("loading");
 
     try {
-      const response = await fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/item_image?" + new URLSearchParams({
+      const response = await fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/item_image?" + new URLSearchParams({
         item_id: itemId,
         image_storage_id: imgStorageId
       }), requestOptions);
@@ -520,7 +520,7 @@ const NewAgent = () => {
       mode: 'cors',
       headers: {'Content-Type': 'application/json'}
     };
-    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/datasets?" + new URLSearchParams({
+    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/datasets?" + new URLSearchParams({
       user_id:user.user_id || user.sub
     }), requestOptions)
     .then(response => response.json())
@@ -545,7 +545,7 @@ const NewAgent = () => {
         headers: {'Content-Type': 'application/json'}
       };
       
-      const url = (process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/dataset?" + new URLSearchParams({
+      const url = (process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/dataset?" + new URLSearchParams({
         dataset_id: datasetId,
         include_items: true
       });
@@ -871,7 +871,7 @@ const NewAgent = () => {
     };
 
     const response = await fetch(
-      (process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/agent_new",
+      (process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/agent_new",
       requestOptions
     );
 

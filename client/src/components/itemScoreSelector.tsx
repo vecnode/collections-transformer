@@ -42,7 +42,7 @@ const ItemScoreSelector = ({
         };    
     
         try {
-          return fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/update_label?" + new URLSearchParams({
+          return fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/update_label?" + new URLSearchParams({
             "labelset_id":ref_id,
             "id": id,
             "score": score == null ? "empty" : score['value']

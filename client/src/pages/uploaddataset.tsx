@@ -87,7 +87,7 @@ const DatasetUpload = () => {
       };
       
       if (dataset_type === 'text') {
-        fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/dataset_new?" + new URLSearchParams({
+        fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/dataset_new?" + new URLSearchParams({
           owner_id:user.user_id || user.sub,
           dataset_type:dataset_type
         }),requestOptions)
@@ -96,7 +96,7 @@ const DatasetUpload = () => {
           router.push("/")
         })
       } else {
-        fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/dataset_new?" + new URLSearchParams({
+        fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/dataset_new?" + new URLSearchParams({
           owner_id:user.user_id || user.sub,
           dataset_type:dataset_type,
           image_upload_type:image_upload_type
