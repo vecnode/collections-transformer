@@ -34,42 +34,6 @@ class Label():
         label["labelset_id"] = str(label["labelset_id"])
 
     return labels
-  
-  def copy_all(labelset_id, new_labelset_id, item_id=None, options={}):
-    try:
-
-      if item_id != None:
-        label_db_res = label_collection.find({
-          "labelset_id":labelset_id,
-          "item_id":item_id
-        })
-      else:
-        label_db_res = label_collection.find({
-          "labelset_id":labelset_id
-        })
-
-      labels = list(label_db_res)
-    
-      for label in labels:
-
-        label.update({"version":"0"})
-        label.update({"versions":[{
-          "id":"0",
-          "value":label['value'] if ('value' in label) else "",
-          "highlight":label['highlight'] if ("highlight" in label) else "",
-          "rationale":label['rationale'] if ("rationale" in label) else "",
-          "exclude":label['exclude'] if ("exclude" in label) else "false"
-        }]})
-
-        label.pop("_id")
-        label.update({
-          "labelset_id": new_labelset_id
-        })
-        label_collection.insert_one(label)
-
-    except Exception as e:
-      print(e)
-      raise e
 
 
   def delete(type, label_id):

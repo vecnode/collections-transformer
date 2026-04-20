@@ -435,16 +435,5 @@ class Dataset():
 
     dataset_collection.delete_one({"_id": ObjectId(dataset_id)}) # Delete dataset
 
-  def get_test_set(dataset_id):
-    dataset = Dataset.get(dataset_id, True, True)
-    # Loads up all the data for this classifier along with embeddings for model predictions
-    ids = []
-    texts = []
-    bert_embeddings = {}
-    for artwork in dataset['artworks']:
-      ids.append(artwork.id)
-      texts.append(artwork.text)
-      bert_embeddings[artwork.text] = artwork.bert_embedding
-    return ids, texts, bert_embeddings
 
 

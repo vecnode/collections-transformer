@@ -1,7 +1,7 @@
 """FastAPI application entrypoint.
 
 Startup order matters:
-1. Connect to MongoDB (sets legacy_api.db / legacy_api.grid_fs globals used by legacy models)
+1. Connect to MongoDB
 2. Connect to Redis (optional – gracefully degraded if unavailable)
 3. Initialize ML providers (optional)
 4. Register routers
@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 from contextlib import asynccontextmanager
 
-# Ensure the server/ directory is on sys.path so app and legacy modules are importable.
+# Ensure the server/ directory is on sys.path so app modules are importable.
 _SERVER_DIR = os.path.dirname(os.path.dirname(__file__))
 if _SERVER_DIR not in sys.path:
     sys.path.insert(0, _SERVER_DIR)
@@ -120,15 +120,10 @@ async def lifespan(app):
     # 1. MongoDB – must succeed before any model code is imported
     # ------------------------------------------------------------------
     from app.infra import mongodb  # noqa: PLC0415
-    import legacy_api  # noqa: PLC0415 – triggers legacy_api/__init__.py stubs only
 
     _client, _db, _grid_fs = mongodb.connect(
         app_settings.mongodb_uri, app_settings.mongodb_database
     )
-    # Inject into legacy_api module globals so existing models keep working.
-    legacy_api.client = _client
-    legacy_api.db = _db
-    legacy_api.grid_fs = _grid_fs
 
     # ------------------------------------------------------------------
     # 1b. Auto-migrate SQLite/JSON data if needed
@@ -145,7 +140,7 @@ async def lifespan(app):
     # 3. ML providers (optional)
     # ------------------------------------------------------------------
     try:
-        from legacy_api import llm_modelling  # noqa: PLC0415
+        from app.providers import llm_modelling  # noqa: PLC0415
         llm_modelling.init(_active_model)
     except Exception as exc:
         logger.warning("ML provider init skipped: %s", exc)

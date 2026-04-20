@@ -1,10 +1,7 @@
-from legacy_api import db, grid_fs
 import logging
 
 from bson.objectid import ObjectId
 import bson.binary
-import json
-from . import llm_modelling as llm
 import pandas as pd
 import copy
 import random
@@ -22,18 +19,23 @@ import traceback
 import pytz
 from pathlib import Path
 from app.core.config import app_settings as settings
+from app.infra.mongodb import get_db, get_grid_fs
 
-category_collection = db["category"]
+db = get_db()
+grid_fs = get_grid_fs()
+if db is None or grid_fs is None:
+    raise RuntimeError("MongoDB must be initialized before importing app.domain.models")
+
 dataset_collection = db["dataset"]
 item_collection = db["item"]
 labelset_collection = db["labelset"]
 label_collection = db["label"]
 text_label_collection = db["text_label"]
-resultset_collection = db["resultset"]
 embedding_collection = db["embedding"]
 image_collection = db["image"]
 analysis_history_collection = db["analysis_history"]
 agent_collection = db["agent"]
+user_collection = db["user"]
 
 formatExamplesInsidePrompt = True
 logger = logging.getLogger(__name__)
@@ -46,8 +48,8 @@ def _log_print(*args, **kwargs):
 print = _log_print
 
 
-# Load model domains in-order into this module namespace to preserve legacy API.
-_MODELS_PARTS_DIR = Path(__file__).with_name("models")
+# Load model domains in-order into this module namespace.
+_MODELS_PARTS_DIR = Path(__file__).resolve().parent / "model_parts"
 _MODELS_PART_FILES = [
     "embedding.py",
     "labelset.py",
@@ -55,9 +57,7 @@ _MODELS_PART_FILES = [
     "score_label.py",
     "label.py",
     "dataset.py",
-    "category.py",
     "item.py",
-    "resultset.py",
     "user.py",
     "analysis_history.py",
     "agent.py",

@@ -13,7 +13,7 @@ router = APIRouter(prefix="/backend", tags=["system"])
 @router.get("/ollama/models")
 async def get_ollama_models():
     try:
-        from legacy_api import provider_ollama  # noqa: PLC0415
+        from app.providers import provider_ollama  # noqa: PLC0415
         result = provider_ollama.list_ollama_models()
         if result.get("status") == "200":
             return success_response(data={"models": result.get("models", [])})
