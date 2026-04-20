@@ -1,7 +1,7 @@
 """Shared API state for the FastAPI runtime.
 
 The FastAPI app initializes these globals during lifespan startup so legacy
-model modules under api.models can keep importing `db` and `grid_fs`.
+model modules under legacy_api.models can keep importing `db` and `grid_fs`.
 """
 
 from __future__ import annotations

@@ -12,7 +12,7 @@ router = APIRouter(prefix="/backend", tags=["agents"])
 
 
 def _models():
-    import api.models as m  # noqa: PLC0415
+    import legacy_api.models as m  # noqa: PLC0415
     return m
 
 
@@ -100,7 +100,7 @@ async def execute_agent_with_images(request: Request):
         if not images_base64:
             return error_response(message="No images found in selected items", status_code=400)
 
-        from api import provider_blip2, provider_ollama  # noqa: PLC0415
+        from legacy_api import provider_blip2, provider_ollama  # noqa: PLC0415
 
         blip2_result = provider_blip2.get_blip2_multimodal_response(
             primer_message="You are an expert image analyzer. Describe what you see in detail.",

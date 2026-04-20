@@ -1,10 +1,10 @@
-from api import db, grid_fs
+from legacy_api import db, grid_fs
 import logging
 
 from bson.objectid import ObjectId
 import bson.binary
 import json
-from . import llm_modelling as llm
+from .. import llm_modelling as llm
 import pandas as pd
 import copy
 import random
@@ -21,7 +21,7 @@ from PIL import Image
 import traceback
 import pytz
 from pathlib import Path
-from config import settings
+from app.core.config import app_settings as settings
 
 category_collection = db["category"]
 dataset_collection = db["dataset"]
@@ -47,7 +47,7 @@ print = _log_print
 
 
 # Load model domains in-order into this module namespace to preserve legacy API.
-_MODELS_PARTS_DIR = Path(__file__).with_name("models")
+_MODELS_PARTS_DIR = Path(__file__).resolve().parent
 _MODELS_PART_FILES = [
     "embedding.py",
     "labelset.py",

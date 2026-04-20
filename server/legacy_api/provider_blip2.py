@@ -6,7 +6,7 @@ import traceback
 from datetime import datetime
 import base64
 import io
-from config import settings
+from app.core.config import app_settings as settings
 
 
 logger = logging.getLogger(__name__)

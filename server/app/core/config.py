@@ -86,3 +86,9 @@ def configure_app_logging() -> None:
         level=level,
         format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     )
+
+
+def apply_runtime_environment() -> None:
+    os.environ.setdefault("ENVIRONMENT", app_settings.environment)
+    os.environ.setdefault("CUDA_LAUNCH_BLOCKING", app_settings.cuda_launch_blocking)
+    os.environ.setdefault("PYTORCH_USE_CUDA_DSA", app_settings.pytorch_use_cuda_dsa)

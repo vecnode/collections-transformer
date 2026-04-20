@@ -33,9 +33,8 @@ cleanup() {
     pkill -f "npm run dev" 2>/dev/null
     pkill -f "next dev" 2>/dev/null
     
-    # Kill python processes running app.py in server directory
-    pkill -f "python3.*app.py" 2>/dev/null
-    pkill -f "python.*app.py" 2>/dev/null
+    # Kill uvicorn server processes for this project
+    pkill -f "uvicorn app.main:app" 2>/dev/null
     
     # Kill any remaining child processes of this script
     pkill -P $$ 2>/dev/null
@@ -66,7 +65,7 @@ else
 fi
 
 # Launch server first
-echo "Launching server (python3 app.py) in terminal window..."
+echo "Launching server (uvicorn app.main:app) in terminal window..."
 if [[ "$TERMINAL_CMD" == "gnome-terminal" ]]; then
     "$TERMINAL_CMD" --title="Server - Collections Transformer" --working-directory="$SERVER_DIR" $TERMINAL_OPTS bash -c "\"${SCRIPTS_DIR}/run_server.sh\"; exec bash" &
 elif [[ "$TERMINAL_CMD" == "konsole" ]]; then

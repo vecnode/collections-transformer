@@ -13,7 +13,7 @@ router = APIRouter(prefix="/backend", tags=["datasets"])
 
 
 def _models():
-    import api.models as m  # noqa: PLC0415
+    import legacy_api.models as m  # noqa: PLC0415
     return m
 
 
