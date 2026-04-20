@@ -35,7 +35,7 @@ const ItemImageLoader = ({
 
         setLoadState("loading")
 
-        fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/item_image?"+ new URLSearchParams({
+        fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/item_image?"+ new URLSearchParams({
             item_id:item_id,
             image_storage_id:img_storage_id
         }), requestOptions)

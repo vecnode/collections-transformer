@@ -44,7 +44,7 @@ const ImageThumbnail = ({ itemId, imageStorageId }) => {
     setLoadState("loading");
 
     try {
-      const response = await fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/item_image?" + new URLSearchParams({
+      const response = await fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/item_image?" + new URLSearchParams({
         item_id: itemId,
         image_storage_id: imgStorageId
       }), requestOptions);
@@ -605,7 +605,7 @@ const Tasks = () => {
       };
       
 
-      const url = (process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/dataset?" + new URLSearchParams({
+      const url = (process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/dataset?" + new URLSearchParams({
         dataset_id: datasetId,
         include_items: true
       });
@@ -664,7 +664,7 @@ const Tasks = () => {
       mode: 'cors',
       headers: {'Content-Type': 'application/json'}
     };
-    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/agents?" + new URLSearchParams({
+    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/agents?" + new URLSearchParams({
       user_id:user.user_id || user.sub
     }), requestOptions)
     .then(response => response.json())
@@ -681,7 +681,7 @@ const Tasks = () => {
       mode: 'cors',
       headers: {'Content-Type': 'application/json'}
     };
-    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/datasets?" + new URLSearchParams({
+    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/datasets?" + new URLSearchParams({
       user_id:user.user_id || user.sub
     }), requestOptions)
     .then(response => response.json())
@@ -729,7 +729,7 @@ const Tasks = () => {
       const agentTask = selectedAgentData?.task_type || 'Text Detection (T/F)';
       
       // Agent Task with Ollama - use new endpoint
-      endpoint = "/backend/agent_execute_with_images";
+      endpoint = "/api/v1/backend/agent_execute_with_images";
       requestOptions = {
         method: 'POST',
         mode: 'cors',
@@ -920,7 +920,7 @@ const Tasks = () => {
       };
 
       const response = await fetch(
-        (process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/analysis/save",
+        (process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/analysis/save",
         requestOptions
       );
 

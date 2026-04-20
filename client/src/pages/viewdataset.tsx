@@ -40,7 +40,7 @@ const ViewDataset = () => {
       };
     
       try {
-        fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/dataset?" + new URLSearchParams({
+        fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/dataset?" + new URLSearchParams({
           dataset_id:dataset_id,
           include_items:"true"
         }),requestOptions)

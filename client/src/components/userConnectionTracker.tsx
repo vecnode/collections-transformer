@@ -38,7 +38,7 @@ const UserConnectionTracker = () => {
 
     const recordConnection = async (eventType) => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL || ''}/backend/user/record_connection`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL || ''}/api/v1/backend/user/record_connection`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 

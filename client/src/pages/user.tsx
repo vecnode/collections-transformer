@@ -44,7 +44,7 @@ const User = () => {
       headers: {'Content-Type': 'application/json'}
     };
     
-    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/user/last_connection?" + new URLSearchParams({
+    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/user/last_connection?" + new URLSearchParams({
       user_id: user.user_id || user.sub
     }), requestOptions)
     .then(response => response.json())
@@ -68,7 +68,7 @@ const User = () => {
       headers: {'Content-Type': 'application/json'}
     };
     
-    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/user/profile?" + new URLSearchParams({
+    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/user/profile?" + new URLSearchParams({
       user_id: user.user_id || user.sub
     }), requestOptions)
     .then(response => response.json())
@@ -105,7 +105,7 @@ const User = () => {
       affiliation: userProfile.affiliation
     });
     
-    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/user/profile?" + params, requestOptions)
+    fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/user/profile?" + params, requestOptions)
     .then(response => response.json())
     .then(res => {
       if (res.status === "200") {

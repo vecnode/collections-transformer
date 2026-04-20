@@ -1,4 +1,4 @@
-"""Agent routes (/backend/agent_new, /backend/agent_execute, etc.)."""
+"""Agent routes used by the current frontend."""
 import logging
 import traceback
 
@@ -34,49 +34,6 @@ async def create_agent(request: Request):
         raise Exception("Failed to create agent")
     except Exception as exc:
         logger.error("create_agent: %s\n%s", exc, traceback.format_exc())
-        return {"status": "500", "error": str(exc)}
-
-
-@router.post("/agent_execute")
-async def execute_agent(request: Request):
-    try:
-        models = _models()
-        data = await request.json()
-        agent_id = data.get("agent_id")
-        user_message = data.get("user_message", "")
-        user_id = data.get("user_id")
-
-        if not agent_id:
-            return {"status": "400", "error": "Missing required field: agent_id"}
-
-        agent = models.Agent.get(agent_id)
-        if not agent:
-            return {"status": "404", "error": "Agent not found"}
-
-        if agent.get("owner") != user_id:
-            return {"status": "403", "error": "Unauthorized access to agent"}
-
-        system_prompt = agent.get("system_prompt", agent.get("description", ""))
-        config = agent.get("config", {})
-        max_words = config.get("max_tokens", 1000) / 1.3
-
-        from api import provider_ollama  # noqa: PLC0415
-        try:
-            provider_ollama.init_ollama()
-        except Exception:
-            pass
-
-        result = provider_ollama.get_ollama_gpt_response(
-            primer_message=system_prompt,
-            user_message=user_message,
-            max_words=int(max_words) if max_words else None,
-        )
-
-        if result.get("status") == "200":
-            return {"status": "200", "data": {"response": result.get("res", ""), "token_usage": result.get("token", {}), "agent_id": agent_id, "agent_name": agent.get("name", "")}}
-        return {"status": "500", "error": result.get("error", "Failed to execute agent")}
-    except Exception as exc:
-        logger.error("execute_agent: %s\n%s", exc, traceback.format_exc())
         return {"status": "500", "error": str(exc)}
 
 

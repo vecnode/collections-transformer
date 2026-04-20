@@ -1,6 +1,5 @@
-"""Authentication routes (/backend/auth/*, /backend/user/*)."""
+"""User profile and preference routes."""
 import logging
-import traceback
 
 from fastapi import APIRouter, Request
 
@@ -11,103 +10,6 @@ router = APIRouter(prefix="/backend", tags=["auth"])
 def _models():
     import api.models as m  # noqa: PLC0415
     return m
-
-
-@router.post("/auth/register")
-async def register(request: Request):
-    try:
-        data = await request.json()
-        username = data.get("username", "").strip()
-        email = data.get("email", "").strip()
-        password = data.get("password", "")
-
-        if not username or not email or not password:
-            return {"status": "400", "error": "Username, email, and password are required"}
-
-        if len(password) < 6:
-            return {"status": "400", "error": "Password must be at least 6 characters"}
-
-        models = _models()
-        user_id, error = models.User.create_local_user(username, email, password)
-        if error:
-            return {"status": "400", "error": error}
-
-        request.session["user_id"] = user_id
-        request.session["username"] = username
-        request.session["email"] = email
-        models.User.record_connection(user_id, "register", True)
-
-        return {"status": "200", "data": {"user_id": user_id, "username": username, "email": email}}
-    except Exception as exc:
-        logger.error("register: %s", exc)
-        return {"status": "500", "error": str(exc)}
-
-
-@router.post("/auth/login")
-async def login(request: Request):
-    try:
-        data = await request.json()
-        username_or_email = data.get("username", "").strip()
-        password = data.get("password", "")
-
-        if not username_or_email or not password:
-            return {"status": "400", "error": "Username/email and password are required"}
-
-        models = _models()
-        user_id, username, email = models.User.authenticate_local_user(username_or_email, password)
-        if not user_id:
-            return {"status": "401", "error": "Invalid username/email or password"}
-
-        request.session["user_id"] = user_id
-        request.session["username"] = username
-        request.session["email"] = email
-        models.User.record_connection(user_id, "login", True)
-
-        return {"status": "200", "data": {"user_id": user_id, "username": username, "email": email}}
-    except Exception as exc:
-        logger.error("login: %s", exc)
-        return {"status": "500", "error": str(exc)}
-
-
-@router.post("/auth/logout")
-async def logout(request: Request):
-    try:
-        models = _models()
-        user_id = request.session.get("user_id")
-        if user_id:
-            models.User.record_connection(user_id, "logout", False)
-        request.session.clear()
-        return {"status": "200", "message": "Logged out successfully"}
-    except Exception as exc:
-        return {"status": "500", "error": str(exc)}
-
-
-@router.get("/auth/verify")
-async def verify_session(request: Request):
-    try:
-        models = _models()
-        user_id = request.session.get("user_id")
-        if not user_id:
-            return {"status": "401", "authenticated": False, "error": "Not authenticated"}
-
-        user = models.User.get_user_by_id(user_id)
-        if not user:
-            request.session.clear()
-            return {"status": "401", "authenticated": False, "error": "User not found"}
-
-        return {
-            "status": "200",
-            "authenticated": True,
-            "data": {
-                "user_id": user.get("user_id"),
-                "username": user.get("username"),
-                "email": user.get("email"),
-                "role": user.get("role", ""),
-                "affiliation": user.get("affiliation", ""),
-            },
-        }
-    except Exception as exc:
-        return {"status": "500", "error": str(exc)}
 
 
 @router.post("/user/record_connection")
@@ -208,7 +110,7 @@ async def get_user_preferences(request: Request):
         preferences = models.User.get_user_preferences(user_id)
         return {"status": "200", "data": preferences}
     except Exception as exc:
-        traceback.print_exc()
+        logger.exception("get_user_preferences")
         return {"status": "500", "error": str(exc)}
 
 
@@ -231,5 +133,5 @@ async def save_user_preferences(request: Request):
             return {"status": "200", "message": message, "data": models.User.get_user_preferences(user_id)}
         return {"status": "400", "error": message}
     except Exception as exc:
-        traceback.print_exc()
+        logger.exception("save_user_preferences")
         return {"status": "500", "error": str(exc)}

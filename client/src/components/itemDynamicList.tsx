@@ -235,7 +235,7 @@ const ItemDynamicList = ({
     };
 
     try {
-      return fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/update_label?" + new URLSearchParams({
+      return fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/update_label?" + new URLSearchParams({
         "labelset_id":ref_id,
         "id": obj_id,// string containing item_id
         "rationale":rationale.length>0 ? rationale : "<Empty>"
@@ -263,7 +263,7 @@ const ItemDynamicList = ({
     };
 
     try {
-      return fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/update_label?" + new URLSearchParams({
+      return fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/update_label?" + new URLSearchParams({
         "labelset_id":ref_id,
         "id": obj_id,// string containing item_id
         "highlight":JSON.stringify(highlight)

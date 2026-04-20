@@ -55,7 +55,7 @@ const Workspace = () => {
         headers: {'Content-Type': 'application/json'}
       };
       
-      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/user/last_connection?" + new URLSearchParams({
+      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/user/last_connection?" + new URLSearchParams({
         user_id: user.user_id || user.sub
       }), requestOptions)
       .then(response => response.json())
@@ -76,7 +76,7 @@ const Workspace = () => {
         headers: {'Content-Type': 'application/json'}
       };
   
-      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/agents?" + new URLSearchParams({
+      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/agents?" + new URLSearchParams({
         user_id:user.user_id || user.sub
       }), requestOptions)
       .then(
@@ -97,7 +97,7 @@ const Workspace = () => {
         headers: {'Content-Type': 'application/json'}
       };
   
-      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/datasets?" + new URLSearchParams({
+      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/datasets?" + new URLSearchParams({
         user_id:user.user_id || user.sub
       }), requestOptions)
       .then(
@@ -119,7 +119,7 @@ const Workspace = () => {
         headers: {'Content-Type': 'application/json'}
       };
   
-      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/labelsets?" + new URLSearchParams({
+      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/labelsets?" + new URLSearchParams({
         user_id:user.user_id || user.sub,
         includeCount:true,
         includeNames:true
@@ -142,7 +142,7 @@ const Workspace = () => {
         headers: {'Content-Type': 'application/json'}
       };
   
-      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/analysis/history?" + new URLSearchParams({
+      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/analysis/history?" + new URLSearchParams({
         user_id: user.user_id || user.sub
       }), requestOptions)
       .then(response => response.json())
@@ -191,7 +191,7 @@ const Workspace = () => {
         body: JSON.stringify({ analysis_id: analysisToDelete._id })
       };
       
-      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/analysis/delete", requestOptions)
+      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/analysis/delete", requestOptions)
       .then(response => response.json())
       .then(data => {
         setStatus("Analysis deleted")
@@ -218,7 +218,7 @@ const Workspace = () => {
         headers: {'Content-Type': 'application/json'}
       };
       
-      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/dataset_delete?" + new URLSearchParams({
+      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/dataset_delete?" + new URLSearchParams({
         dataset_id: datasetToDelete._id
       }), requestOptions)
       .then(response => response.json())
@@ -247,7 +247,7 @@ const Workspace = () => {
         headers: {'Content-Type': 'application/json'}
       };
       
-      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/labelset_delete?" + new URLSearchParams({
+      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/labelset_delete?" + new URLSearchParams({
         labelset_id: labelsetToDelete._id
       }), requestOptions)
       .then(response => response.json())
@@ -277,7 +277,7 @@ const Workspace = () => {
         body: JSON.stringify({ agent_id: agentToDelete._id })
       };
       
-      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/agent_delete", requestOptions)
+      fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/agent_delete", requestOptions)
       .then(response => response.json())
       .then(data => {
         setStatus("Agent deleted")
@@ -309,7 +309,7 @@ const Workspace = () => {
           itemIds.map(async (itemId) => {
             try {
               console.log(`Fetching item with ID: ${itemId}`);
-              const response = await fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/backend/item?" + new URLSearchParams({
+              const response = await fetch((process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/item?" + new URLSearchParams({
                 item_id: itemId
               }), requestOptions);
               

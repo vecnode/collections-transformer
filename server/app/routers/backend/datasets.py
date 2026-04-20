@@ -1,4 +1,4 @@
-"""Dataset and category CRUD routes (/backend/dataset*, /backend/category*, /backend/model_source)."""
+"""Dataset CRUD routes."""
 import json
 import logging
 import traceback
@@ -15,24 +15,6 @@ def _models():
     import api.models as m  # noqa: PLC0415
     return m
 
-
-# ---------------------------------------------------------------------------
-# Model source
-# ---------------------------------------------------------------------------
-
-@router.get("/model_source")
-@router.post("/model_source")
-async def get_model_source():
-    try:
-        from app.main import _active_model  # noqa: PLC0415
-        return {"status": "200", "data": _active_model}
-    except Exception as exc:
-        return {"status": "500", "error": str(exc)}
-
-
-# ---------------------------------------------------------------------------
-# Datasets
-# ---------------------------------------------------------------------------
 
 @router.get("/dataset")
 @router.post("/dataset")
