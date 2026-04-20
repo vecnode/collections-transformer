@@ -1,0 +1,20 @@
+meta {
+  name: Update Dataset
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/backend/dataset_update
+  body: none
+  auth: none
+}
+
+params:query {
+  dataset_id: {{datasetId}}
+  data: {"name":"Updated Dataset Name"}
+}
+
+headers {
+  Accept: application/json
+}

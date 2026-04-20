@@ -1,0 +1,25 @@
+meta {
+  name: Create Text Dataset
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/backend/dataset_new
+  body: multipartForm
+  auth: none
+}
+
+params:query {
+  owner_id: {{userId}}
+  dataset_type: text
+}
+
+body:form-data {
+  dataset_name: Example Text Dataset
+  text_file: /absolute/path/to/your-text-dataset.csv
+}
+
+headers {
+  Accept: application/json
+}

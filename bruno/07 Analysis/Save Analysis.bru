@@ -1,0 +1,31 @@
+meta {
+  name: Save Analysis
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/backend/analysis/save
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+body:json {
+  {
+    "user_id": "{{userId}}",
+    "dataset_id": "{{datasetId}}",
+    "selected_items": [
+      "{{itemId}}"
+    ],
+    "chat_messages": [],
+    "analysis_summary": {
+      "summary": "example"
+    },
+    "agent_id": "{{agentId}}"
+  }
+}

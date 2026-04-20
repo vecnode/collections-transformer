@@ -1,0 +1,22 @@
+meta {
+  name: Delete Analysis
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/backend/analysis/delete
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+body:json {
+  {
+    "analysis_id": "{{analysisId}}"
+  }
+}

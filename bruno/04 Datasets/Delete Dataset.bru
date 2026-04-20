@@ -1,0 +1,19 @@
+meta {
+  name: Delete Dataset
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/backend/dataset_delete
+  body: none
+  auth: none
+}
+
+params:query {
+  dataset_id: {{datasetId}}
+}
+
+headers {
+  Accept: application/json
+}

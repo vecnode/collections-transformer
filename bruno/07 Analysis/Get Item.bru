@@ -1,0 +1,19 @@
+meta {
+  name: Get Item
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v1/backend/item
+  body: none
+  auth: none
+}
+
+params:query {
+  item_id: {{itemId}}
+}
+
+headers {
+  Accept: application/json
+}

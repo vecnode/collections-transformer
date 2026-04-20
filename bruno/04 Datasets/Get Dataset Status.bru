@@ -1,0 +1,19 @@
+meta {
+  name: Get Dataset Status
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/v1/backend/dataset_status
+  body: none
+  auth: none
+}
+
+params:query {
+  dataset_id: {{datasetId}}
+}
+
+headers {
+  Accept: application/json
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Update User Profile
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/backend/user/profile
+  body: none
+  auth: none
+}
+
+params:query {
+  user_id: {{userId}}
+  role: Researcher
+  affiliation: UAL
+}
+
+headers {
+  Accept: application/json
+}

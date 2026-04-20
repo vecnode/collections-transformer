@@ -1,0 +1,19 @@
+meta {
+  name: Delete Labelset
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/backend/labelset_delete
+  body: none
+  auth: none
+}
+
+params:query {
+  labelset_id: {{labelsetId}}
+}
+
+headers {
+  Accept: application/json
+}

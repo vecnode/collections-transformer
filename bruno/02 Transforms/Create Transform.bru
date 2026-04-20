@@ -1,0 +1,26 @@
+meta {
+  name: Create Transform
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/transforms
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+body:json {
+  {
+    "dataset_id": "{{datasetId}}",
+    "operation": "noop",
+    "params": {
+      "note": "edit me"
+    }
+  }
+}

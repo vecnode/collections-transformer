@@ -1,0 +1,15 @@
+meta {
+  name: Get Transform Status
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/transforms/{{transformJobId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}

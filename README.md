@@ -126,6 +126,28 @@ Examples:
 Legacy `/backend/*` endpoints have been removed from the FastAPI application.
 New integrations should target `/api/v1/*` only.
 
+### Bruno API collection
+
+An importable Bruno collection for the live API is stored in [bruno/README.md](/home/luisarandas/Desktop/collections-transformer/bruno/README.md) and the surrounding `bruno/` folder.
+
+The collection mirrors the active FastAPI router groups:
+
+- `01 Health` -> `/api/v1/health`, `/api/v1/readiness`
+- `02 Transforms` -> `/api/v1/transforms*`
+- `03 User` -> `/api/v1/backend/user/*`
+- `04 Datasets` -> `/api/v1/backend/dataset*`
+- `05 Agents` -> `/api/v1/backend/agent*`
+- `06 Labelsets` -> `/api/v1/backend/labelsets`, `/api/v1/backend/update_label`
+- `07 Analysis` -> `/api/v1/backend/analysis/*`, `/api/v1/backend/item*`
+- `08 System` -> `/api/v1/backend/ollama/models`
+
+To use it:
+
+1. Open the `bruno/` folder in Bruno.
+2. Select the `Local` environment.
+3. Update the placeholder IDs in `bruno/environments/Local.bru`.
+4. Run requests against `http://localhost`, which matches the Docker + Caddy setup.
+
 Connection flow for deployment:
 
 - Browser -> `caddy` -> `client`

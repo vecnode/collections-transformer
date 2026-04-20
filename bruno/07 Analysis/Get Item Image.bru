@@ -1,0 +1,20 @@
+meta {
+  name: Get Item Image
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/v1/backend/item_image
+  body: none
+  auth: none
+}
+
+params:query {
+  item_id: {{itemId}}
+  image_storage_id: {{imageStorageId}}
+}
+
+headers {
+  Accept: application/json
+}

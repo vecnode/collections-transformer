@@ -1,0 +1,19 @@
+meta {
+  name: Get Last Connection
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/backend/user/last_connection
+  body: none
+  auth: none
+}
+
+params:query {
+  user_id: {{userId}}
+}
+
+headers {
+  Accept: application/json
+}

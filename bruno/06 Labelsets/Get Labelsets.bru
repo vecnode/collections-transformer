@@ -1,0 +1,22 @@
+meta {
+  name: Get Labelsets
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/backend/labelsets
+  body: none
+  auth: none
+}
+
+params:query {
+  user_id: {{userId}}
+  include_labels: true
+  include_names: true
+  include_count: true
+}
+
+headers {
+  Accept: application/json
+}

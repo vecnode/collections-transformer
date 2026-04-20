@@ -1,0 +1,22 @@
+meta {
+  name: Delete Agent
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/backend/agent_delete
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+body:json {
+  {
+    "agent_id": "{{agentId}}"
+  }
+}

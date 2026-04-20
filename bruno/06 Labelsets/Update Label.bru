@@ -1,0 +1,21 @@
+meta {
+  name: Update Label
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/backend/update_label
+  body: none
+  auth: none
+}
+
+params:query {
+  labelset_id: {{labelsetId}}
+  id: positive-checkbox-artwork-{{itemId}}-text-0
+  checked: true
+}
+
+headers {
+  Accept: application/json
+}

@@ -1,0 +1,28 @@
+meta {
+  name: Execute Agent With Images
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/backend/agent_execute_with_images
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+body:json {
+  {
+    "agent_id": "{{agentId}}",
+    "dataset_id": "{{datasetId}}",
+    "selected_items": [
+      "{{itemId}}"
+    ],
+    "user_id": "{{userId}}",
+    "task": "Image Detection (text)"
+  }
+}
