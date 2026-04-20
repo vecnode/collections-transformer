@@ -196,8 +196,25 @@ def create_app(model: str = "dual") -> "FastAPI":
         expose_headers=["*"],
     )
 
+    # Canonical contract: all API routes are available under /api/v1/*.
+    # Legacy /backend/* routes are kept as compatibility shims.
     application.include_router(v1_router)
+    application.include_router(backend_router, prefix="/api/v1")
     application.include_router(backend_router)
+
+    @application.middleware("http")
+    async def legacy_backend_deprecation_middleware(request, call_next):
+        response = await call_next(request)
+
+        if request.url.path.startswith("/backend"):
+            response.headers["Deprecation"] = "true"
+            response.headers["Sunset"] = "Wed, 31 Dec 2026 23:59:59 GMT"
+            response.headers["Warning"] = (
+                '299 - "Legacy /backend endpoints are deprecated; use /api/v1/backend"'
+            )
+            response.headers["Link"] = '</api/v1/backend>; rel="successor-version"'
+
+        return response
 
     return application
 

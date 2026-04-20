@@ -11,7 +11,6 @@ Code developed in the context of the UKRI project "Transforming Collections" und
 
 ## Reproduce
 
-
 ```bash
 sudo systemctl stop mongod
 
@@ -108,6 +107,23 @@ Proxy routing:
 - `/` -> `client:3000`
 - `/backend*` -> `api:8080`
 - `/api*` -> `api:8080`
+
+### API contract convergence
+
+Canonical API surface is now versioned under `/api/v1/*`.
+
+- Existing versioned routes: `/api/v1/health`, `/api/v1/readiness`, `/api/v1/transforms*`
+- Legacy backend routes are also exposed under versioned paths using compatibility shims:
+	- `/backend/agents` -> `/api/v1/backend/agents`
+	- `/backend/datasets` -> `/api/v1/backend/datasets`
+	- `/backend/analysis/*` -> `/api/v1/backend/analysis/*`
+	- and other `/backend/*` routes under `/api/v1/backend/*`
+
+Deprecation plan:
+
+- `/backend/*` remains functional to avoid frontend regressions.
+- `/backend/*` responses include deprecation headers (`Deprecation`, `Sunset`, `Warning`, `Link`).
+- New integrations should target `/api/v1/*` only.
 
 Connection flow for deployment:
 
