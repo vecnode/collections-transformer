@@ -3,6 +3,8 @@ import logging
 
 from fastapi import APIRouter
 
+from app.api_responses import success_response
+
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["health"])
 
@@ -10,7 +12,7 @@ router = APIRouter(tags=["health"])
 @router.get("/health")
 async def health():
     """Liveness probe."""
-    return {"status": "ok"}
+    return success_response(data={"status": "ok"})
 
 
 @router.get("/readiness")
@@ -42,4 +44,7 @@ async def readiness():
         checks["redis"] = f"error: {exc}"
 
     all_ok = all(v == "ok" for v in checks.values())
-    return {"status": "ok" if all_ok else "degraded", "checks": checks}
+    return success_response(
+        data={"status": "ok" if all_ok else "degraded", "checks": checks},
+        status_code=200 if all_ok else 503,
+    )
