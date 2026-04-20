@@ -67,3 +67,4 @@ def error_response(
 
     payload.update(extra)
     return JSONResponse(status_code=status_code, content=jsonable_encoder(payload))
+

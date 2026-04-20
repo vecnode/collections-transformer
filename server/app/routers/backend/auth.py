@@ -10,7 +10,7 @@ router = APIRouter(prefix="/backend", tags=["auth"])
 
 
 def _models():
-    import api.models as m  # noqa: PLC0415
+    import app.domain.models as m  # noqa: PLC0415
     return m
 
 

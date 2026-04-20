@@ -43,3 +43,15 @@ def disconnect() -> None:
     if _client:
         _client.close()
         logger.info("MongoDB connection closed")
+
+
+def get_client() -> MongoClient | None:
+    return _client
+
+
+def get_db() -> Any:
+    return _db
+
+
+def get_grid_fs() -> gridfs.GridFS | None:
+    return _grid_fs

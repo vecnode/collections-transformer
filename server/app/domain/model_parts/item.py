@@ -15,18 +15,6 @@ class Item():
     result = item_collection.insert_many(item_list)
     return result.inserted_ids
 
-  def update_text_subcontent(item_id, subcontent_value):
-
-    subcontent_value = json.loads(subcontent_value)
-
-    subcontent = {
-      "subcontent_value":subcontent_value
-    }
-
-    query = { '_id': ObjectId(item_id) }
-    newvalue = { "$set": { 'content.$[].subcontent': subcontent } }
-    item_collection.update_one(query, newvalue, upsert=True)
-
   def update(item_id,data,content_index=None):
     id = item_id if isinstance(item_id,ObjectId) else ObjectId(item_id)
     query = { '_id': id }

@@ -3,7 +3,7 @@ import traceback
 from datetime import datetime
 
 import requests
-from config import settings
+from app.core.config import app_settings as settings
 
 logger = logging.getLogger(__name__)
 

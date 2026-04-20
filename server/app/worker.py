@@ -35,8 +35,8 @@ async def run_transform(payload: dict) -> dict:
     dataset_id = payload.get("dataset_id")
     logger.info("Running transform '%s' on dataset %s", operation, dataset_id)
 
-    # Placeholder – real domain logic lives in server/api/models/
-    # e.g. call Dataset.run_transform(dataset_id, operation, payload["params"])
+    # Placeholder – real domain logic should dispatch through app.domain.models
+    # or future app service modules.
     return {"operation": operation, "dataset_id": dataset_id, "result": "ok"}
 
 

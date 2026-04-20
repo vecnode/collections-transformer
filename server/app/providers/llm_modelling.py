@@ -5,7 +5,7 @@ import logging
 from datetime import datetime
 import re
 import threading
-from config import apply_runtime_environment
+from app.core.config import apply_runtime_environment
 
 
 apply_runtime_environment()
