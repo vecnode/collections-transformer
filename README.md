@@ -24,39 +24,11 @@ docker compose -f docker/docker-compose.yml up -d --build
 docker compose -f docker/docker-compose.yml down
 ```
 
-```bash
-# Migrate your SQLite file (optional)
-cp ~/my_old_data/db.sqlite server/db/db.sqlite
-./scripts/build_seed_archive_from_sqlite.sh
-# server/db/tanc_database.archive.gz
-```
-
-After that, fresh deployments use the archive automatically:
 
 ### Manual
 
 ```bash
-# Set up backend and frontend environments
-uv venv venv
-source venv/bin/activate
-uv pip install -r requirements.txt
-
-# Set up frontend (from root in another terminal)
-cd client/
-nvm install 20
-nvm use 20
-npm install
-
-# Start services
-# Terminal 1 (from root, backend - development):
-cd server/
-python3 app.py
-
-# Terminal 1 (from root, backend - production with Gunicorn):
-./scripts/run_server_prod.sh
-
-# Terminal 2 (from root/client, frontend):
-npm run dev
+c
 ```
 
 
@@ -68,9 +40,29 @@ Runtime settings are loaded from `.env` (project root), using:
 - `server/app/core/config.py` (FastAPI app and worker)
 - `server/config.py` (legacy compatibility entrypoints)
 
-1. Copy `.env.template` to `.env` in the project root.
-2. Set the values you need for your environment.
-3. Restart containers/services after changing env vars.
+1. Choose an environment profile template and copy it to `.env` in the project root:
+
+```bash
+# Local/manual backend + frontend dev
+cp .env.local.template .env
+
+# Docker deployment via compose + caddy
+cp .env.docker.template .env
+```
+
+2. If you need a single generic baseline, `.env.template` is also available.
+3. Set the values you need for your environment.
+4. Restart containers/services after changing env vars.
+
+Profile guidance:
+
+- Local profile (`.env.local.template`)
+	- Uses localhost datastore URLs (`127.0.0.1`, `localhost`).
+	- Sets `NEXT_PUBLIC_SERVER_URL=http://localhost:8080` for manual frontend-to-backend calls.
+- Docker profile (`.env.docker.template`)
+	- Uses container service DNS (`mongodb`, `redis`) for backend runtime.
+	- Sets `NEXT_PUBLIC_SERVER_URL=http://localhost` so browser traffic goes through Caddy.
+	- Uses `OLLAMA_BASE_URL=http://host.docker.internal:11434` by default.
 
 For Docker deployments, set `OLLAMA_BASE_URL` to a network-reachable endpoint from containers.
 Default in compose is `http://host.docker.internal:11434`.
