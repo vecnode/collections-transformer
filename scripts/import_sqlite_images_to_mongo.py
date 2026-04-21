@@ -11,8 +11,7 @@ It updates existing Mongo `item` documents in place by:
 3. Replacing the item content with the current image content schema
 
 Example:
-  /home/luisarandas/Desktop/collections-transformer/venv/bin/python \
-    scripts/import_sqlite_images_to_mongo.py \
+    python scripts/import_sqlite_images_to_mongo.py \
     --dataset-id 42 \
     --image-dir /path/to/images
 """

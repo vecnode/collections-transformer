@@ -125,7 +125,7 @@ Inference providers:
 
 ### Bruno API collection
 
-An importable Bruno collection for the live API is stored in [bruno/README.md](/home/luisarandas/Desktop/collections-transformer/bruno/README.md) and the surrounding `bruno/` folder.
+An importable Bruno collection for the live API is stored in [bruno/README.md](./bruno/README.md) and the surrounding `bruno/` folder.
 
 The collection mirrors the active FastAPI router groups:
 
