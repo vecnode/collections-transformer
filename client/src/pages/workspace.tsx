@@ -17,7 +17,7 @@ import { withAuth } from "@/components/withAuth";
 const Workspace = () => {
     const { user } = useAuth();
 
-    const title = "Workspace - Collections Transformer (TaNC UAL)"
+    const title = "Dashboard - Collections Transformer (TaNC UAL)"
 
     const [datasets, setDatasets] = useState([{id:"Loading...",name:" ",status:""}])
     const [labelsets, setLabelsets] = useState([{id:"Loading...",name:" "}])
@@ -369,7 +369,7 @@ const Workspace = () => {
 
             <section className="home-hero">
               <span className="home-kicker">Operations Dashboard</span>
-              <h1 className="home-title">Workspace</h1>
+              <h1 className="home-title">Dashboard</h1>
               <p className="home-subtitle">
                 Signed in as <strong>{displayName}</strong>
                 {lastConnection && (
@@ -404,7 +404,7 @@ const Workspace = () => {
             {/* Tab bar */}
             <div className="ws-tabs">
               {[
-                { id: 'history',     icon: 'task_alt',    label: 'Analysis History',  sub: 'Saved runs from the Tasks page' },
+                { id: 'history',     icon: 'task_alt',    label: 'Analysis History',  sub: 'Saved runs from the Analysis page' },
                 { id: 'agents',      icon: 'smart_toy',   label: 'Agents',            sub: 'Ollama model configurations' },
                 { id: 'datasets',    icon: 'folder_open', label: 'Datasets',          sub: 'Uploaded media collections' },
                 { id: 'annotations', icon: 'label',       label: 'Annotations',       sub: 'Label schemas and category sets' },
@@ -426,7 +426,7 @@ const Workspace = () => {
               <div className="agent-card-body ws-panel-body">
                 {activeTab === 'history' && (
                   analysisHistory.length === 0 ? (
-                    <div className="ws-empty">No saved analysis history yet. Save your first analysis from the Tasks page.</div>
+                    <div className="ws-empty">No saved analysis history yet. Save your first analysis from the Analysis page.</div>
                   ) : (
                     <div className="ws-table-wrap">
                       <table className="ws-table">

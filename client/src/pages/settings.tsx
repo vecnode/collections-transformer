@@ -21,7 +21,7 @@ const Settings = () => {
   }, [user]);
   
   const fetchUserPreferences = () => {
-    const requestOptions = {
+    const requestOptions: RequestInit = {
       method: 'GET',
       mode: 'cors',
       headers: {'Content-Type': 'application/json'}
@@ -45,7 +45,7 @@ const Settings = () => {
     setSaving(true);
     setSaveMessage('');
     
-    const requestOptions = {
+    const requestOptions: RequestInit = {
       method: 'POST',
       mode: 'cors',
       headers: {'Content-Type': 'application/json'},
@@ -75,7 +75,7 @@ const Settings = () => {
 
   const fetchOllamaModels = () => {
     setLoadingModels(true);
-    const requestOptions = {
+    const requestOptions: RequestInit = {
       method: 'GET',
       mode: 'cors',
       headers: {'Content-Type': 'application/json'}
@@ -116,48 +116,66 @@ const Settings = () => {
         <title>Settings - Collections Transformer</title>
       </Head>
       <main>
-        <div className="container settings-shell">
-          <h1>Settings</h1>
-          <hr/>
-          
-          <div className="settings-row">
-            <span className="settings-label">LLM Provider:</span>
-            <span>Ollama</span>
-          </div>
+        <div className="container">
+          <section className="home-hero">
+            <p className="home-kicker">Preferences</p>
+            <h1>Settings</h1>
+            <p className="home-subtitle">Manage model provider options for a clean and consistent analysis workflow.</p>
+          </section>
 
-          <div className="settings-row">
-            <span className="settings-label">Ollama Backend:</span>
-            <select
-              value={ollamaBackend}
-              onChange={(e) => setOllamaBackend(e.target.value)}
-              disabled={loadingModels}
-              className={`settings-input ${loadingModels ? 'is-disabled' : ''}`}
-            >
-              {loadingModels ? (
-                <option value="">Loading models...</option>
-              ) : ollamaModels.length > 0 ? (
-                ollamaModels.map((model) => (
-                  <option key={model} value={model}>{model}</option>
-                ))
-              ) : (
-                <option value="">No models available</option>
-              )}
-            </select>
-          </div>
+          <div className="agent-shell">
+            <section className="agent-card">
+              <div className="agent-card-header">
+                <span className="agent-card-icon material-symbols-outlined">tune</span>
+                <div>
+                  <h2 className="agent-card-title">Model Configuration</h2>
+                  <p className="agent-card-subtitle">Choose the active local model backend used for analysis requests.</p>
+                </div>
+              </div>
 
-          <div className="settings-actions">
-            {saveMessage && (
-              <span className={`settings-message ${saveMessage.includes('successfully') ? 'is-success' : 'is-error'}`}>
-                {saveMessage}
-              </span>
-            )}
-            <button
-              onClick={handleSavePreferences}
-              disabled={saving}
-              className={`settings-save-btn ${saving ? 'is-saving' : ''}`}
-            >
-              {saving ? 'Saving' : 'Save'}
-            </button>
+              <div className="agent-card-body">
+                <div className="agent-field">
+                  <label className="agent-label">LLM Provider</label>
+                  <div className="agent-input">Ollama</div>
+                </div>
+
+                <div className="agent-field">
+                  <label className="agent-label">Ollama Backend</label>
+                  <select
+                    value={ollamaBackend}
+                    onChange={(e) => setOllamaBackend(e.target.value)}
+                    disabled={loadingModels}
+                    className="agent-input agent-select"
+                  >
+                    {loadingModels ? (
+                      <option value="">Loading models...</option>
+                    ) : ollamaModels.length > 0 ? (
+                      ollamaModels.map((model) => (
+                        <option key={model} value={model}>{model}</option>
+                      ))
+                    ) : (
+                      <option value="">No models available</option>
+                    )}
+                  </select>
+                </div>
+
+                <section className="agent-submit-row">
+                  {saveMessage && (
+                    <span className={`ws-badge ${saveMessage.includes('successfully') ? 'ws-badge--completed' : 'ws-badge--error'}`}>
+                      {saveMessage}
+                    </span>
+                  )}
+                  <button
+                    onClick={handleSavePreferences}
+                    disabled={saving}
+                    className="agent-submit-btn"
+                  >
+                    <span className="material-symbols-outlined">save</span>
+                    {saving ? 'Saving' : 'Save Settings'}
+                  </button>
+                </section>
+              </div>
+            </section>
           </div>
         </div>
       </main>

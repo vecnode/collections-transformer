@@ -1137,7 +1137,7 @@ const Tasks = () => {
   return (
     <main>
       <div className="container">
-        <h1>Tasks</h1>
+        <h1>Analysis</h1>
         <hr/>
 
         <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>

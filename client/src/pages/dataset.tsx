@@ -10,7 +10,7 @@ import StatusBox from '@/components/statusBox'
 
 const DatasetPage = () => {
   const { user } = useAuth()
-  const title = "Dataset — Collections Transformer"
+  const title = "Upload — Collections Transformer"
 
   const [text_file, setTextFile] = useState(null)
   const [image_files, setImageFiles] = useState(null)
@@ -90,7 +90,7 @@ const DatasetPage = () => {
           {/* Hero — full width, same as home/newagent */}
           <section className="home-hero">
             <p className="home-kicker">Collections Management</p>
-            <h1>Dataset</h1>
+            <h1>Upload</h1>
             <p className="home-subtitle">
               Ingest text, image, or multimodal collections into the platform. Datasets power every agent analysis run.
             </p>

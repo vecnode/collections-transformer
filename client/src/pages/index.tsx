@@ -23,7 +23,7 @@ const Home = () => {
     const jumpLinks = [
       {
         href: '/workspace',
-        label: 'Workspace',
+        label: 'Dashboard',
         description: 'Review datasets, agents, analysis and history.'
       },
       {
@@ -33,13 +33,13 @@ const Home = () => {
       },
       {
         href: '/dataset',
-        label: 'Dataset',
+        label: 'Upload',
         description: 'Upload and prepare datasets for analysis workflows.'
       },
       {
         href: '/tasks',
-        label: 'Tasks',
-        description: 'Track and execute active processing tasks in one place.'
+        label: 'Analysis',
+        description: 'Track and execute active analysis runs in one place.'
       },
       {
         href: '/user',

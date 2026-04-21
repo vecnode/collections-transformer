@@ -42,14 +42,14 @@ const SideBar = () => {
                             
                             <MenuItem icon={<span className='material-symbols-outlined'>home</span>} component={<Link href="/" />}> Home </MenuItem>
 
-                            <MenuItem icon={<span className='material-symbols-outlined'>hub</span>} component={<Link href="/workspace" />}> Workspace </MenuItem>
+                            <MenuItem icon={<span className='material-symbols-outlined'>hub</span>} component={<Link href="/workspace" />}> Dashboard </MenuItem>
                             
                             <MenuItem icon={<span className='material-symbols-outlined'>psychology</span>} component={<Link href="/newagent" />}> New Agent </MenuItem>
                             
                             
-                            <MenuItem icon={<span className='material-symbols-outlined'>upload</span>} component={<Link href="/dataset" />}> Dataset </MenuItem>
+                            <MenuItem icon={<span className='material-symbols-outlined'>upload</span>} component={<Link href="/dataset" />}> Upload </MenuItem>
 
-                            <MenuItem icon={<span className='material-symbols-outlined'>pattern</span>} component={<Link href="/tasks" />}> Tasks </MenuItem>
+                            <MenuItem icon={<span className='material-symbols-outlined'>pattern</span>} component={<Link href="/tasks" />}> Analysis </MenuItem>
                             
                             <hr></hr>
                         </Menu>
