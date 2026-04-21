@@ -349,6 +349,21 @@ const ViewDataset = () => {
       return imageContent?.content_value?.image_storage_id ?? null;
     };
 
+    const getItemTextValues = (item: CollectionItem): string[] => {
+      if (!item.content || !Array.isArray(item.content)) {
+        return [];
+      }
+
+      return item.content
+        .filter((content: NonNullable<CollectionItem['content']>[number]) => {
+          const textValue = content.content_value?.text;
+          return content.content_type === 'text'
+            && typeof textValue === 'string'
+            && textValue.trim() !== '';
+        })
+        .map((content: NonNullable<CollectionItem['content']>[number]) => (content.content_value?.text || '').trim());
+    };
+
     const getImageReferenceName = (item: CollectionItem): string | null => {
       if (!item.content || !Array.isArray(item.content)) {
         return null;
@@ -436,29 +451,51 @@ const ViewDataset = () => {
                       </div>
                       {selectedItem || dataset.artworks[0] ? (
                         <div style={{ fontSize: '0.85rem', lineHeight: '1.5' }}>
+                          {(() => {
+                            const currentItem = selectedItem || dataset.artworks[0];
+                            const imageStorageId = getItemImageStorageId(currentItem);
+                            const imageReference = getImageReferenceName(currentItem);
+                            const textValues = getItemTextValues(currentItem);
+                            const hasImage = Boolean(imageStorageId || imageReference);
+                            const hasText = textValues.length > 0;
+
+                            return (
+                              <>
                           <div style={{ marginBottom: '0.5rem' }}>
-                            <strong>ID:</strong> {(selectedItem || dataset.artworks[0])._id || '-'}
+                            <strong>ID:</strong> {currentItem._id || '-'}
                           </div>
                           <div style={{ marginBottom: '0.5rem' }}>
-                            <strong>Position:</strong> {(selectedItem || dataset.artworks[0]).position !== undefined ? (selectedItem || dataset.artworks[0]).position : dataset.artworks.indexOf(selectedItem || dataset.artworks[0]) + 1}
+                            <strong>Position:</strong> {currentItem.position !== undefined ? currentItem.position : dataset.artworks.indexOf(currentItem) + 1}
                           </div>
                           <div>
                             <strong>Content:</strong> 
-                            {getItemImageStorageId(selectedItem || dataset.artworks[0]) ? (
+                            {hasImage ? (
+                              <>
+                            {imageStorageId ? (
                               <ItemThumbnail
-                                itemId={(selectedItem || dataset.artworks[0])._id}
-                                imageStorageId={getItemImageStorageId(selectedItem || dataset.artworks[0]) || ''}
-                              />
-                            ) : isItemImage(selectedItem || dataset.artworks[0]) ? (
-                              <ImageReferencePreview
-                                filename={getImageReferenceName(selectedItem || dataset.artworks[0]) || 'Unknown image'}
+                                itemId={currentItem._id}
+                                imageStorageId={imageStorageId}
                               />
                             ) : (
+                              <ImageReferencePreview
+                                filename={imageReference || 'Unknown image'}
+                              />
+                            )}
+                            {hasText ? (
+                              <div style={{ marginTop: '0.4rem', padding: '0.5rem', backgroundColor: '#fff', borderRadius: '2px', fontSize: '0.8rem', maxHeight: '150px', overflowY: 'auto', wordBreak: 'break-word' }}>
+                                {textValues.join(' | ')}
+                              </div>
+                            ) : null}
+                              </>
+                            ) : (
                               <div style={{ marginTop: '0.25rem', padding: '0.5rem', backgroundColor: '#fff', borderRadius: '2px', fontSize: '0.8rem', maxHeight: '150px', overflowY: 'auto', wordBreak: 'break-word' }}>
-                                {getItemContentValue(selectedItem || dataset.artworks[0])}
+                                {getItemContentValue(currentItem)}
                               </div>
                             )}
                           </div>
+                              </>
+                            );
+                          })()}
                         </div>
                       ) : null}
                     </div>

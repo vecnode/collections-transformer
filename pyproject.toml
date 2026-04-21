@@ -8,7 +8,7 @@ include = ["server/**", "README.md", "requirements.txt"]
 [project]
 name = "collections-transformer"
 version = "0.1.0"
-description = "Agent-based platform for multimodal LLM analysis of GLAM datasets"
+description = "Agent-based platform for multimodal LLM analysis of datasets in the GLAM sector"
 readme = "README.md"
 requires-python = ">=3.12"
 
