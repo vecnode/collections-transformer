@@ -1,32 +1,9 @@
+import Head from 'next/head'
 import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import DatasetModal from '../components/datasetModal';
 
 import { useAuth } from "@/contexts/AuthContext";
 import { withAuth } from "@/components/withAuth";
-
-const RadioList = ({ items, name, selectedId, onChange, getLabel }) => (
-  <div>
-    {items.map(item => (
-      <label
-        key={item._id || item.id}
-        style={{
-          display: 'block',
-          marginBottom: '0px',
-          fontSize: 'small'
-        }}
-      >
-        <input
-          type="radio"
-          name={name}
-          value={item._id || item.id}
-          checked={selectedId === (item._id || item.id)}
-          onChange={() => onChange(item._id || item.id)}
-        />
-        <span style={{ marginLeft: '3px' }}>{getLabel(item)}</span>
-      </label>
-    ))}
-  </div>
-)
 
 // Custom Image Thumbnail Component for Table
 const ImageThumbnail = ({ itemId, imageStorageId }) => {
@@ -459,26 +436,67 @@ const SelectedItemsDisplay = ({ selectedItems, datasetData, onClearAll }) => {
   );
 };
 
+const TaskPageLinks = ({ items, onSelect }) => {
+  return (
+    <ul style={{ margin: 0, paddingLeft: '1.2rem' }}>
+      {items.map((item, index) => (
+        <li key={item.id} style={{ marginBottom: index < items.length - 1 ? '0.35rem' : 0 }}>
+          <button
+            type="button"
+            onClick={() => onSelect(item.id)}
+            style={{ background: 'transparent', border: 'none', padding: 0, color: '#111', textDecoration: 'underline', cursor: 'pointer' }}
+          >
+            {item.label}
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
 const Tasks = () => {
   const { user } = useAuth();
+  const title = "Analysis - Collections Transformer"
   const [datasets, setDatasets] = useState([]);
   const [agents, setAgents] = useState([]);
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [selectedDataset, setSelectedDataset] = useState(null);
-  const [selectedButtonType, setSelectedButtonType] = useState('boolean'); // Default to first option
   const [selectedDatasetData, setSelectedDatasetData] = useState(null);
   const [loadingDataset, setLoadingDataset] = useState(false);
   const [selectedItems, setSelectedItems] = useState(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(50);
-  const [analysisResult, setAnalysisResult] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [chatMessages, setChatMessages] = useState([]); // New state for chat messages
   const [maxSentences, setMaxSentences] = useState(3); // New state for sentence limit
   const [taskType, setTaskType] = useState(null); // 'human', 'ai', or null
+  const [humanTaskPage, setHumanTaskPage] = useState(null); // 'annotate' | 'talk' | null
+  const [agentTaskPage, setAgentTaskPage] = useState(null); // 'image' | 'text' | null
   const [serviceProvider, setServiceProvider] = useState('Ollama');
   // Task is now determined by the selected agent's task_type
   const scrollPositionRef = useRef({ container: null, position: 0 });
+  const taskModeOptions = [
+    {
+      id: 'human',
+      icon: 'person',
+      label: 'Human Task',
+      desc: 'Manual review and annotation flow.'
+    },
+    {
+      id: 'ai',
+      icon: 'smart_toy',
+      label: 'Agent Task',
+      desc: 'Run automated agent analysis.'
+    }
+  ];
+  const humanTaskLinks = [
+    { id: 'annotate', label: 'Annotate Dataset' },
+    { id: 'talk', label: 'Talk to Dataset' }
+  ];
+  const agentTaskLinks = [
+    { id: 'image', label: 'Analyse image' },
+    { id: 'text', label: 'Analyse text' }
+  ];
 
   const getSelectedDataset = () => {
     return datasets.find(d => d._id === selectedDataset) || null;
@@ -657,6 +675,11 @@ const Tasks = () => {
     console.log("Selected dataset changed to:", selectedDataset);
     fetchDatasetData(selectedDataset);
   }, [selectedDataset]);
+
+  useEffect(() => {
+    setHumanTaskPage(null);
+    setAgentTaskPage(null);
+  }, [taskType]);
 
   const getAgents = () => {
     const requestOptions = {
@@ -1135,65 +1158,113 @@ const Tasks = () => {
   };
 
   return (
-    <main>
+    <>
+      <Head>
+        <title>{title}</title>
+      </Head>
+      <main>
       <div className="container">
-        <h1>Analysis</h1>
-        <hr/>
+        <section className="home-hero">
+          <p className="home-kicker">Execution</p>
+          <h1>Analysis</h1>
+          <p className="home-subtitle">Run the platform workflow from one place, with human or agent-driven task modes.</p>
+        </section>
 
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
-          <button
-            onClick={() => setTaskType('human')}
-            style={{
-              border: '1px solid black',
-              borderRadius: '5px',
-              marginBottom: '4px',
-              padding: '8px 12px',
-              backgroundColor: taskType === 'human' ? '#f5f5f5' : 'transparent',
-              cursor: 'pointer',
-              minWidth: '120px'
-            }}
-            onMouseEnter={(e) => {
-              if (taskType !== 'human') e.target.style.backgroundColor = '#f5f5f5';
-            }}
-            onMouseLeave={(e) => {
-              if (taskType !== 'human') e.target.style.backgroundColor = 'transparent';
-            }}
-          >
-            Human Task
-          </button>
-          <button
-            onClick={() => setTaskType('ai')}
-            style={{
-              border: '1px solid black',
-              borderRadius: '5px',
-              marginBottom: '4px',
-              padding: '8px 12px',
-              backgroundColor: taskType === 'ai' ? '#f5f5f5' : 'transparent',
-              cursor: 'pointer',
-              minWidth: '120px'
-            }}
-            onMouseEnter={(e) => {
-              if (taskType !== 'ai') e.target.style.backgroundColor = '#f5f5f5';
-            }}
-            onMouseLeave={(e) => {
-              if (taskType !== 'ai') e.target.style.backgroundColor = 'transparent';
-            }}
-          >
-            Agent Task
-          </button>
+        <div className="agent-shell" style={{ marginBottom: '1rem' }}>
+          <section className="agent-card">
+            <div className="agent-card-header">
+              <span className="agent-card-icon material-symbols-outlined">toggle_on</span>
+              <div>
+                <h2 className="agent-card-title">Task Mode</h2>
+                <p className="agent-card-subtitle">Choose how you want to execute this analysis session.</p>
+              </div>
+            </div>
+            <div className="agent-card-body">
+              <div className="ds-type-grid">
+                {taskModeOptions.map((mode) => (
+                  <button
+                    key={mode.id}
+                    type="button"
+                    className={`ds-type-card${taskType === mode.id ? ' ds-type-card--active' : ''}`}
+                    onClick={() => setTaskType(mode.id)}
+                  >
+                    <span className="material-symbols-outlined ds-type-icon">{mode.icon}</span>
+                    <span className="ds-type-label">{mode.label}</span>
+                    <span className="ds-type-desc">{mode.desc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
         </div>
-        <hr/>
 
         {taskType === null ? (
           <div style={{ textAlign: 'center', padding: '2rem' }}>
-            Choose One Option
+            Choose a task mode to start.
           </div>
         ) : taskType === 'human' ? (
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
-            Lorem ipsum
-          </div>
+          <>
+            <div className="agent-card" style={{ marginBottom: '1rem' }}>
+              <div className="agent-card-body">
+                <div className="agent-field" style={{ paddingBottom: '0.2rem' }}>
+                  <label className="agent-label">Human Task Pages</label>
+                  <TaskPageLinks items={humanTaskLinks} onSelect={setHumanTaskPage} />
+                </div>
+              </div>
+            </div>
+
+            {humanTaskPage === null ? (
+              <div style={{ textAlign: 'center', padding: '1rem 2rem 2rem' }}>
+                Select one Human Task page.
+              </div>
+            ) : humanTaskPage === 'annotate' ? (
+              <div className="agent-card">
+                <div className="agent-card-header">
+                  <span className="agent-card-icon material-symbols-outlined">edit_note</span>
+                  <div>
+                    <h2 className="agent-card-title">Annotate Dataset</h2>
+                    <p className="agent-card-subtitle">Manual annotation flow page.</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="agent-card">
+                <div className="agent-card-header">
+                  <span className="agent-card-icon material-symbols-outlined">chat</span>
+                  <div>
+                    <h2 className="agent-card-title">Talk to Dataset</h2>
+                    <p className="agent-card-subtitle">Conversational dataset exploration page.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <>
+            <div className="agent-card" style={{ marginBottom: '1rem' }}>
+              <div className="agent-card-body">
+                <div className="agent-field" style={{ paddingBottom: '0.2rem' }}>
+                  <label className="agent-label">Agent Task Pages</label>
+                  <TaskPageLinks items={agentTaskLinks} onSelect={setAgentTaskPage} />
+                </div>
+              </div>
+            </div>
+
+            {agentTaskPage === null ? (
+              <div style={{ textAlign: 'center', padding: '1rem 2rem 2rem' }}>
+                Select one Agent Task page.
+              </div>
+            ) : (
+              <>
+                <div className="agent-card" style={{ marginBottom: '1rem' }}>
+                  <div className="agent-card-header">
+                    <span className="agent-card-icon material-symbols-outlined">auto_awesome</span>
+                    <div>
+                      <h2 className="agent-card-title">{agentTaskPage === 'image' ? 'Analyse image' : 'Analyse text'}</h2>
+                      <p className="agent-card-subtitle">Configure the agent, dataset and items for this analysis run.</p>
+                    </div>
+                  </div>
+                </div>
             <div style={{ border: '1px solid grey', borderRadius: '5px', padding: '10px', paddingLeft: '20px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 'bold' }}>Service Provider:</span>
               <select
@@ -1540,10 +1611,13 @@ const Tasks = () => {
                 </button>
               </div>
             </div>
+              </>
+            )}
           </>
         )}
       </div>
     </main>
+    </>
   );
 };
 
