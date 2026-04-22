@@ -6,7 +6,6 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-import tempfile
 import time
 from pathlib import Path
 
@@ -56,18 +55,13 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run direct TrOCR inference on a printed-text image")
     parser.add_argument(
         "--image",
-        default=None,
-        help="Path to local image file. If omitted, the script generates a temporary printed-text image.",
-    )
-    parser.add_argument(
-        "--text",
-        default="HELLO OCR",
-        help="Printed text used when generating a temporary test image.",
+        required=True,
+        help="Path to local image file for OCR inference.",
     )
     parser.add_argument(
         "--expected",
-        default="hello ocr",
-        help="Expected OCR phrase (case-insensitive, punctuation-insensitive).",
+        default=None,
+        help="Optional expected OCR phrase (case-insensitive, punctuation-insensitive).",
     )
     parser.add_argument(
         "--force-cpu",
@@ -81,68 +75,42 @@ def _normalize(text: str) -> str:
     return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]+", " ", text.lower())).strip()
 
 
-def _create_test_image(text: str, image_path: Path) -> None:
-    try:
-        from PIL import Image, ImageDraw, ImageFont  # noqa: PLC0415
-    except ModuleNotFoundError as exc:
-        if exc.name == "PIL":
-            _add_local_venv_site_packages()
-            from PIL import Image, ImageDraw, ImageFont  # noqa: PLC0415
-        else:
-            raise
-
-    image = Image.new("RGB", (960, 280), color="white")
-    draw = ImageDraw.Draw(image)
-
-    try:
-        font = ImageFont.truetype("DejaVuSans.ttf", 72)
-    except Exception:
-        font = ImageFont.load_default()
-
-    draw.text((40, 90), text, fill="black", font=font)
-    image.save(image_path)
-
-
 def main() -> None:
     args = parse_args()
+    image_path = Path(args.image)
+    if not image_path.exists():
+        fail(f"Image file not found: {image_path}")
 
-    with tempfile.TemporaryDirectory(prefix="trocr-test-") as tmp_dir:
-        tmp_image_path = Path(tmp_dir) / "ocr_printed.png"
+    print(f"-> image={image_path}")
+    print(f"-> expected={repr(args.expected)}, force_cpu={args.force_cpu}")
 
-        if args.image:
-            image_path = Path(args.image)
-            if not image_path.exists():
-                fail(f"Image file not found: {image_path}")
-        else:
-            _create_test_image(args.text, tmp_image_path)
-            image_path = tmp_image_path
+    started = time.perf_counter()
 
-        print(f"-> image={image_path}")
-        print(f"-> expected='{args.expected}', force_cpu={args.force_cpu}")
+    try:
+        TrOcrTransformersBackend = _import_trocr_backend_class()
+        backend = TrOcrTransformersBackend()
+        backend.init(force_cpu=args.force_cpu)
+        text = backend.recognize_text(image=image_path.read_bytes(), max_words=64)
+    except Exception as exc:
+        fail(f"TrOCR inference failed: {exc}")
 
-        started = time.perf_counter()
+    if not text or not text.strip():
+        fail("TrOCR returned empty output")
 
-        try:
-            TrOcrTransformersBackend = _import_trocr_backend_class()
-            backend = TrOcrTransformersBackend()
-            backend.init(force_cpu=args.force_cpu)
-            text = backend.recognize_text(image=image_path.read_bytes(), max_words=64)
-        except Exception as exc:
-            fail(f"TrOCR inference failed: {exc}")
+    if not re.search(r"[A-Za-z0-9]", text):
+        fail(f"TrOCR returned low-signal output: '{text}'")
 
-        if not text or not text.strip():
-            fail("TrOCR returned empty output")
-
+    if args.expected:
         normalized_output = _normalize(text)
         expected_tokens = [tok for tok in _normalize(args.expected).split(" ") if tok]
         missing = [tok for tok in expected_tokens if tok not in normalized_output]
         if missing:
             fail(f"Missing expected tokens {missing}. OCR output='{text}'")
 
-        elapsed_ms = int((time.perf_counter() - started) * 1000)
-        print("RESULT:")
-        print(text.strip())
-        print(f"PASS: TrOCR inference completed ({elapsed_ms} ms)")
+    elapsed_ms = int((time.perf_counter() - started) * 1000)
+    print("RESULT:")
+    print(text.strip())
+    print(f"PASS: TrOCR inference completed ({elapsed_ms} ms)")
 
 
 if __name__ == "__main__":

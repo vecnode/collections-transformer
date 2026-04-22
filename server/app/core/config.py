@@ -75,7 +75,7 @@ def load_app_settings() -> AppSettings:
         ollama_model_option=os.getenv("OLLAMA_MODEL_OPTION", "gemma3:27b"),
         ollama_base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
         blip2_model_name=os.getenv("BLIP2_MODEL_NAME", "Salesforce/blip2-opt-2.7b"),
-        trocr_model_name=os.getenv("TROCR_MODEL_NAME", "microsoft/trocr-large-printed"),
+        trocr_model_name=os.getenv("TROCR_MODEL_NAME", "zai-org/GLM-OCR"),
         cuda_launch_blocking=os.getenv("CUDA_LAUNCH_BLOCKING", "1"),
         pytorch_use_cuda_dsa=os.getenv("PYTORCH_USE_CUDA_DSA", "1"),
     )
