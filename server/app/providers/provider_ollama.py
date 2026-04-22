@@ -78,7 +78,7 @@ def list_ollama_models():
             "models": []
         }
 
-def get_ollama_gpt_response(primer_message, user_message, max_words=None):
+def get_ollama_llm_response(primer_message, user_message, max_words=None):
     """Get response from Ollama (local inference)"""
     try:
         # Calculate max_tokens based on max_words if provided

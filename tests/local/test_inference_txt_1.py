@@ -85,7 +85,7 @@ def main() -> None:
     user_message = f"Text to summarise:\n\n{text_content}"
 
     print("Sending to Ollama...")
-    result = provider_ollama.get_ollama_gpt_response(
+    result = provider_ollama.get_ollama_llm_response(
         primer_message=system_prompt,
         user_message=user_message,
         max_words=120,

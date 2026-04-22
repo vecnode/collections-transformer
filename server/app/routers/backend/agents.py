@@ -122,7 +122,7 @@ async def execute_agent_with_images(request: Request):
         except Exception:
             pass
 
-        ollama_result = provider_ollama.get_ollama_gpt_response(
+        ollama_result = provider_ollama.get_ollama_llm_response(
             primer_message=system_prompt,
             user_message=f"Based on the following image description, return only True or False.\n\nImage Description:\n{blip2_text}\n\nCriteria: {system_prompt}\n\nReturn only True or False.",
             max_words=50,

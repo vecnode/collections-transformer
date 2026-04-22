@@ -307,7 +307,7 @@ def get_batch_predictions(i,test_batch, system_prompt, analyser_type, analyser_f
 
       from . import provider_ollama as provider_ollama
       provider_ollama.init_ollama()
-      model_result = provider_ollama.get_ollama_gpt_response(system_prompt, user_prompt)
+      model_result = provider_ollama.get_ollama_llm_response(system_prompt, user_prompt)
       if model_result.get('status') == "200":
         batch_end_time = model_result.get("end")
         response_text = model_result.get("res", "")
