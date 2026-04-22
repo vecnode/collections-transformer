@@ -1,0 +1,10 @@
+object_id,text
+chunk-001,"Shakespeare wrote for both popular and elite audiences, and his plays were shaped by live performance constraints. In this sample, the text is intentionally longer to test sentence-aware chunking and preserve context across clauses."
+chunk-002,"In Hamlet, the language shifts between philosophical reflection and direct emotional speech. A robust chunking system should avoid splitting key ideas mid-thought when punctuation suggests a natural boundary."
+chunk-003,"Macbeth moves quickly from prophecy to violence to paranoia, creating a compact but intense narrative arc. This row includes multiple sentence lengths so token windows can be evaluated under mixed rhythm."
+chunk-004,"King Lear presents political power as deeply personal, especially through dialogue between parents and children. During ingestion, longer records like this should remain readable and semantically coherent after segmentation."
+chunk-005,"Othello demonstrates how suggestion can outweigh evidence when trust is fragile. The row is designed to test whether uploaded text survives parsing without dropped commas, broken quotes, or malformed fields."
+chunk-006,"Romeo and Juliet balances private love scenes with public conflict and social pressure. If chunking is configured well, both thematic contrast and chronology should remain understandable in downstream analysis."
+chunk-007,"The Tempest mixes spectacle, reconciliation, and questions of authority within a controlled island setting. Multi-sentence input helps verify that embedding and retrieval components can handle narrative transitions cleanly."
+chunk-008,"Shakespeare's sonnets use tight formal constraints while expressing unstable emotions and shifting perspectives. This final toy row stresses upload reliability, CSV quoting correctness, and realistic paragraph-like text flow."
+chunk-009,"Across the canon, recurring motifs include time, memory, ambition, jealousy, and forgiveness. Together these examples provide a compact but practical dataset for local testing on the upload page."

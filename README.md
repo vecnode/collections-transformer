@@ -72,7 +72,7 @@ cd ..
 curl -sS http://localhost:8080/api/v1/health
 curl -sS http://localhost:8080/api/v1/readiness
 
-# 8) Local API smoke tests (with backend + frontend running)
+# 8) Local API tests (with backend + frontend running)
 uv run tests/local/test_health.py
 uv run tests/local/test_user_login.py
 ```
