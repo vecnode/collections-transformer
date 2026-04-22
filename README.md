@@ -75,11 +75,17 @@ curl -sS http://localhost:8080/api/v1/readiness
 # 8) Local API tests (with backend + frontend running)
 uv run tests/local/test_health.py
 uv run tests/local/test_user_login.py
+
 uv run tests/local/test_upload_csv_text.py --mode single
 uv run tests/local/test_upload_csv_text.py --mode chunked
-uv run tests/local/test_inference_img_1.py --mode caption # BLIP2
-uv run tests/local/test_inference_img_1.py --mode long-description # BLIP2
-uv run tests/local/test_inference_ocr_1.py --image assets/test_img_2.png # GLM-OCR TrOCR
+
+uv run tests/local/test_inference_img_1.py --mode caption # BLIP2 (img short-description)
+uv run tests/local/test_inference_img_1.py --mode long-description # BLIP2 (img long-description)
+uv run tests/local/test_inference_ocr_1.py --image assets/test_img_2.png # GLM-OCR TrOCR (img text-detection)
+
+# test_inference_txt_1.py - summarise assets/test_txt_1.txt, 3 sentences
+# test_inference_txt_2.py - extract topic, single sentence
+# 
 ```
 
 
