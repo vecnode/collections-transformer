@@ -77,9 +77,9 @@ uv run tests/local/test_health.py
 uv run tests/local/test_user_login.py
 uv run tests/local/test_upload_csv_text.py --mode single
 uv run tests/local/test_upload_csv_text.py --mode chunked
-uv run tests/local/test_inference_img_1.py --mode caption
-uv run tests/local/test_inference_img_1.py --mode long-description
-uv run tests/local/test_inference_ocr_1.py --image assets/test_img_2.png
+uv run tests/local/test_inference_img_1.py --mode caption # BLIP2
+uv run tests/local/test_inference_img_1.py --mode long-description # BLIP2
+uv run tests/local/test_inference_ocr_1.py --image assets/test_img_2.png # GLM-OCR TrOCR
 ```
 
 
