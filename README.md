@@ -83,9 +83,8 @@ uv run tests/local/test_inference_img_1.py --mode caption # BLIP2 (img short-des
 uv run tests/local/test_inference_img_1.py --mode long-description # BLIP2 (img long-description)
 uv run tests/local/test_inference_ocr_1.py --image assets/test_img_2.png # GLM-OCR TrOCR (img text-detection)
 
-# test_inference_txt_1.py - summarise assets/test_txt_1.txt, 3 sentences
-# test_inference_txt_2.py - extract topic, single sentence
-# 
+uv run tests/local/test_inference_txt_1.py --text assets/test_txt_1.txt # Ollama (txt summarise, 3 sentences)
+uv run tests/local/test_inference_txt_2.py --text assets/test_txt_1.txt # Ollama (txt topic, single sentence)
 ```
 
 
