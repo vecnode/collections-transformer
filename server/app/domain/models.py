@@ -47,6 +47,25 @@ def _log_print(*args, **kwargs):
 print = _log_print
 
 
+def _read_uploaded_csv(csv_source):
+  """Read CSV from a path, file-like object, or FastAPI UploadFile."""
+  if hasattr(csv_source, "file"):
+    stream = csv_source.file
+    try:
+      stream.seek(0)
+    except Exception:
+      pass
+    return pd.read_csv(stream, sep=",", low_memory=False, na_filter=True)
+
+  if hasattr(csv_source, "seek"):
+    try:
+      csv_source.seek(0)
+    except Exception:
+      pass
+
+  return pd.read_csv(csv_source, sep=",", low_memory=False, na_filter=True)
+
+
 # Inlined from model_parts/embedding.py
 class Embedding():
 
@@ -985,7 +1004,7 @@ class Dataset():
   
   
   def create_text_dataset(owner_id,dataset_name,data_file):
-    df = pd.read_csv(data_file, sep=",", low_memory=False, na_filter=True)
+    df = _read_uploaded_csv(data_file)
     texts = list(df['text'])
 
     if 'object_id' in df:
@@ -1046,7 +1065,7 @@ class Dataset():
     try:
 
       if image_upload_type == 'image_link':
-        df = pd.read_csv(images, sep=",", low_memory=False, na_filter=True)
+        df = _read_uploaded_csv(images)
         df['id'] = df.index.astype(str)
         image_links = df[['id', 'image']].to_dict('records')
         images, error_links = Dataset.download_image_links(image_links)
@@ -1145,10 +1164,10 @@ class Dataset():
   def create_text_and_image_dataset(owner_id,dataset_name,text,images,text_and_images,image_upload_type):
     try:
       if image_upload_type == 'image_file':
-        df = pd.read_csv(text, sep=",", low_memory=False, na_filter=True)
+        df = _read_uploaded_csv(text)
         files = images
       else: 
-        df = pd.read_csv(text_and_images, sep=",", low_memory=False, na_filter=True)
+        df = _read_uploaded_csv(text_and_images)
         #make id column out of urls 
         df['id'] = df.index.astype(str)
         image_links = df[['id', 'image']].to_dict('records')

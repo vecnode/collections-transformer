@@ -24,10 +24,7 @@ class Blip2Config:
     model_name: str = settings.blip2_model_name
     default_prompt: str = "Provide a detailed description of this image."
     timeout_seconds: float = 300.0
-    temperature: float = 0.8
-    top_p: float = 0.95
-    repetition_penalty: float = 1.3
-    min_length: int = 20
+    repetition_penalty: float = 1.1
 
 
 class Blip2TransformersBackend:
@@ -108,13 +105,16 @@ class Blip2TransformersBackend:
             image_bytes = image_data
         return Image.open(io.BytesIO(image_bytes))
 
-    def _prepare_inputs(self, image: Image.Image) -> dict[str, Any]:
+    def _prepare_inputs(self, image: Image.Image, prompt: str | None = None) -> dict[str, Any]:
         import torch
 
         if self._processor is None or self._model is None or self._device is None:
             raise RuntimeError("BLIP-2 backend not initialized")
 
-        inputs = self._processor(images=image, return_tensors="pt")
+        if prompt:
+            inputs = self._processor(images=image, text=prompt, return_tensors="pt")
+        else:
+            inputs = self._processor(images=image, return_tensors="pt")
         converted: dict[str, Any] = {}
         for key, value in inputs.items():
             if isinstance(value, torch.Tensor):
@@ -126,35 +126,57 @@ class Blip2TransformersBackend:
                 converted[key] = value
         return converted
 
-    def _generate_caption(self, image: Image.Image, max_words: int | None = None) -> str:
+    def _generate_caption(self, image: Image.Image, prompt: str | None = None, max_words: int | None = None) -> str:
         import torch
 
         if self._model is None or self._device is None:
             raise RuntimeError("BLIP-2 backend not initialized")
 
-        max_new_tokens = int(max_words * 1.5) if max_words else 300
-        num_beams = 3 if self._device == "cuda" else 5
-        inputs = self._prepare_inputs(image)
+        max_new_tokens = max(8, int(max_words * 1.3)) if max_words else 80
+        num_beams = 5 if self._device == "cpu" else 3
+        inputs = self._prepare_inputs(image, prompt)
 
         if self._device == "cuda":
             torch.cuda.empty_cache()
 
+        generate_kwargs: dict[str, Any] = {
+            "max_new_tokens": max_new_tokens,
+            "num_beams": num_beams,
+            "do_sample": False,
+            "repetition_penalty": self.config.repetition_penalty,
+            "length_penalty": 1.0,
+            "no_repeat_ngram_size": 3,
+            "early_stopping": True,
+        }
+        if max_new_tokens >= 120:
+            generate_kwargs["min_new_tokens"] = min(max_new_tokens - 2, 80)
+
         with torch.no_grad():
-            generated_ids = self._model.generate(
-                **inputs,
-                max_new_tokens=max_new_tokens,
-                num_beams=num_beams,
-                do_sample=True,
-                temperature=self.config.temperature,
-                top_p=self.config.top_p,
-                repetition_penalty=self.config.repetition_penalty,
-                min_length=self.config.min_length,
-            )
+            generated_ids = self._model.generate(**inputs, **generate_kwargs)
 
         if self._processor is None:
             raise RuntimeError("BLIP-2 processor not initialized")
 
         text = self._processor.batch_decode(generated_ids, skip_special_tokens=True)[0].strip()
+        if prompt:
+            prompt_norm = prompt.strip()
+            if text.startswith(prompt_norm):
+                text = text[len(prompt_norm):].lstrip(" :\n\t")
+
+        # If generation returns empty/echo-only text, retry once with greedy decoding.
+        if not text:
+            fallback_kwargs = {
+                "max_new_tokens": max(16, min(128, max_new_tokens + 16)),
+                "num_beams": 1,
+                "do_sample": False,
+            }
+            with torch.no_grad():
+                generated_ids = self._model.generate(**inputs, **fallback_kwargs)
+            text = self._processor.batch_decode(generated_ids, skip_special_tokens=True)[0].strip()
+            if prompt:
+                prompt_norm = prompt.strip()
+                if text.startswith(prompt_norm):
+                    text = text[len(prompt_norm):].lstrip(" :\n\t")
 
         del generated_ids, inputs
         if self._device == "cuda":
@@ -164,13 +186,13 @@ class Blip2TransformersBackend:
 
     def describe_image(self, image: str | bytes, prompt: str | None = None, max_words: int | None = None) -> str:
         """Describe one image while retaining prompt parameter for API symmetry."""
-        _ = prompt or self.config.default_prompt
+        effective_prompt = prompt
 
         self.init()
         image_obj = self._decode_image(image)
 
         try:
-            return self._generate_caption(image_obj, max_words=max_words)
+            return self._generate_caption(image_obj, prompt=effective_prompt, max_words=max_words)
         except Exception as exc:
             import torch
 
@@ -181,7 +203,7 @@ class Blip2TransformersBackend:
                 self._device = None
                 self._dtype = None
                 self.init(force_cpu=True)
-                return self._generate_caption(image_obj, max_words=max_words)
+                return self._generate_caption(image_obj, prompt=effective_prompt, max_words=max_words)
             raise
 
     def describe_images(self, images: list[str | bytes], prompt: str | None = None, max_words: int | None = None) -> list[str]:
