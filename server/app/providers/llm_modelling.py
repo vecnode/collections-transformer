@@ -5,6 +5,7 @@ import logging
 from datetime import datetime
 import re
 import threading
+from typing import Any
 from app.core.config import apply_runtime_environment
 
 
@@ -27,6 +28,56 @@ def _log_print(*args, **kwargs):
 print = _log_print
 
 
+_warmup_threads: dict[str, threading.Thread | None] = {
+  "blip2": None,
+  "trocr": None,
+}
+_provider_ready: dict[str, bool] = {
+  "blip2": False,
+  "trocr": False,
+}
+_provider_warmup_errors: dict[str, str | None] = {
+  "blip2": None,
+  "trocr": None,
+}
+_warmup_lock = threading.Lock()
+
+
+def _set_warmup_result(name: str, ready: bool, error: str | None = None) -> None:
+  with _warmup_lock:
+    _provider_ready[name] = ready
+    _provider_warmup_errors[name] = error
+
+
+def _start_warmup_thread(name: str, target) -> None:
+  with _warmup_lock:
+    existing = _warmup_threads.get(name)
+    if existing and existing.is_alive():
+      print(f"{name.upper()} warm-up already running")
+      return
+
+    thread = threading.Thread(target=target, daemon=True, name=f"warmup-{name}")
+    _warmup_threads[name] = thread
+    thread.start()
+    print(f"{name.upper()} warm-up started in background")
+
+
+def get_provider_warmup_status() -> dict[str, dict[str, Any]]:
+  """Return traceable warm-up state for background provider initialization."""
+  with _warmup_lock:
+    status: dict[str, dict[str, Any]] = {}
+    for name in ("blip2", "trocr"):
+      thread = _warmup_threads.get(name)
+      status[name] = {
+        "started": thread is not None,
+        "alive": bool(thread and thread.is_alive()),
+        "ready": _provider_ready.get(name, False),
+        "error": _provider_warmup_errors.get(name),
+        "thread_name": thread.name if thread else None,
+      }
+    return status
+
+
 
 
 def init(model):
@@ -46,19 +97,31 @@ def init(model):
     def _warmup_blip2():
       try:
         provider_blip2.init_blip2()
+        _set_warmup_result("blip2", True, None)
         print("Blip2 initialized (always used for image tasks)")
       except Exception as e:
+        _set_warmup_result("blip2", False, str(e))
         print(f"Warning: Could not initialize Blip2: {e}")
+
+    def _warmup_trocr():
+      try:
+        from . import provider_trocr as provider_trocr
+        provider_trocr.init_trocr()
+        _set_warmup_result("trocr", True, None)
+        print("TrOCR initialized (OCR for printed text)")
+      except Exception as e:
+        _set_warmup_result("trocr", False, str(e))
+        print(f"Warning: Could not initialize TrOCR: {e}")
 
     # Blip2 loading is expensive and can block API readiness for minutes.
     # Warm it up in the background; image requests still lazy-init on demand.
-    threading.Thread(target=_warmup_blip2, daemon=True).start()
-    print("Blip2 warm-up started in background")
+    _start_warmup_thread("blip2", _warmup_blip2)
+    _start_warmup_thread("trocr", _warmup_trocr)
 
     print("======================================================")
     print("================= SERVER INITIALISED =================")
     print("Model Source: " + model_source)
-    print("Providers: Ollama (text) + Blip2 (images)")
+    print("Providers: Ollama (text) + Blip2 (images) + TrOCR (ocr)")
     print("======================================================")
 
 
