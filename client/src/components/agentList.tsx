@@ -10,9 +10,6 @@ const AgentList = ({
     name:" "}], 
   onDeleteHandler
 }) => {
-
-  console.log(agents)
-
   agents.sort(function(a,b){
     if ((a!= null) && (b != null)){
       let a_date = 'created_at' in a ? new Date(a['created_at']) : (("_id" in a) ? dateFromObjectId(a._id) : "")
@@ -24,8 +21,8 @@ const AgentList = ({
   });
 
   return (
-    <div className="ws-table-wrap">
-    <table id="agents" className="ws-table">
+    <div className="ws-table-wrap ws-table-wrap--agents">
+    <table id="agents" className="ws-table ws-table--agents">
     <thead>
       <tr>
         <th>Name</th>
@@ -39,21 +36,20 @@ const AgentList = ({
         if (agent!= null){
           return (
             <tr key={"agent-" + (agent._id != undefined ? agent._id : "")}>
-              <td>
+              <td title={agent.name && agent.name.length > 0 ? agent.name : "* Untitled *"}>
                 { agent.name && agent.name.length>0 ? agent.name : "* Untitled *" }
               </td>
-              <td 
-                style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                title={agent.description || ""}
-              >
-                { agent.description || "" }
+              <td className="agent-description-cell" title={agent.description || ""}>
+                <span className="agent-description-text">
+                  { agent.description || "" }
+                </span>
               </td>
               <td>
                 { 'created_at' in agent ? (new Date(agent['created_at']).toLocaleString()) : (("_id" in agent) ? dateFromObjectId(agent._id).toLocaleString() : "") }
               </td>
-              <td>
+              <td className="agent-actions-cell">
               { 'owner' in agent && agent.owner == user_id ? (
-                <button className="ws-btn ws-btn--danger" onClick={() => onDeleteHandler(agent)}>
+                <button className="ws-btn ws-btn--danger agent-delete-btn" onClick={() => onDeleteHandler(agent)}>
                   Delete
                 </button>
               ) : (

@@ -2410,6 +2410,59 @@ code {
   border-right: none;
 }
 
+.ws-table-wrap--agents {
+  overflow-x: hidden;
+}
+
+.ws-table--agents {
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.ws-table--agents th,
+.ws-table--agents td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ws-table--agents th:nth-child(1),
+.ws-table--agents td:nth-child(1) {
+  width: 20%;
+}
+
+.ws-table--agents th:nth-child(3),
+.ws-table--agents td:nth-child(3) {
+  width: 24%;
+}
+
+.ws-table--agents th:nth-child(4),
+.ws-table--agents td:nth-child(4) {
+  width: 120px;
+}
+
+.ws-table--agents .ws-btn {
+  min-width: auto;
+  width: auto;
+}
+
+.ws-table--agents .agent-actions-cell {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.ws-table--agents .agent-delete-btn {
+  width: 100%;
+  min-width: 0;
+}
+
+.agent-description-text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .ws-badge {
   display: inline-block;
   padding: 2px 8px;
