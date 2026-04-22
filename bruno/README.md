@@ -1,4 +1,4 @@
-# Bruno Collection
+# OUTDATED
 
 This folder contains an importable Bruno collection for the live FastAPI routes exposed by this repository.
 

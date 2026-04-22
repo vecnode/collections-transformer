@@ -79,6 +79,7 @@ uv run tests/local/test_upload_csv_text.py --mode single
 uv run tests/local/test_upload_csv_text.py --mode chunked
 uv run tests/local/test_inference_img_1.py --mode caption
 uv run tests/local/test_inference_img_1.py --mode long-description
+uv run tests/local/test_inference_ocr_1.py --image assets/test_img_2.png
 ```
 
 
@@ -123,11 +124,13 @@ Important variables:
 - `NEXT_PUBLIC_SERVER_URL`
 - `OLLAMA_MODEL_OPTION`, `OLLAMA_BASE_URL`
 - `BLIP2_MODEL_NAME`
+- `TROCR_MODEL_NAME`
 
 Inference providers:
 
 - Text inference: Ollama (`OLLAMA_BASE_URL`, `OLLAMA_MODEL_OPTION`)
 - Image inference: Blip2 (`BLIP2_MODEL_NAME`, default `Salesforce/blip2-opt-2.7b`)
+- OCR inference: GLM-OCR (`TROCR_MODEL_NAME`, default `zai-org/GLM-OCR`)
 
 
 
