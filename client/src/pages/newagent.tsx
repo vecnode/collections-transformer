@@ -39,20 +39,31 @@ const NewAgent = () => {
       })
     };
 
-    const response = await fetch(
-      (process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/agent_new",
-      requestOptions
-    );
+    try {
+      const response = await fetch(
+        (process.env.NEXT_PUBLIC_SERVER_URL || "") + "/api/v1/backend/agent_new",
+        requestOptions
+      );
 
-    const data = await response.json();    
-    if (data.status === "200") {
-      alert('Agent created successfully!');
-      // Reset form
-      setAiName('');
-      setTaskDescription('');
-      setTaskType('Text Detection (T/F)');
-    } else {
-      alert('Error creating Agent: ' + (data.error || 'Unknown error'));
+      const data = await response.json();
+      if (response.ok && data.ok) {
+        alert(data.message || 'Agent created successfully!');
+        // Reset form
+        setAiName('');
+        setTaskDescription('');
+        setTaskType('Text Detection (T/F)');
+        return;
+      }
+
+      const errorMessage =
+        data?.error?.message ||
+        data?.message ||
+        'Unknown error';
+
+      alert('Error creating Agent: ' + errorMessage);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert('Error creating Agent: ' + errorMessage);
     }
   };
 
