@@ -87,7 +87,7 @@ uv run tests/local/test_inference_txt_1.py --text assets/test_txt_1.txt # gemma3
 uv run tests/local/test_inference_txt_2.py --text assets/test_txt_1.txt # gemma3:27b (txt topic, single sentence)
 ```
 
-x
+
 
 ## Server configuration
 
