@@ -1,0 +1,24 @@
+# Format: label\ttext
+# label: 1=positive, 0=negative, 2=unlabeled
+1	This is a great product and I love it.
+1	Absolutely fantastic experience, highly recommend!
+1	The results were excellent and exceeded my expectations.
+1	Very satisfied with the service provided.
+1	I would definitely use this again, very positive.
+1	Superb quality and fast delivery.
+1	The support team was very helpful and friendly.
+1	Exceeded my expectations in every way.
+1	I am extremely happy with my purchase.
+1	Five stars, will buy again!
+0	Terrible experience, I am very disappointed.
+0	I would not recommend this to anyone.
+0	The product did not work as advertised.
+0	Very poor quality and bad support.
+0	I regret buying this, not worth it.
+0	Customer service was rude and unhelpful.
+0	The item broke after one use.
+0	Not as described, very misleading.
+0	Waste of money, do not buy.
+0	Extremely dissatisfied with the results.
+2   This is a bad product.
+2   This is a great product.

@@ -85,6 +85,8 @@ uv run tests/local/test_inference_ocr_1.py --image assets/test_img_2.png # GLM-O
 
 uv run tests/local/test_inference_txt_1.py --text assets/test_txt_1.txt # gemma3:27b (txt summarise, 3 sentences)
 uv run tests/local/test_inference_txt_2.py --text assets/test_txt_1.txt # gemma3:27b (txt topic, single sentence)
+
+uv run tests/local/test_embed_classifier_1.py # sentence-transformers/all-MiniLM-L6-v2 (txt classification, embedding)
 ```
 
 
