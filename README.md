@@ -1,12 +1,6 @@
 # Collections Transformer
 
-Under heavy development.
-
-Agent-based platform for multimodal LLM analysis of datasets in the GLAM sector.
-
-Code developed in the context of the UKRI project "Transforming Collections" undertaken at UAL "Towards a National Collection (TaNC)".
-
-
+Minimal agent-based platform for multimodal LLM analysis of datasets in the GLAM sector.
 
 
 ## Reproduce
@@ -106,74 +100,17 @@ cp .env.docker.template .env
 ```
 
 
-Profile behavior:
 
-- Local profile (`.env.local.template`)
-  - Datastores on localhost (`127.0.0.1`, `localhost`)
-  - Requires MongoDB listening on `127.0.0.1:27017`
-  - `./scripts/ensure_mongodb.sh` will start `mongod` when available via systemd
-  - `./scripts/restore_local_seed_data.sh` restores the bundled seed archive into local MongoDB
-  - Redis is optional for app startup
-  - `NEXT_PUBLIC_SERVER_URL=http://localhost:8080`
-- Docker profile (`.env.docker.template`)
-  - Datastores on container DNS (`mongodb`, `redis`)
-  - `NEXT_PUBLIC_SERVER_URL=http://localhost` (browser via Caddy)
-  - `OLLAMA_BASE_URL=http://host.docker.internal:11434` by default
+Profile behavior:
+- Local: `.env.local.template` — localhost datastores, MongoDB required, Redis optional, `NEXT_PUBLIC_SERVER_URL=http://localhost:8080`
+- Docker: `.env.docker.template` — container DNS, `NEXT_PUBLIC_SERVER_URL=http://localhost`, `OLLAMA_BASE_URL=http://host.docker.internal:11434`
 
 For Docker, `OLLAMA_BASE_URL` must be reachable from containers.
 
-Important variables:
-
-- `ENVIRONMENT`, `LOG_LEVEL`
-- `API_HOST`, `API_PORT`, `API_RELOAD`, `SECRET_KEY`
-- `MONGODB_URI`, `MONGODB_DATABASE`
-- `REDIS_URL`
-- `NEXT_PUBLIC_SERVER_URL`
-- `OLLAMA_MODEL_OPTION`, `OLLAMA_BASE_URL`
-- `BLIP2_MODEL_NAME`
-- `TROCR_MODEL_NAME`
-
-Inference providers:
-
+Model configuration:
 - Text inference: Ollama (`OLLAMA_BASE_URL`, `OLLAMA_MODEL_OPTION`)
-- Image inference: Blip2 (`BLIP2_MODEL_NAME`, default `Salesforce/blip2-opt-2.7b`)
-- OCR inference: GLM-OCR (`TROCR_MODEL_NAME`, default `zai-org/GLM-OCR`)
+- Image inference: Blip2 (`BLIP2_MODEL_NAME`, default: `Salesforce/blip2-opt-2.7b`)
+- OCR inference: GLM-OCR (`TROCR_MODEL_NAME`, default: `zai-org/GLM-OCR`)
+- Text embedding/classification: Sentence Transformers (`EMBED_MODEL_NAME`, default: `sentence-transformers/all-MiniLM-L6-v2`)
 
-
-
-### Bruno API collection
-
-An importable Bruno collection for the live API is stored in [bruno/README.md](./bruno/README.md) and the surrounding `bruno/` folder.
-
-The collection mirrors the active FastAPI router groups:
-
-- `01 Health` -> `/api/v1/health`, `/api/v1/readiness`
-- `02 Transforms` -> `/api/v1/transforms*`
-- `03 User` -> `/api/v1/backend/user/*`
-- `04 Datasets` -> `/api/v1/backend/dataset*`
-- `05 Agents` -> `/api/v1/backend/agent*`
-- `06 Labelsets` -> `/api/v1/backend/labelsets`, `/api/v1/backend/update_label`
-- `07 Analysis` -> `/api/v1/backend/analysis/*`, `/api/v1/backend/item*`
-- `08 System` -> `/api/v1/backend/ollama/models`
-
-To use it:
-
-1. Open the `bruno/` folder in Bruno.
-2. Select the `Local` environment.
-3. Update the placeholder IDs in `bruno/environments/Local.bru`.
-4. Run requests against `http://localhost`, which matches the Docker + Caddy setup.
-
-Connection flow for deployment:
-
-- Browser -> `caddy` -> `client`
-- Browser -> `caddy` -> `api` (`/backend` and `/api` routes)
-- `api` <-> `mongodb`
-- `api` <-> `redis`
-- `worker` <-> `redis` and `mongodb`
-- `api` <-> Ollama (`OLLAMA_BASE_URL`, external or reachable network endpoint)
-
-Notes:
-
-- Public entrypoint is `http://localhost` (via Caddy on port 80)
-- `api` and `client` are intentionally internal-only in this deployment mode
 
